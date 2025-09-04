@@ -1,0 +1,54 @@
+[flake8]
+# Base configuration
+max-line-length = 100
+max-complexity = 10
+show-source = True
+statistics = True
+count = True
+
+# File patterns
+filename = *.py
+exclude =
+    .git,
+    .venv,
+    __pycache__,
+    .mypy_cache,
+    .pytest_cache,
+    build,
+    dist,
+    *.egg-info,
+    migrations,
+    docs
+
+# Error codes to ignore
+ignore = 
+    # E203: Whitespace before ':' (conflicts with black)
+    E203,
+    # W503: Line break before binary operator (conflicts with black)
+    W503,
+    # E501: Line too long (handled by black)
+    E501,
+    # F401: Imported but unused (handled by mypy)
+    F401
+
+# Error codes to select
+select = E,W,F,C
+
+# Docstring conventions
+docstring-convention = google
+
+# Import order configuration
+import-order-style = google
+application-import-names = hummingbot
+application-package-names = hummingbot
+
+# Per-file ignores
+per-file-ignores = 
+    # Test files can have unused imports and long lines
+    tests/*:F401,E501
+    # __init__.py files can have unused imports
+    __init__.py:F401
+    # Configuration files can have long lines
+    config/*:E501
+    # Migration files can be ignored
+    migrations/*:E501,F401

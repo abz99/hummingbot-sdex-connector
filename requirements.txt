@@ -1,0 +1,26 @@
+# Production Requirements for Stellar SDEX Connector v3.0
+
+# Core dependencies
+stellar-sdk==8.2.1
+aiohttp==3.12.15
+cryptography==45.0.7
+
+# Development and testing
+pytest==8.4.1
+pytest-asyncio==1.1.0
+pytest-cov==6.2.1
+black==25.1.0
+flake8==7.3.0
+mypy==1.17.1
+
+# Monitoring and observability  
+prometheus_client==0.22.1
+structlog==25.4.0
+
+# Security
+hvac  # HashiCorp Vault client
+pynacl==1.5.0
+
+# Configuration
+python-dotenv==1.1.1
+pyyaml

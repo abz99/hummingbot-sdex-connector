@@ -1,0 +1,25 @@
+# Production Configuration for Stellar SDEX Connector v3.0
+
+stellar:
+  network: mainnet
+  horizon_urls:
+    - https://horizon.stellar.org
+    - https://horizon.publicnode.org
+    - https://horizon.satoshipay.io
+  soroban_rpc_urls:
+    - https://mainnet.sorobanrpc.com
+    - https://soroban-mainnet.stellar.org
+  network_passphrase: "Public Global Stellar Network ; September 2015"
+  base_fee: 100
+  timeout: 30
+
+security:
+  provider: hsm_aws  # Production security provider
+  
+logging:
+  level: INFO
+  format: json
+  
+metrics:
+  prometheus_enabled: true
+  port: 8000

@@ -1,0 +1,23 @@
+# Development Configuration for Stellar SDEX Connector v3.0
+
+stellar:
+  network: testnet
+  horizon_urls:
+    - https://horizon-testnet.stellar.org
+    - https://horizon-testnet.publicnode.org
+  soroban_rpc_urls:
+    - https://soroban-testnet.stellar.org
+  network_passphrase: "Test SDF Network ; September 2015"
+  base_fee: 100
+  timeout: 30
+
+security:
+  provider: local  # local, hsm_aws, hsm_azure, mpc, hardware_wallet
+  
+logging:
+  level: DEBUG
+  format: json
+  
+metrics:
+  prometheus_enabled: true
+  port: 8000

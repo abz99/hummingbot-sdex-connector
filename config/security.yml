@@ -1,0 +1,28 @@
+# Security Configuration Template for Stellar SDEX Connector v3.0
+# DO NOT COMMIT ACTUAL CREDENTIALS TO VERSION CONTROL
+
+security_providers:
+  local:
+    # For development only
+    secret_key: "${STELLAR_SECRET_KEY}"
+    
+  hsm_aws:
+    region: "${AWS_REGION}"
+    key_id: "${AWS_KMS_KEY_ID}"
+    endpoint: "${AWS_KMS_ENDPOINT}"
+    
+  hsm_azure:
+    vault_url: "${AZURE_KEY_VAULT_URL}"
+    key_name: "${AZURE_KEY_NAME}"
+    
+  mpc:
+    threshold: 2
+    total_parties: 3
+    party_endpoints:
+      - "${MPC_PARTY_1_ENDPOINT}"
+      - "${MPC_PARTY_2_ENDPOINT}"  
+      - "${MPC_PARTY_3_ENDPOINT}"
+    
+  hardware_wallet:
+    device_type: "ledger"  # ledger, trezor, keepkey
+    derivation_path: "m/44'/148'/0'"
