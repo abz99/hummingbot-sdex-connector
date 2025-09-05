@@ -438,6 +438,47 @@ class StellarSecurityManager:
         
         return keypair, key_id
     
+    async def store_keypair(
+        self,
+        keypair: Keypair,
+        store_type: Optional[KeyStoreType] = None
+    ) -> str:
+        """Store an existing Stellar keypair with secure storage."""
+        account_id = keypair.public_key
+        
+        # Determine storage type based on security level
+        if store_type is None:
+            if self.config.security_level == SecurityLevel.DEVELOPMENT:
+                store_type = KeyStoreType.MEMORY
+            else:
+                store_type = KeyStoreType.FILE_SYSTEM
+        
+        # Create key metadata
+        key_id = f"stellar_{account_id[:8]}_{int(time.time())}"
+        metadata = KeyMetadata(
+            key_id=key_id,
+            account_id=account_id,
+            key_type="ed25519",
+            store_type=store_type,
+            created_at=time.time(),
+            security_level=self.config.security_level,
+            encrypted=True
+        )
+        
+        # Store the keypair
+        key_data = keypair.secret.encode()
+        await self._stores[store_type].store_key(key_id, key_data, metadata)
+        
+        self.logger.info(
+            f"Stored existing keypair: {account_id}",
+            category=LogCategory.SECURITY,
+            account_id=account_id,
+            key_id=key_id,
+            store_type=store_type.name
+        )
+        
+        return key_id
+    
     async def get_keypair(self, key_id: str) -> Optional[Keypair]:
         """Retrieve a keypair by key ID."""
         # Try each store type

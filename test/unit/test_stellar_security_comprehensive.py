@@ -717,8 +717,8 @@ class TestIntegrationScenarios:
         keypair2 = hd_manager.get_account_keypair(wallet_id, 1)
 
         # Store keypairs in security manager
-        _, key_id1 = await security_manager.generate_keypair(keypair1.public_key)
-        _, key_id2 = await security_manager.generate_keypair(keypair2.public_key)
+        key_id1 = await security_manager.store_keypair(keypair1)
+        key_id2 = await security_manager.store_keypair(keypair2)
 
         # Verify storage
         stored_keypair1 = await security_manager.get_keypair(key_id1)
