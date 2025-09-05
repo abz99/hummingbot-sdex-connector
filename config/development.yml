@@ -1,23 +1,150 @@
-# Development Configuration for Stellar SDEX Connector v3.0
+# Development Environment Configuration
+# Optimized for local development and testing
 
+# Import base network configuration
 stellar:
-  network: testnet
-  horizon_urls:
-    - https://horizon-testnet.stellar.org
-    - https://horizon-testnet.publicnode.org
-  soroban_rpc_urls:
-    - https://soroban-testnet.stellar.org
-  network_passphrase: "Test SDF Network ; September 2015"
-  base_fee: 100
-  timeout: 30
+  # Use testnet for development
+  default_network: "testnet"
+  
+  # Development-specific overrides
+  networks:
+    testnet:
+      # Local development options
+      horizon:
+        # Prefer local if available, fallback to public
+        primary: "http://localhost:8000"  # Local Horizon (if running)
+        fallbacks:
+          - "https://horizon-testnet.stellar.org"
+          - "https://horizon-testnet-1.stellar.org"
+        timeout: 60  # Longer timeout for debugging
+      
+      soroban:
+        primary: "http://localhost:8000/soroban/rpc"  # Local Soroban RPC
+        fallbacks:
+          - "https://soroban-testnet.stellar.org"
+        timeout: 30
+      
+      # Relaxed rate limits for development
+      rate_limits:
+        requests_per_second: 1000
+        burst_limit: 5000
+      
+      # Auto-fund test accounts
+      friendbot:
+        enabled: true
+        auto_fund_accounts: true
+        funding_amount: 10000  # 10,000 XLM for testing
+  
+  # Development-specific features
+  features:
+    enable_debug_logging: true
+    allow_unsafe_operations: true
+    skip_signature_verification: false  # Keep enabled for testing
+    enable_test_endpoints: true
+    detailed_error_messages: true
 
-security:
-  provider: local  # local, hsm_aws, hsm_azure, mpc, hardware_wallet
+hummingbot:
+  # Hummingbot development settings
+  exchange_id: "stellar"
+  trading_mode: "development"
   
+  # Development connector settings
+  connector:
+    stellar:
+      # Enable all features for development
+      enable_order_book_tracking: true
+      enable_user_stream_tracking: true
+      enable_performance_optimization: true
+      
+      # Development-friendly settings
+      order_refresh_interval: 5  # seconds
+      balance_update_interval: 10  # seconds
+      
+      # Mock data for development
+      enable_mock_data: false
+      mock_data_file: "config/mock_trading_data.json"
+
+# Logging configuration for development
 logging:
-  level: DEBUG
-  format: json
+  level: "DEBUG"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   
+  # Development-specific logging
+  loggers:
+    stellar_network_manager: "DEBUG"
+    stellar_chain_interface: "DEBUG"
+    stellar_exchange: "INFO"
+    stellar_order_manager: "DEBUG"
+    stellar_security: "WARNING"  # Avoid logging sensitive data
+    
+  # Log to file and console
+  handlers:
+    - type: "console"
+      level: "DEBUG"
+    - type: "file"
+      level: "DEBUG"
+      filename: "logs/development.log"
+      max_bytes: 10485760  # 10MB
+      backup_count: 5
+
+# Security settings for development
+security:
+  # Use test credentials only
+  use_production_keys: false
+  
+  # Local key storage
+  key_storage:
+    type: "file"
+    path: "keys/development/"
+    encryption: "aes256"
+  
+  # Development HSM simulation
+  hsm:
+    enabled: false
+    simulate: true  # Simulate HSM for development
+    
+# Database configuration
+database:
+  type: "sqlite"
+  path: "data/development.db"
+  
+# API keys for development (use test keys only)
+api_keys:
+  stellar_expert: "test_key"
+  stellarterm: "test_key"
+  
+# Performance settings for development
+performance:
+  # Disable caching for immediate feedback
+  enable_caching: false
+  
+  # Small connection pools for development
+  connection_pool_size: 5
+  max_concurrent_requests: 10
+  
+  # Quick timeouts for development
+  default_timeout: 30
+  
+# Testing configuration
+testing:
+  # Test account management
+  auto_create_accounts: true
+  test_account_count: 5
+  auto_fund_accounts: true
+  
+  # Mock external services
+  mock_external_apis: false
+  
+  # Test data
+  use_test_data: false
+  test_data_file: "test/fixtures/development_data.json"
+
+# Metrics configuration for development
 metrics:
   prometheus_enabled: true
   port: 8000
+  endpoint: "/metrics"
+  
+  # Development-specific metrics
+  detailed_metrics: true
+  include_debug_metrics: true

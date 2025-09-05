@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from decimal import Decimal
 
 
 class ExchangeBase(ABC):
-    def __init__(self, trading_pairs: List[str] = None, **kwargs):
+    def __init__(self, trading_pairs: Optional[List[str]] = None, **kwargs: Any) -> None:
         self._trading_pairs = trading_pairs or []
         self._account_balances: Dict[str, Decimal] = {}
 

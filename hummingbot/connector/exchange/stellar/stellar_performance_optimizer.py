@@ -5,13 +5,16 @@ Connection pooling, caching, and request batching.
 
 import asyncio
 import time
-from typing import Dict, List, Optional, Any, Callable, Tuple
+from typing import Dict, List, Optional, Any, Callable, Tuple, TYPE_CHECKING
 from dataclasses import dataclass
 from decimal import Decimal
 import aiohttp
 from collections import defaultdict, deque
 import hashlib
 import json
+
+if TYPE_CHECKING:
+    from .stellar_observability import StellarObservabilityFramework
 
 
 @dataclass
@@ -36,7 +39,7 @@ class RequestBatch:
 class ConnectionPool:
     """Advanced connection pool manager."""
 
-    def __init__(self, max_connections: int = 50, max_keepalive: int = 10):
+    def __init__(self, max_connections: int = 50, max_keepalive: int = 10) -> None:
         self.max_connections = max_connections
         self.max_keepalive = max_keepalive
         self._pools: Dict[str, aiohttp.ClientSession] = {}
@@ -60,7 +63,7 @@ class ConnectionPool:
 
         return self._pools[base_url]
 
-    async def close_all(self):
+    async def close_all(self) -> None:
         """Close all connection pools."""
         for session in self._pools.values():
             await session.close()
@@ -71,11 +74,11 @@ class ConnectionPool:
 class RequestCache:
     """Intelligent request caching with TTL and LRU eviction."""
 
-    def __init__(self, max_entries: int = 1000, default_ttl: int = 60):
+    def __init__(self, max_entries: int = 1000, default_ttl: int = 60) -> None:
         self.max_entries = max_entries
         self.default_ttl = default_ttl
         self._cache: Dict[str, CacheEntry] = {}
-        self._access_order: deque = deque()  # LRU tracking
+        self._access_order: deque[str] = deque()  # LRU tracking
 
     def _generate_key(self, endpoint: str, params: Dict[str, Any]) -> str:
         """Generate cache key from endpoint and parameters."""
@@ -103,7 +106,7 @@ class RequestCache:
 
         return None
 
-    def set(self, endpoint: str, params: Dict[str, Any], data: Any, ttl: Optional[int] = None):
+    def set(self, endpoint: str, params: Dict[str, Any], data: Any, ttl: Optional[int] = None) -> None:
         """Cache response data."""
         key = self._generate_key(endpoint, params)
         expires_at = time.time() + (ttl or self.default_ttl)
@@ -121,7 +124,7 @@ class RequestCache:
             self._access_order.remove(key)
         self._access_order.append(key)
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear all cached entries."""
         self._cache.clear()
         self._access_order.clear()
@@ -144,15 +147,15 @@ class RequestCache:
 class RequestBatcher:
     """Batch similar requests for efficiency."""
 
-    def __init__(self, batch_size: int = 10, batch_timeout: float = 0.1):
+    def __init__(self, batch_size: int = 10, batch_timeout: float = 0.1) -> None:
         self.batch_size = batch_size
         self.batch_timeout = batch_timeout
         self._pending_batches: Dict[str, RequestBatch] = {}
-        self._batch_tasks: Dict[str, asyncio.Task] = {}
+        self._batch_tasks: Dict[str, asyncio.Task[None]] = {}
 
     async def add_request(
         self, batch_key: str, endpoint: str, params: Dict[str, Any], callback: Callable[[Any], None]
-    ):
+    ) -> None:
         """Add request to batch."""
         if batch_key not in self._pending_batches:
             # Create new batch
@@ -179,7 +182,7 @@ class RequestBatcher:
                     self._batch_tasks[batch_key].cancel()
                 await self._execute_batch(batch_key)
 
-    async def _execute_batch_after_timeout(self, batch_key: str):
+    async def _execute_batch_after_timeout(self, batch_key: str) -> None:
         """Execute batch after timeout."""
         try:
             await asyncio.sleep(self.batch_timeout)
@@ -187,7 +190,7 @@ class RequestBatcher:
         except asyncio.CancelledError:
             pass  # Batch was executed early
 
-    async def _execute_batch(self, batch_key: str):
+    async def _execute_batch(self, batch_key: str) -> None:
         """Execute batched requests."""
         if batch_key not in self._pending_batches:
             return
@@ -216,7 +219,7 @@ class RequestBatcher:
 class StellarPerformanceOptimizer:
     """Performance optimization manager with caching, pooling, and batching."""
 
-    def __init__(self, observability: "StellarObservabilityFramework"):
+    def __init__(self, observability: "StellarObservabilityFramework") -> None:
         self.observability = observability
 
         # Performance components
@@ -225,7 +228,7 @@ class StellarPerformanceOptimizer:
         self.request_batcher = RequestBatcher(batch_size=10, batch_timeout=0.1)
 
         # Performance metrics
-        self._request_times: deque = deque(maxlen=1000)
+        self._request_times: deque[float] = deque(maxlen=1000)
         self._cache_hits = 0
         self._cache_misses = 0
         self._batched_requests = 0
@@ -234,7 +237,7 @@ class StellarPerformanceOptimizer:
         # Rate limiting
         self._request_semaphore = asyncio.Semaphore(50)  # Max concurrent requests
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize performance optimizer."""
         await self.observability.log_event(
             "performance_optimizer_initialized",
@@ -245,7 +248,7 @@ class StellarPerformanceOptimizer:
             },
         )
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup performance optimizer resources."""
         await self.connection_pool.close_all()
         self.request_cache.clear()
@@ -326,7 +329,7 @@ class StellarPerformanceOptimizer:
 
         return await future
 
-    def preload_cache(self, endpoint: str, params_list: List[Dict[str, Any]], data_list: List[Any]):
+    async def preload_cache(self, endpoint: str, params_list: List[Dict[str, Any]], data_list: List[Any]) -> None:
         """Preload cache with known data."""
         for params, data in zip(params_list, data_list):
             self.request_cache.set(endpoint, params, data)
@@ -358,7 +361,7 @@ class StellarPerformanceOptimizer:
             "active_connections": len(self.connection_pool._pools),
         }
 
-    def optimize_for_pattern(self, pattern: str, settings: Dict[str, Any]):
+    async def optimize_for_pattern(self, pattern: str, settings: Dict[str, Any]) -> None:
         """Optimize settings for specific usage patterns."""
         if pattern == "high_frequency_trading":
             # Optimize for low latency

@@ -1,0 +1,316 @@
+# Stellar Multi-Network Configuration
+# Comprehensive network settings for testnet, futurenet, and mainnet
+
+stellar:
+  # Default network for development
+  default_network: "testnet"
+  
+  # Network switching configuration
+  auto_failover: true
+  health_check_interval: 30  # seconds
+  max_retries: 3
+  timeout_seconds: 10
+  
+  networks:
+    # Stellar Testnet - Development and Testing
+    testnet:
+      name: "Stellar Testnet"
+      network_passphrase: "Test SDF Network ; September 2015"
+      
+      # Horizon API endpoints (primary + fallbacks)
+      horizon:
+        primary: "https://horizon-testnet.stellar.org"
+        fallbacks:
+          - "https://horizon-testnet-1.stellar.org"
+          - "https://horizon-testnet-2.stellar.org"
+        timeout: 30
+        retry_count: 3
+        
+      # Core node endpoints for direct connection
+      core_nodes:
+        - "stellar-core-testnet-1.stellar.org:11625"
+        - "stellar-core-testnet-2.stellar.org:11625"
+        
+      # Soroban RPC endpoints
+      soroban:
+        primary: "https://soroban-testnet.stellar.org"
+        fallbacks:
+          - "https://soroban-testnet-1.stellar.org"
+        timeout: 20
+        
+      # Archive endpoints for historical data
+      history_archives:
+        - "https://history.stellar.org/prd/core-testnet/core_testnet_001"
+        - "https://history.stellar.org/prd/core-testnet/core_testnet_002"
+        
+      # Network characteristics
+      base_fee: 100  # stroops
+      base_reserve: 5000000  # stroops (0.5 XLM)
+      max_tx_set_size: 1000
+      ledger_version: 19
+      
+      # Asset configuration
+      native_asset: "XLM"
+      fee_asset: "XLM"
+      
+      # Rate limiting
+      rate_limits:
+        requests_per_second: 100
+        burst_limit: 500
+        
+      # Friendbot for funding test accounts
+      friendbot:
+        enabled: true
+        url: "https://friendbot.stellar.org"
+        funding_amount: 10000  # XLM
+
+    # Stellar Futurenet - Latest features testing  
+    futurenet:
+      name: "Stellar Futurenet"
+      network_passphrase: "Test SDF Future Network ; October 2022"
+      
+      # Horizon API endpoints
+      horizon:
+        primary: "https://horizon-futurenet.stellar.org"
+        fallbacks:
+          - "https://horizon-futurenet-1.stellar.org"
+        timeout: 30
+        retry_count: 3
+        
+      # Core node endpoints
+      core_nodes:
+        - "stellar-core-futurenet-1.stellar.org:11625"
+        
+      # Soroban RPC endpoints
+      soroban:
+        primary: "https://rpc-futurenet.stellar.org"
+        fallbacks:
+          - "https://soroban-futurenet.stellar.org"
+        timeout: 20
+        
+      # Archive endpoints
+      history_archives:
+        - "https://history.stellar.org/prd/core-futurenet/core_futurenet_001"
+        
+      # Network characteristics  
+      base_fee: 100  # stroops
+      base_reserve: 5000000  # stroops (0.5 XLM)
+      max_tx_set_size: 1000
+      ledger_version: 20  # Latest features
+      
+      # Asset configuration
+      native_asset: "XLM"
+      fee_asset: "XLM"
+      
+      # Rate limiting
+      rate_limits:
+        requests_per_second: 50
+        burst_limit: 200
+        
+      # Friendbot for funding test accounts
+      friendbot:
+        enabled: true
+        url: "https://friendbot-futurenet.stellar.org"
+        funding_amount: 10000  # XLM
+
+    # Stellar Mainnet - Production network
+    mainnet:
+      name: "Stellar Mainnet"
+      network_passphrase: "Public Global Stellar Network ; September 2015"
+      
+      # Horizon API endpoints (multiple providers)
+      horizon:
+        primary: "https://horizon.stellar.org"
+        fallbacks:
+          - "https://horizon.publicnode.org"
+          - "https://stellar-horizon.satoshipay.io"
+          - "https://horizon-1.stellar.lobstr.co"
+          - "https://horizon-2.stellar.lobstr.co"
+        timeout: 30
+        retry_count: 5  # Higher retries for production
+        
+      # Core node endpoints
+      core_nodes:
+        - "stellar-core-live-1.stellar.org:11625"
+        - "stellar-core-live-2.stellar.org:11625"
+        - "stellar-core-live-3.stellar.org:11625"
+        
+      # Soroban RPC endpoints
+      soroban:
+        primary: "https://soroban-rpc.stellar.org"
+        fallbacks:
+          - "https://rpc-mainnet.stellar.org"
+          - "https://soroban-rpc.publicnode.org"
+        timeout: 25
+        
+      # Archive endpoints for historical data
+      history_archives:
+        - "https://history.stellar.org/prd/core-live/core_live_001"
+        - "https://history.stellar.org/prd/core-live/core_live_002"
+        - "https://history.stellar.org/prd/core-live/core_live_003"
+        
+      # Network characteristics
+      base_fee: 100  # stroops (minimum)
+      base_reserve: 5000000  # stroops (0.5 XLM)
+      max_tx_set_size: 1000
+      ledger_version: 19
+      
+      # Asset configuration
+      native_asset: "XLM"
+      fee_asset: "XLM"
+      
+      # Rate limiting (more conservative for production)
+      rate_limits:
+        requests_per_second: 200
+        burst_limit: 1000
+        
+      # No friendbot on mainnet
+      friendbot:
+        enabled: false
+        
+      # Production-specific settings
+      production:
+        enhanced_monitoring: true
+        alert_on_failures: true
+        backup_providers: true
+        
+  # Asset directory endpoints
+  asset_directories:
+    - name: "StellarTerm"
+      url: "https://stellarterm.com/directory/"
+      priority: 1
+    - name: "Stellar Expert"  
+      url: "https://stellar.expert/explorer/public/asset/"
+      priority: 2
+    - name: "LOBSTR"
+      url: "https://lobstr.co/assets/"
+      priority: 3
+      
+  # Well-known asset configurations
+  well_known_assets:
+    mainnet:
+      USDC:
+        code: "USDC"
+        issuer: "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN"
+        domain: "centre.io"
+        verified: true
+      USDT:
+        code: "USDT"
+        issuer: "GCQTGZQQ5G4PTM2GL7CDIFKUBIPEC52BROAQIAPW53XBRJVN6ZJVTG6V"
+        domain: "tether.to"
+        verified: true
+      yUSDC:
+        code: "yUSDC"
+        issuer: "GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF"
+        domain: "ultra.capital"
+        verified: true
+      BTC:
+        code: "BTC"
+        issuer: "GAUTUYY2THLF7SGITDFMXJVYH3LHDSMGEAKSBU267M2K7A3W543CKUEF"
+        domain: "apay.io"
+        verified: true
+      ETH:
+        code: "ETH"
+        issuer: "GBDEVU63Y6NTHJQQZIKVTC23NWLQVP3WJ2RI2OTSJTNYOIGICST6DUXR"
+        domain: "apay.io"
+        verified: true
+        
+    testnet:
+      USDC:
+        code: "USDC"
+        issuer: "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+        domain: "centre.io"
+        verified: false  # Test asset
+      TEST:
+        code: "TEST"
+        issuer: "GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z"
+        domain: "testnet.stellar.org"  
+        verified: false
+        
+  # DEX and trading pairs configuration
+  trading_pairs:
+    mainnet:
+      popular:
+        - "XLM-USDC"
+        - "XLM-USDT"
+        - "XLM-BTC"
+        - "XLM-ETH"
+        - "USDC-USDT"
+        - "BTC-USDC"
+        - "ETH-USDC"
+      supported:
+        - "XLM-yUSDC"
+        # Additional pairs will be discovered dynamically
+        
+    testnet:
+      popular:
+        - "XLM-USDC"
+        - "XLM-TEST"
+        
+  # AMM and Liquidity Pool settings
+  amm:
+    # Soroban AMM contracts (Phase 3)
+    contracts:
+      mainnet:
+        stellar_amm: "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQAAJTZSTGH"  # Example
+        phoenix_amm: "CDHJ4K5UEKZN4AYKBWB5CGFBFZ4HYU5QCXVHYRM7SBRZ8RQMVZJG4G9P"  # Example
+      testnet:
+        test_amm: "CDTEST123456789ABCDEF0123456789ABCDEF0123456789ABCDE"  # Example
+        
+    # Liquidity mining rewards (if supported)
+    rewards:
+      enabled: true
+      min_liquidity: 1000  # Minimum XLM equivalent
+      
+  # Performance and reliability settings
+  performance:
+    connection_pool_size: 20
+    max_concurrent_requests: 50
+    request_timeout: 30
+    retry_backoff_base: 2
+    max_retry_delay: 60
+    
+    # Caching configuration
+    cache:
+      account_info_ttl: 30  # seconds
+      order_book_ttl: 5     # seconds
+      asset_info_ttl: 300   # seconds
+      
+    # Circuit breaker settings
+    circuit_breaker:
+      failure_threshold: 5
+      recovery_timeout: 60
+      half_open_max_calls: 3
+      
+  # Monitoring and alerting
+  monitoring:
+    health_checks:
+      enabled: true
+      interval: 30  # seconds
+      endpoints:
+        - horizon_health
+        - soroban_health
+        - core_node_health
+        
+    alerts:
+      network_down_threshold: 3  # consecutive failures
+      high_latency_threshold: 5000  # milliseconds
+      error_rate_threshold: 0.1    # 10% error rate
+      
+  # Security settings
+  security:
+    # TLS/SSL configuration
+    tls:
+      verify_certificates: true
+      min_tls_version: "1.2"
+      
+    # Request signing for authenticated endpoints
+    request_signing:
+      enabled: true
+      algorithm: "ed25519"
+      
+    # Rate limiting protection
+    protection:
+      enable_jitter: true
+      respect_rate_limits: true
+      backoff_on_429: true

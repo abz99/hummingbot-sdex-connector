@@ -5,10 +5,14 @@ Production-ready implementation with connection pooling and failover.
 
 import asyncio
 from decimal import Decimal
-from typing import Dict, List, Optional, Union, Any
+from typing import Dict, List, Optional, Union, Any, TYPE_CHECKING
 from dataclasses import dataclass
 import aiohttp
 from stellar_sdk import ServerAsync, Keypair, Account, TransactionBuilder, Network, Asset
+
+if TYPE_CHECKING:
+    from .stellar_security import EnterpriseSecurityFramework
+    from .stellar_observability import StellarObservabilityFramework
 
 
 @dataclass
@@ -38,7 +42,7 @@ class ModernStellarChainInterface:
         config: "StellarNetworkConfig",
         security_framework: "EnterpriseSecurityFramework",
         observability: "StellarObservabilityFramework",
-    ):
+    ) -> None:
         self.config = config
         self.security_framework = security_framework
         self.observability = observability
@@ -64,7 +68,7 @@ class ModernStellarChainInterface:
         self._sequence_locks: Dict[str, asyncio.Lock] = {}
         self._reserve_cache: Dict[str, Decimal] = {}
 
-    async def start(self):
+    async def start(self) -> None:
         """Initialize connection pool and Stellar SDK clients."""
         try:
             # Initialize connection pool
@@ -111,7 +115,7 @@ class ModernStellarChainInterface:
             await self.observability.log_error("chain_interface_start_failed", e)
             raise
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Gracefully shutdown connection pool and cleanup resources."""
         if self.session_pool and not self.session_pool.closed:
             await self.session_pool.close()
@@ -238,7 +242,7 @@ class ModernStellarChainInterface:
             # Return conservative estimate
             return Decimal("5.0")
 
-    async def _switch_to_next_horizon(self):
+    async def _switch_to_next_horizon(self) -> None:
         """Switch to next healthy Horizon server."""
         if not self.horizon_servers:
             return
@@ -254,7 +258,7 @@ class ModernStellarChainInterface:
             },
         )
 
-    async def _monitor_server_health(self):
+    async def _monitor_server_health(self) -> None:
         """Continuously monitor server health and update status."""
         while True:
             try:

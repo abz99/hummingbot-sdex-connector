@@ -137,14 +137,42 @@ docker-run: ## Run Docker container
 docker-test: ## Run tests in Docker
 	docker run --rm stellar-hummingbot-connector-v3:latest pytest
 
-# Stellar network setup
-stellar-setup: ## Setup Stellar testnet accounts
-	@echo "Setting up Stellar testnet accounts..."
-	python scripts/setup_stellar_accounts.py
+# Stellar network setup and management
+stellar-validate: ## Validate all Stellar network configurations
+	@echo "Validating Stellar networks..."
+	python scripts/stellar_network_setup.py --validate
 
-stellar-fund: ## Fund Stellar testnet accounts
-	@echo "Funding Stellar testnet accounts..."
-	python scripts/fund_accounts.py
+stellar-validate-testnet: ## Validate testnet configuration
+	@echo "Validating Stellar testnet..."
+	python scripts/stellar_network_setup.py --validate --network testnet
+
+stellar-validate-futurenet: ## Validate futurenet configuration  
+	@echo "Validating Stellar futurenet..."
+	python scripts/stellar_network_setup.py --validate --network futurenet
+
+stellar-validate-mainnet: ## Validate mainnet configuration
+	@echo "Validating Stellar mainnet..."
+	python scripts/stellar_network_setup.py --validate --network mainnet
+
+stellar-setup: ## Create test accounts for development
+	@echo "Creating Stellar test accounts..."
+	python scripts/stellar_network_setup.py --create-accounts --account-count 5
+
+stellar-setup-testnet: ## Create testnet accounts
+	@echo "Creating Stellar testnet accounts..."
+	python scripts/stellar_network_setup.py --create-accounts --network testnet --account-count 5
+
+stellar-setup-futurenet: ## Create futurenet accounts
+	@echo "Creating Stellar futurenet accounts..."
+	python scripts/stellar_network_setup.py --create-accounts --network futurenet --account-count 3
+
+stellar-test-trading: ## Test trading functionality
+	@echo "Testing Stellar trading functionality..."
+	python scripts/stellar_network_setup.py --test-trading --network testnet
+
+stellar-full-setup: ## Complete Stellar setup (validate + create accounts + test)
+	@echo "Running complete Stellar setup..."
+	python scripts/stellar_network_setup.py --validate --create-accounts --test-trading
 
 # Performance profiling
 profile: ## Profile application performance

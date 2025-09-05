@@ -1,0 +1,265 @@
+# Environment-specific Stellar network configurations
+# Override settings for different deployment environments
+
+environments:
+  # Local development environment
+  development:
+    stellar:
+      default_network: "testnet"
+      networks:
+        testnet:
+          # Use local Stellar Core for development if available
+          horizon:
+            primary: "http://localhost:8000"  # Local Horizon instance
+            fallbacks:
+              - "https://horizon-testnet.stellar.org"
+          
+          # Local Soroban RPC for contract development
+          soroban:
+            primary: "http://localhost:8000/soroban/rpc"
+            fallbacks:
+              - "https://soroban-testnet.stellar.org"
+          
+          # Relaxed rate limits for development
+          rate_limits:
+            requests_per_second: 1000
+            burst_limit: 5000
+          
+          # Enhanced logging for debugging
+          logging:
+            level: "DEBUG"
+            include_request_details: true
+
+  # Testing environment (CI/CD)
+  testing:
+    stellar:
+      default_network: "testnet"
+      networks:
+        testnet:
+          # Use reliable public endpoints for testing
+          horizon:
+            primary: "https://horizon-testnet.stellar.org"
+            fallbacks:
+              - "https://horizon-testnet-1.stellar.org"
+          
+          # Moderate rate limits for testing
+          rate_limits:
+            requests_per_second: 100
+            burst_limit: 500
+          
+          # Test-specific settings
+          friendbot:
+            enabled: true
+            auto_fund_accounts: true
+            funding_amount: 10000
+            
+          # Circuit breaker settings for testing
+          circuit_breaker:
+            failure_threshold: 3
+            recovery_timeout: 30
+
+  # Staging environment (pre-production)
+  staging:
+    stellar:
+      default_network: "futurenet"  # Test latest features
+      networks:
+        futurenet:
+          # Production-like configuration with futurenet
+          horizon:
+            primary: "https://horizon-futurenet.stellar.org"
+            fallbacks:
+              - "https://horizon-futurenet-1.stellar.org"
+          
+          soroban:
+            primary: "https://rpc-futurenet.stellar.org"
+          
+          # Production-like rate limits
+          rate_limits:
+            requests_per_second: 200
+            burst_limit: 1000
+          
+          # Enhanced monitoring for staging
+          monitoring:
+            health_checks:
+              enabled: true
+              interval: 15  # More frequent checks
+            
+            alerts:
+              enabled: true
+              network_down_threshold: 2
+              high_latency_threshold: 3000
+
+  # Production environment
+  production:
+    stellar:
+      default_network: "mainnet"
+      networks:
+        mainnet:
+          # Multiple high-availability providers
+          horizon:
+            primary: "https://horizon.stellar.org"
+            fallbacks:
+              - "https://horizon.publicnode.org"
+              - "https://stellar-horizon.satoshipay.io"
+              - "https://horizon-1.stellar.lobstr.co"
+              - "https://horizon-2.stellar.lobstr.co"
+            timeout: 25  # Shorter timeout for production
+            retry_count: 5
+          
+          soroban:
+            primary: "https://soroban-rpc.stellar.org"
+            fallbacks:
+              - "https://rpc-mainnet.stellar.org"
+              - "https://soroban-rpc.publicnode.org"
+            timeout: 20
+          
+          # Conservative production rate limits
+          rate_limits:
+            requests_per_second: 150
+            burst_limit: 750
+          
+          # Production monitoring and alerting
+          monitoring:
+            health_checks:
+              enabled: true
+              interval: 10  # Frequent health checks
+            
+            alerts:
+              enabled: true
+              network_down_threshold: 1  # Immediate alerts
+              high_latency_threshold: 2000
+              error_rate_threshold: 0.05  # 5% error rate
+          
+          # Production security settings
+          security:
+            tls:
+              verify_certificates: true
+              min_tls_version: "1.3"  # Stricter TLS requirements
+            
+            request_signing:
+              enabled: true
+              algorithm: "ed25519"
+            
+            # Enhanced protection
+            protection:
+              enable_jitter: true
+              respect_rate_limits: true
+              backoff_on_429: true
+              max_backoff: 300  # 5 minutes max backoff
+          
+          # Production performance tuning
+          performance:
+            connection_pool_size: 50
+            max_concurrent_requests: 100
+            request_timeout: 20
+            
+            # Aggressive caching for production
+            cache:
+              account_info_ttl: 60
+              order_book_ttl: 2
+              asset_info_ttl: 600
+            
+            # Production circuit breaker
+            circuit_breaker:
+              failure_threshold: 3
+              recovery_timeout: 120
+              half_open_max_calls: 5
+
+# Environment variable mappings
+env_vars:
+  # Allow override via environment variables
+  STELLAR_NETWORK: "stellar.default_network"
+  STELLAR_HORIZON_URL: "stellar.networks.{network}.horizon.primary"
+  STELLAR_SOROBAN_URL: "stellar.networks.{network}.soroban.primary"
+  STELLAR_RATE_LIMIT: "stellar.networks.{network}.rate_limits.requests_per_second"
+  
+  # Security environment variables
+  STELLAR_SIGNING_KEY: "stellar.security.signing_key"
+  STELLAR_ENCRYPTION_KEY: "stellar.security.encryption_key"
+  
+  # Monitoring environment variables
+  ENABLE_HEALTH_CHECKS: "stellar.monitoring.health_checks.enabled"
+  HEALTH_CHECK_INTERVAL: "stellar.monitoring.health_checks.interval"
+
+# Network-specific feature flags
+feature_flags:
+  development:
+    - enable_debug_logging
+    - allow_unsafe_operations
+    - skip_signature_verification
+    - enable_test_endpoints
+    
+  testing:
+    - enable_mock_responses
+    - accelerated_timeouts
+    - detailed_error_messages
+    
+  staging:
+    - enable_performance_profiling
+    - enhanced_monitoring
+    - feature_preview_access
+    
+  production:
+    - enable_comprehensive_logging
+    - strict_validation
+    - enhanced_security
+    - real_time_monitoring
+
+# Asset configurations per environment
+asset_configs:
+  development:
+    # Allow any assets for development
+    allow_unknown_assets: true
+    require_asset_verification: false
+    
+  testing:
+    # Limited set of test assets
+    allowed_assets:
+      - "XLM"
+      - "USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+      - "TEST:GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z"
+    
+  staging:
+    # Curated asset list for staging
+    require_asset_verification: true
+    verify_asset_domains: true
+    
+  production:
+    # Strict asset controls for production
+    require_asset_verification: true
+    verify_asset_domains: true
+    check_asset_reputation: true
+    
+    # Only verified, well-known assets
+    allowed_asset_categories:
+      - "stablecoin"
+      - "major_cryptocurrency"
+      - "verified_token"
+
+# Deployment-specific optimizations
+optimizations:
+  development:
+    # Development optimizations
+    cache_disabled: true
+    connection_pooling: false
+    concurrent_requests: 10
+    
+  testing:
+    # Testing optimizations
+    fast_failover: true
+    reduced_timeouts: true
+    parallel_execution: true
+    
+  staging:
+    # Staging optimizations
+    aggressive_caching: true
+    connection_pooling: true
+    load_balancing: true
+    
+  production:
+    # Production optimizations
+    connection_pooling: true
+    request_batching: true
+    intelligent_routing: true
+    predictive_caching: true
+    cdn_integration: true

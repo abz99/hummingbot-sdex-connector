@@ -5,10 +5,14 @@ Real-time user data tracking and WebSocket management.
 
 import asyncio
 import aiohttp
-from typing import Dict, List, Optional, Callable, Any, Set
+from typing import Dict, List, Optional, Callable, Any, Set, TYPE_CHECKING
 from enum import Enum
 from decimal import Decimal
 import time
+
+if TYPE_CHECKING:
+    from .stellar_chain_interface import ModernStellarChainInterface
+    from .stellar_observability import StellarObservabilityFramework
 
 
 class StreamEventType(Enum):
@@ -32,8 +36,8 @@ class StellarUserStreamData:
         event_type: StreamEventType,
         account_id: str,
         data: Dict[str, Any],
-        timestamp: float = None,
-    ):
+        timestamp: Optional[float] = None,
+    ) -> None:
         self.event_type = event_type
         self.account_id = account_id
         self.data = data
@@ -47,15 +51,15 @@ class StellarUserStreamTracker:
         self,
         chain_interface: "ModernStellarChainInterface",
         observability: "StellarObservabilityFramework",
-    ):
+    ) -> None:
         self.chain_interface = chain_interface
         self.observability = observability
 
         # Stream management
         self._tracked_accounts: Set[str] = set()
         self._stream_sessions: Dict[str, aiohttp.ClientSession] = {}
-        self._stream_tasks: Dict[str, asyncio.Task] = {}
-        self._event_handlers: List[Callable[[StellarUserStreamData], None]] = []
+        self._stream_tasks: Dict[str, asyncio.Task[None]] = {}
+        self._event_handlers: List[Callable[[StellarUserStreamData], Any]] = []
 
         # Connection state
         self._connected: bool = False
@@ -64,10 +68,10 @@ class StellarUserStreamTracker:
         self._reconnect_delay = 5
 
         # Event queues
-        self._event_queue: asyncio.Queue = asyncio.Queue()
-        self._processing_task: Optional[asyncio.Task] = None
+        self._event_queue: asyncio.Queue[StellarUserStreamData] = asyncio.Queue()
+        self._processing_task: Optional[asyncio.Task[None]] = None
 
-    async def start(self):
+    async def start(self) -> None:
         """Start user stream tracker."""
         try:
             self._processing_task = asyncio.create_task(self._process_events())
@@ -81,7 +85,7 @@ class StellarUserStreamTracker:
             await self.observability.log_error("user_stream_start_failed", e)
             raise
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop user stream tracker and cleanup."""
         self._connected = False
 
@@ -110,7 +114,7 @@ class StellarUserStreamTracker:
 
         await self.observability.log_event("user_stream_tracker_stopped")
 
-    async def add_account(self, account_id: str):
+    async def add_account(self, account_id: str) -> None:
         """Add account to stream tracking."""
         if account_id in self._tracked_accounts:
             return
@@ -126,7 +130,7 @@ class StellarUserStreamTracker:
             {"account_id": account_id, "total_tracked": len(self._tracked_accounts)},
         )
 
-    async def remove_account(self, account_id: str):
+    async def remove_account(self, account_id: str) -> None:
         """Remove account from stream tracking."""
         if account_id not in self._tracked_accounts:
             return
@@ -147,16 +151,16 @@ class StellarUserStreamTracker:
             {"account_id": account_id, "total_tracked": len(self._tracked_accounts)},
         )
 
-    def add_event_handler(self, handler: Callable[[StellarUserStreamData], None]):
+    def add_event_handler(self, handler: Callable[[StellarUserStreamData], Any]) -> None:
         """Add event handler for stream data."""
         self._event_handlers.append(handler)
 
-    def remove_event_handler(self, handler: Callable[[StellarUserStreamData], None]):
+    def remove_event_handler(self, handler: Callable[[StellarUserStreamData], Any]) -> None:
         """Remove event handler."""
         if handler in self._event_handlers:
             self._event_handlers.remove(handler)
 
-    async def _start_account_stream(self, account_id: str):
+    async def _start_account_stream(self, account_id: str) -> None:
         """Start streaming for a specific account."""
         if account_id in self._stream_tasks:
             return
@@ -169,7 +173,7 @@ class StellarUserStreamTracker:
         task = asyncio.create_task(self._stream_account_events(account_id, session))
         self._stream_tasks[account_id] = task
 
-    async def _stream_account_events(self, account_id: str, session: aiohttp.ClientSession):
+    async def _stream_account_events(self, account_id: str, session: aiohttp.ClientSession) -> None:
         """Stream events for a specific account."""
         reconnect_attempts = 0
 
@@ -234,7 +238,7 @@ class StellarUserStreamTracker:
             )
         )
 
-    async def _handle_stream_data(self, account_id: str, data_str: str):
+    async def _handle_stream_data(self, account_id: str, data_str: str) -> None:
         """Handle incoming stream data."""
         try:
             # In real implementation, this would parse actual Horizon SSE data
@@ -250,7 +254,7 @@ class StellarUserStreamTracker:
                 "stream_data_handle_error", e, {"account_id": account_id}
             )
 
-    async def _process_events(self):
+    async def _process_events(self) -> None:
         """Process events from the queue."""
         while self._connected:
             try:
