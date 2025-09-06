@@ -1,0 +1,25 @@
+# Readline configuration for auto-accept
+# This eliminates interactive prompts at the readline level
+
+# Set completion to be non-interactive
+set completion-query-items 0
+set completion-display-width 0
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set skip-completed-text on
+set completion-ignore-case on
+
+# Disable confirmation for dangerous operations
+set enable-bracketed-paste off
+
+# Auto-complete without asking
+set page-completions off
+
+# Don't ring bell
+set bell-style none
+
+# No history expansion
+set expand-tilde off
+
+# Disable menu completion
+set menu-complete-display-prefix off

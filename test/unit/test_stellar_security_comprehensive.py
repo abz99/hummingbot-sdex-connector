@@ -433,7 +433,7 @@ class TestKeyDerivation:
         assert parsed_path.address_index == 10
 
         # Create child path
-        child_path = path.child(3)
+        child_path = path.derive_child(3)
         assert child_path.address_index == 3
 
     def test_master_seed_generation(self):
@@ -443,7 +443,7 @@ class TestKeyDerivation:
         # Generate master seed
         seed = derivation.generate_master_seed(256)
         assert isinstance(seed, MasterSeed)
-        assert len(seed.seed) == 32  # 256 bits = 32 bytes
+        assert len(seed.seed_bytes) == 32  # 256 bits = 32 bytes
         assert seed.mnemonic is None
         assert seed.passphrase is None
 
@@ -455,13 +455,13 @@ class TestKeyDerivation:
         seed = derivation.seed_from_mnemonic(mnemonic, "test_passphrase")
 
         assert isinstance(seed, MasterSeed)
-        assert len(seed.seed) == 32
+        assert len(seed.seed_bytes) == 32
         assert seed.mnemonic == mnemonic
         assert seed.passphrase == "test_passphrase"
 
         # Same mnemonic should produce same seed
         seed2 = derivation.seed_from_mnemonic(mnemonic, "test_passphrase")
-        assert seed.seed == seed2.seed
+        assert seed.seed_bytes == seed2.seed_bytes
 
     def test_master_key_derivation(self):
         """Test master extended key derivation."""
@@ -563,7 +563,7 @@ class TestHierarchicalKeyManager:
         seed = manager.create_wallet(wallet_id, entropy_bits=256)
 
         assert isinstance(seed, MasterSeed)
-        assert len(seed.seed) == 32
+        assert len(seed.seed_bytes) == 32
         assert wallet_id in manager._master_seeds
 
         # Should not allow duplicate wallet IDs

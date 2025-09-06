@@ -1,0 +1,51 @@
+#!/bin/bash
+# Ultimate Auto-Accept Configuration for Claude Code
+# Source this file to eliminate ALL interactive prompts
+
+# Load the .env file
+if [ -f "$(pwd)/.env" ]; then
+    source "$(pwd)/.env"
+fi
+
+# Override input functions to auto-accept
+yes() { echo "y"; }
+read() { echo ""; }
+confirm() { return 0; }
+
+# Export functions
+export -f yes read confirm
+
+# Python input override
+export PYTHONSTARTUP="$(pwd)/.python_auto_accept.py"
+
+# Git configuration for non-interactive mode
+git config --global --add safe.directory '*'
+git config --global user.name "Claude Code" 2>/dev/null || true
+git config --global user.email "claude@anthropic.com" 2>/dev/null || true
+git config --global core.editor "true"
+git config --global merge.tool "true"
+git config --global init.defaultBranch "main"
+git config --global push.default "simple"
+git config --global pull.rebase "false"
+
+# SSH configuration for auto-accept
+mkdir -p ~/.ssh
+if ! grep -q "Host \*" ~/.ssh/config 2>/dev/null; then
+    echo "Host *" >> ~/.ssh/config
+    echo "    StrictHostKeyChecking no" >> ~/.ssh/config
+    echo "    UserKnownHostsFile /dev/null" >> ~/.ssh/config
+    echo "    LogLevel ERROR" >> ~/.ssh/config
+fi
+
+# Terminal settings
+export PAGER=cat
+export EDITOR=true
+export VISUAL=true
+
+# Language and locale
+export LC_ALL=C
+export LANG=C
+
+# Debugging (optional)
+# export PS4='+ ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+

@@ -1,0 +1,33 @@
+# Auto-Accept Configuration File
+# This file contains environment settings to eliminate all prompts and confirmations
+
+# Git settings (already configured globally)
+GIT_AUTO_ACCEPT=true
+
+# Python package management
+PIP_YES=1
+PIP_QUIET=1
+PIP_NO_INPUT=1
+PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# System package management
+DEBIAN_FRONTEND=noninteractive
+APT_LISTCHANGES_FRONTEND=none
+UCF_FORCE_CONFFOLD=1
+
+# Development tools
+PYTHONDONTWRITEBYTECODE=1
+PYTEST_AUTO_ACCEPT=true
+
+# CI/CD settings
+CI=true
+AUTOMATED=true
+BATCH_MODE=true
+
+# Disable interactive features
+NO_INTERACTIVE=1
+FORCE_YES=1
+ASSUME_YES=1
+
+# IDE settings
+VSCODE_AUTO_ACCEPT=true

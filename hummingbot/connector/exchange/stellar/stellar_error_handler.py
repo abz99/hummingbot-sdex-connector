@@ -4,7 +4,10 @@ Advanced error classification and recovery.
 """
 
 import asyncio
-from typing import Dict, Optional, Any, Union
+from typing import Dict, Optional, Any, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .stellar_observability import StellarObservabilityFramework
 from enum import Enum
 from stellar_sdk import exceptions as stellar_exceptions
 
@@ -52,7 +55,7 @@ class StellarErrorClassification:
 class ModernStellarErrorHandler:
     """Advanced error handling and classification."""
 
-    def __init__(self, observability: "StellarObservabilityFramework"):
+    def __init__(self, observability: Optional["StellarObservabilityFramework"] = None):
         self.observability = observability
         self._error_patterns = self._initialize_error_patterns()
         self._error_counts: Dict[str, int] = {}
@@ -104,8 +107,9 @@ class ModernStellarErrorHandler:
         # Check for known Stellar error patterns
         for pattern, classification in self._error_patterns.items():
             if pattern in error_str:
-                await self.observability.log_event(
-                    "error_classified",
+                if self.observability:
+                    await self.observability.log_event(
+                        "error_classified",
                     {
                         "pattern": pattern,
                         "category": classification.category.value,
@@ -147,8 +151,9 @@ class ModernStellarErrorHandler:
         classification = await self.classify_error(error)
 
         # Log error with classification
-        await self.observability.log_error(
-            "stellar_error_handled",
+        if self.observability:
+            await self.observability.log_error(
+                "stellar_error_handled",
             error,
             {
                 "category": classification.category.value,
@@ -165,13 +170,14 @@ class ModernStellarErrorHandler:
 
         return classification
 
-    async def handle_startup_error(self, error: Exception):
+    async def handle_startup_error(self, error: Exception) -> None:
         """Handle startup errors."""
         classification = await self.handle_error(error, {"phase": "startup"})
 
         if classification.severity == ErrorSeverity.CRITICAL:
-            await self.observability.log_event(
-                "startup_failure_critical",
+            if self.observability:
+                await self.observability.log_event(
+                    "startup_failure_critical",
                 {"error_type": type(error).__name__, "message": str(error)},
             )
             raise error
@@ -193,9 +199,9 @@ class ModernStellarErrorHandler:
         classification = await self.classify_error(error)
 
         if classification.retry_after:
-            return classification.retry_after * (2 ** (attempt - 1))  # Exponential backoff
+            return int(classification.retry_after * (2 ** (attempt - 1)))  # Exponential backoff
 
-        return min(2**attempt, 30)  # Default exponential backoff, max 30s
+        return int(min(2**attempt, 30))  # Default exponential backoff, max 30s
 
     def get_error_statistics(self) -> Dict[str, int]:
         """Get error statistics for monitoring."""

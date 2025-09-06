@@ -106,7 +106,9 @@ class RequestCache:
 
         return None
 
-    def set(self, endpoint: str, params: Dict[str, Any], data: Any, ttl: Optional[int] = None) -> None:
+    def set(
+        self, endpoint: str, params: Dict[str, Any], data: Any, ttl: Optional[int] = None
+    ) -> None:
         """Cache response data."""
         key = self._generate_key(endpoint, params)
         expires_at = time.time() + (ttl or self.default_ttl)
@@ -329,7 +331,9 @@ class StellarPerformanceOptimizer:
 
         return await future
 
-    async def preload_cache(self, endpoint: str, params_list: List[Dict[str, Any]], data_list: List[Any]) -> None:
+    async def preload_cache(
+        self, endpoint: str, params_list: List[Dict[str, Any]], data_list: List[Any]
+    ) -> None:
         """Preload cache with known data."""
         for params, data in zip(params_list, data_list):
             self.request_cache.set(endpoint, params, data)

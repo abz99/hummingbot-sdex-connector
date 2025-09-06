@@ -9,10 +9,28 @@ from typing import Dict, List, Optional, Union, Any, TYPE_CHECKING
 from dataclasses import dataclass
 import aiohttp
 from stellar_sdk import ServerAsync, Keypair, Account, TransactionBuilder, Network, Asset
+from stellar_sdk.client.aiohttp_client import AiohttpClient
 
 if TYPE_CHECKING:
     from .stellar_security import EnterpriseSecurityFramework
     from .stellar_observability import StellarObservabilityFramework
+
+# Define StellarNetworkConfig for type checking
+@dataclass
+class StellarNetworkConfig:
+    """Network configuration for Stellar."""
+    horizon_url: str
+    network_passphrase: str
+    fallback_urls: List[str] = None
+    
+    def __post_init__(self):
+        if self.fallback_urls is None:
+            self.fallback_urls = []
+    
+    @property
+    def horizon_urls(self) -> List[str]:
+        """Get all horizon URLs (primary + fallbacks)."""
+        return [self.horizon_url] + self.fallback_urls
 
 
 @dataclass
@@ -39,9 +57,9 @@ class ModernStellarChainInterface:
 
     def __init__(
         self,
-        config: "StellarNetworkConfig",
-        security_framework: "EnterpriseSecurityFramework",
-        observability: "StellarObservabilityFramework",
+        config: StellarNetworkConfig,
+        security_framework: Optional["EnterpriseSecurityFramework"] = None,
+        observability: Optional["StellarObservabilityFramework"] = None,
     ) -> None:
         self.config = config
         self.security_framework = security_framework
@@ -83,7 +101,8 @@ class ModernStellarChainInterface:
 
             # Initialize Horizon servers with failover
             for horizon_url in self.config.horizon_urls:
-                server = ServerAsync(horizon_url=horizon_url, client=self.session_pool)
+                aiohttp_client = AiohttpClient(session=self.session_pool)
+                server = ServerAsync(horizon_url=horizon_url, client=aiohttp_client)
                 self.horizon_servers.append(server)
                 self._horizon_health_status[horizon_url] = True
 
@@ -141,7 +160,11 @@ class ModernStellarChainInterface:
                     if not self.current_horizon:
                         await self._switch_to_next_horizon()
 
-                    account = await self.current_horizon.accounts().account_id(account_id).call()
+                    if self.current_horizon is None:
+                        return None
+                        
+                    account_call_builder = self.current_horizon.accounts().account_id(account_id)
+                    account = await account_call_builder.call()
 
                     # Update sequence number cache
                     sequence = int(account.sequence)
@@ -220,24 +243,25 @@ class ModernStellarChainInterface:
 
             # Count account entries
             subentry_count = (
-                len(account.signers)
+                len(getattr(account, 'signers', []))
                 - 1  # Signers (excluding master key)
-                + len(account.balances)
+                + len(getattr(account, 'balances', []))
                 - 1  # Trustlines (excluding native)
-                + len(account.data)  # Data entries
+                + len(getattr(account, 'data', {}))  # Data entries
                 + len(getattr(account, "offers", []))  # Open offers
             )
 
             minimum_balance = account_reserve + (base_reserve * subentry_count)
 
             # Cache result
-            self._reserve_cache[account.account_id] = minimum_balance
+            account_id = getattr(account, 'account_id', getattr(account, 'id', ''))
+            self._reserve_cache[account_id] = minimum_balance
 
             return minimum_balance
 
         except Exception as e:
             await self.observability.log_error(
-                "reserve_calculation_failed", e, {"account_id": account.account_id}
+                "reserve_calculation_failed", e, {"account_id": getattr(account, 'account_id', getattr(account, 'id', 'unknown'))}
             )
             # Return conservative estimate
             return Decimal("5.0")
