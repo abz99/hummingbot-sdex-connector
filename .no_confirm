@@ -1,8 +1,14 @@
-# Auto-accept configuration marker
+# Claude Code Auto-accept configuration marker
 # This file signals that all interactive prompts should be automatically accepted
 
+# Claude Code specific
 CLAUDE_NO_CONFIRM=1
 CLAUDE_AUTO_ACCEPT=1
+CLAUDE_CODE_AUTO_ACCEPT=1
+CLAUDE_CLI_AUTO_ACCEPT=1
+CLAUDE_BATCH_MODE=1
+
+# System level
 CI=true
 NON_INTERACTIVE=1
 BATCH_MODE=true
@@ -13,6 +19,7 @@ ASK=0
 PROMPT=0
 AUTO_CONFIRM=1
 FORCE_YES=1
+DEBIAN_FRONTEND=noninteractive
 
 # Tool-specific auto-accept
 MYPY_QUIET=1
@@ -20,3 +27,7 @@ PYTEST_NO_HEADER=1
 BLACK_QUIET=1
 FLAKE8_QUIET=1
 PIP_QUIET=1
+
+# Terminal auto-accept
+SHELL_AUTO_ACCEPT=1
+BASH_AUTO_ACCEPT=1

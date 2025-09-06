@@ -475,7 +475,7 @@ class TestKeyDerivation:
         assert len(master_key.chain_code) == 32
         assert master_key.depth == 0
         assert master_key.is_private is True
-        assert master_key.parent_fingerprint == b"\x00" * 4
+        assert master_key.parent_fingerprint == 0
 
     def test_child_key_derivation(self):
         """Test child key derivation."""

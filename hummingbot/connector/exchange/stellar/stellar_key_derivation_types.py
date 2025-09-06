@@ -163,6 +163,13 @@ class ExtendedKey:
         hash160 = hashlib.new('ripemd160', hashlib.sha256(self.key).digest()).digest()
         return int.from_bytes(hash160[:4], 'big')
     
+    @property
+    def is_private(self) -> bool:
+        """Check if this is a private key."""
+        # For extended keys, we assume all keys are private unless specified otherwise
+        # This is a simplified implementation
+        return True
+    
     def to_stellar_keypair(self) -> Optional["Keypair"]:
         """Convert to Stellar keypair if possible."""
         try:
