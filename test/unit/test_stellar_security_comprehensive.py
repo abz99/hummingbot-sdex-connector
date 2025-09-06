@@ -498,9 +498,11 @@ class TestKeyDerivation:
         derivation = SecureKeyDerivation(SecurityLevel.DEVELOPMENT)
 
         seed = derivation.generate_master_seed(256)
+        master_key = derivation.derive_master_key(seed)
         path = DerivationPath(account=0)
+        derived_key = derivation.derive_child_key(master_key, path)
 
-        keypair = derivation.derive_stellar_keypair(seed, path)
+        keypair = derivation.derive_stellar_keypair(derived_key)
 
         assert isinstance(keypair, Keypair)
         assert len(keypair.public_key) == 56  # Stellar public key length
