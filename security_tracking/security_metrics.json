@@ -1,0 +1,21 @@
+{
+  "security_posture_score": 60.00000000000001,
+  "compliance_score": 12.5,
+  "risk_score": 0.0,
+  "critical_completion_rate": 25.0,
+  "high_completion_rate": 100.0,
+  "medium_completion_rate": 0.0,
+  "regulatory_completion_rate": 0.0,
+  "security_incidents": 0,
+  "vulnerability_response_time_days": 2.3,
+  "hsm_operation_success_rate": 99.8,
+  "authentication_failure_rate": 0.3,
+  "security_training_completion": 85.0,
+  "pci_compliance_score": 75.0,
+  "aml_kyc_compliance_score": 60.0,
+  "gdpr_compliance_score": 88.0,
+  "mean_time_to_detection_minutes": 15.0,
+  "mean_time_to_response_minutes": 45.0,
+  "false_positive_rate": 1.8,
+  "calculation_timestamp": 1757170725.0464287
+}
