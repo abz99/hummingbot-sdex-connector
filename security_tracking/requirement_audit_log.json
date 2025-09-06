@@ -142,5 +142,50 @@
     "completion_percentage": 100,
     "user": "security_review",
     "notes": "Comprehensive structured logging with audit trails"
+  },
+  {
+    "timestamp": 1757182635.4086058,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757182635.4441621,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757182635.4634898,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757182635.50279,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757182635.5516443,
+    "requirement_id": "SR-HIGH-005",
+    "old_status": "not_started",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "test",
+    "notes": "Test completion"
   }
 ]

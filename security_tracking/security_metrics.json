@@ -1,9 +1,9 @@
 {
-  "security_posture_score": 43.99999999999999,
+  "security_posture_score": 46.057142857142864,
   "compliance_score": 0.0,
   "risk_score": 0.0,
   "critical_completion_rate": 0.0,
-  "high_completion_rate": 75.0,
+  "high_completion_rate": 57.14285714285714,
   "medium_completion_rate": 0.0,
   "regulatory_completion_rate": 0.0,
   "security_incidents": 0,
@@ -17,5 +17,5 @@
   "mean_time_to_detection_minutes": 15.0,
   "mean_time_to_response_minutes": 45.0,
   "false_positive_rate": 1.8,
-  "calculation_timestamp": 1757182568.9754052
+  "calculation_timestamp": 1757183291.5305028
 }

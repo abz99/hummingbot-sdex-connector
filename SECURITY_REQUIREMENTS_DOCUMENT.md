@@ -41,11 +41,12 @@ This Security Requirements Document (SRD) formalizes the security requirements d
 
 | Category | Priority | Count | Description |
 |----------|----------|-------|-------------|
-| **CRIT** | P0 | 12 | Critical security controls (Key management, Authentication) |
-| **HIGH** | P1 | 18 | High-impact controls (Encryption, Monitoring) |
-| **MED** | P2 | 15 | Medium-impact controls (Logging, Validation) |
+| **CRIT** | P0 | 13 | Critical security controls (Key management, Authentication) |
+| **HIGH** | P1 | 21 | High-impact controls (Encryption, Monitoring) |
+| **MED** | P2 | 19 | Medium-impact controls (Logging, Validation) |
 | **LOW** | P3 | 8 | Low-impact controls (Documentation, Training) |
 | **REG** | P1 | 7 | Regulatory compliance requirements |
+| **DEV** | Mixed | 8 | Development security requirements |
 
 ### 2.2 Security Levels
 
@@ -526,6 +527,209 @@ class SecurityRequirementTracker:
 
 ---
 
+## Development Security Requirements (DEV)
+
+### SR-DEV-001: Secret Management Framework ⭐ **CRITICAL (P0)**
+**Threat Addressed**: Secret Exposure in Development  
+**Requirement ID**: SR-DEV-001  
+**Status**: ❌ **NOT IMPLEMENTED**  
+
+**Requirement Statement**: 
+All secrets and credentials MUST be managed through a centralized secret management system with proper access controls and audit trails.
+
+**Acceptance Criteria**:
+- [ ] No hardcoded secrets in source code
+- [ ] Environment-specific secret injection using HashiCorp Vault or equivalent
+- [ ] Secret rotation capabilities with automated lifecycle management
+- [ ] Comprehensive audit trails for all secret access operations
+- [ ] Encrypted secret storage at rest with proper key management
+- [ ] Integration with CI/CD pipeline for secure secret deployment
+
+**Implementation Timeline**: Phase 1 (Weeks 1-2)  
+**Dependencies**: HashiCorp Vault infrastructure setup  
+**Owner**: Security Engineering Team
+
+**Risk Impact**: Complete system compromise through secret exposure
+
+---
+
+### SR-DEV-002: Development Environment Hardening ⭐ **HIGH (P1)**
+**Threat Addressed**: Insecure Development Configuration  
+**Requirement ID**: SR-DEV-002  
+**Status**: 🔄 **PARTIAL IMPLEMENTATION**  
+
+**Requirement Statement**: 
+Development environments MUST implement security controls appropriate to their risk level while maintaining developer productivity.
+
+**Acceptance Criteria**:
+- [ ] Remove `allow_unsafe_operations: true` from development configurations
+- [ ] Implement environment-specific security policy enforcement
+- [ ] Restrict debug modes and detailed error messages in shared environments
+- [ ] Establish secure development configuration baselines
+- [ ] Implement development environment monitoring and alerting
+
+**Current Implementation Gap**: Development config contains unsafe operation flags
+
+**Implementation Timeline**: Phase 1 (Weeks 1-2)  
+**Owner**: DevOps Team
+
+---
+
+### SR-DEV-003: Supply Chain Security ⭐ **HIGH (P1)**
+**Threat Addressed**: Supply Chain Attacks  
+**Requirement ID**: SR-DEV-003  
+**Status**: ❌ **NOT IMPLEMENTED**  
+
+**Requirement Statement**: 
+Software supply chain MUST be protected against malicious dependencies and build pipeline compromise.
+
+**Acceptance Criteria**:
+- [ ] Automated dependency vulnerability scanning with Safety/Snyk
+- [ ] Software Bill of Materials (SBOM) generation in SPDX format
+- [ ] Package integrity verification using checksums and signatures
+- [ ] Secure build pipeline with provenance attestation
+- [ ] Dependency pinning with controlled update processes
+- [ ] Third-party component security assessment
+
+**Implementation Timeline**: Phase 2 (Weeks 2-3)  
+**Dependencies**: CI/CD pipeline integration  
+**Owner**: Security Engineering Team
+
+---
+
+### SR-DEV-004: Source Code Security **MEDIUM (P2)**
+**Threat Addressed**: Development Workflow Security  
+**Requirement ID**: SR-DEV-004  
+**Status**: 🔄 **PARTIAL IMPLEMENTATION**  
+
+**Requirement Statement**: 
+Source code MUST be protected against unauthorized access and tampering through secure development workflows.
+
+**Acceptance Criteria**:
+- [ ] Branch protection rules requiring code review for main branch
+- [ ] Automated security scanning (SAST/DAST) in CI/CD pipeline
+- [ ] Signed commits for sensitive or production-affecting changes
+- [ ] Secure code review process with security-focused checklists
+- [ ] Repository access controls with principle of least privilege
+
+**Current Implementation**: Basic pre-commit hooks implemented
+
+**Implementation Timeline**: Phase 3 (Weeks 3-4)  
+**Owner**: Development Team
+
+---
+
+### SR-DEV-005: Configuration Management Security **MEDIUM (P2)**
+**Threat Addressed**: Configuration and Environment Drift  
+**Requirement ID**: SR-DEV-005  
+**Status**: 🔄 **PARTIAL IMPLEMENTATION**  
+
+**Requirement Statement**: 
+Configuration management MUST prevent configuration drift and ensure consistent security controls across environments.
+
+**Acceptance Criteria**:
+- [ ] Infrastructure as Code (IaC) security scanning with Checkov/tfsec
+- [ ] Configuration validation and drift detection automation
+- [ ] Environment-specific configuration enforcement policies
+- [ ] Configuration change audit trails and approval workflows
+- [ ] Secure configuration templates with security baselines
+
+**Current Implementation**: Manual configuration management with good separation
+
+**Implementation Timeline**: Phase 4 (Weeks 4-6)  
+**Owner**: Infrastructure Team
+
+---
+
+### SR-DEV-006: Testing Environment Security **MEDIUM (P2)**
+**Threat Addressed**: Testing and Quality Assurance Security  
+**Requirement ID**: SR-DEV-006  
+**Status**: 🟡 **BASIC IMPLEMENTATION**  
+
+**Requirement Statement**: 
+Testing environments MUST implement appropriate security controls to prevent data exposure while supporting development activities.
+
+**Acceptance Criteria**:
+- [ ] Test data sanitization and anonymization procedures
+- [ ] Isolated test environments with network segmentation
+- [ ] Test-specific access controls and authentication
+- [ ] Secure test data management lifecycle
+- [ ] Test environment monitoring and compliance validation
+
+**Current Implementation**: Basic test isolation with test accounts
+
+**Implementation Timeline**: Phase 4 (Weeks 4-6)  
+**Owner**: QA/Testing Team
+
+---
+
+### SR-DEV-007: Developer Access Security ⭐ **HIGH (P1)**
+**Threat Addressed**: Developer Workstation Compromise  
+**Requirement ID**: SR-DEV-007  
+**Status**: ❌ **NOT IMPLEMENTED**  
+
+**Requirement Statement**: 
+Developer access to systems and resources MUST be secured through appropriate authentication and authorization controls.
+
+**Acceptance Criteria**:
+- [ ] Multi-factor authentication for all developer system access
+- [ ] Role-based access controls (RBAC) with regular review
+- [ ] Just-in-time (JIT) access for sensitive development resources
+- [ ] Privileged access management (PAM) for elevated permissions
+- [ ] Regular access attestation and de-provisioning procedures
+
+**Implementation Timeline**: Phase 2 (Weeks 2-3)  
+**Dependencies**: Identity management system integration  
+**Owner**: Security Engineering Team
+
+---
+
+### SR-DEV-008: Development Monitoring and Logging **MEDIUM (P2)**
+**Threat Addressed**: Development Workflow Security  
+**Requirement ID**: SR-DEV-008  
+**Status**: 🔄 **PARTIAL IMPLEMENTATION**  
+
+**Requirement Statement**: 
+Development activities MUST be monitored and logged to detect security incidents and policy violations.
+
+**Acceptance Criteria**:
+- [ ] Developer activity logging and behavioral monitoring
+- [ ] Anomaly detection for unusual development patterns
+- [ ] Security incident response procedures for development environments
+- [ ] Compliance monitoring for development security policies
+- [ ] Audit trails for sensitive development operations
+
+**Current Implementation**: Basic logging framework exists
+
+**Implementation Timeline**: Phase 4 (Weeks 4-6)  
+**Owner**: Security Operations Team
+
+---
+
+## Development Security Implementation Roadmap
+
+### 🚀 **Phase 1: Critical Foundations (Weeks 1-2)**
+- **SR-DEV-001**: Implement HashiCorp Vault secret management
+- **SR-DEV-002**: Harden development environment configurations
+- **Priority**: Address immediate secret exposure risks
+
+### 📊 **Phase 2: Access and Supply Chain (Weeks 2-3)**
+- **SR-DEV-003**: Deploy supply chain security scanning
+- **SR-DEV-007**: Implement enhanced developer access controls
+- **Priority**: Secure development access and dependencies
+
+### 🔐 **Phase 3: Workflow Security (Weeks 3-4)**
+- **SR-DEV-004**: Enhanced source code security controls
+- **Priority**: Secure development workflows and code integrity
+
+### 📈 **Phase 4: Advanced Controls (Weeks 4-6)**
+- **SR-DEV-005**: Configuration management security
+- **SR-DEV-006**: Testing environment security hardening
+- **SR-DEV-008**: Development monitoring and compliance
+- **Priority**: Complete development security posture
+
+---
+
 ## Appendices
 
 ### Appendix A: Threat-to-Requirement Mapping
@@ -539,6 +743,9 @@ class SecurityRequirementTracker:
 
 ### Appendix D: Testing and Validation Procedures
 [Security testing procedures and acceptance criteria]
+
+### Appendix E: Development Security Threat Model
+[Comprehensive development security threat analysis - see DEVELOPMENT_SECURITY_THREAT_MODEL.md]
 
 ---
 
