@@ -33,15 +33,34 @@ class StellarExchange(ExchangeBase):
         from stellar_security import SecureKeyManager, SecurityConfig
         from stellar_chain_interface import StellarChainInterface, StellarNetworkConfig
         from stellar_order_manager import StellarOrderManager
+        
+        # Modern Hummingbot patterns (Phase 2)
+        from hummingbot.connector.exchange.stellar.stellar_throttler import create_stellar_throttler
+        from hummingbot.connector.exchange.stellar.stellar_web_assistant import (
+            create_stellar_web_factory,
+            create_testnet_web_factory
+        )
 
         self._security_config = SecurityConfig()
         self._key_manager = SecureKeyManager(self._security_config)
         self._wallet_address = None  # Will be set after key storage
 
+        # Modern throttling and web assistant (Phase 2)
+        self._throttler = create_stellar_throttler()
+        
+        if stellar_network == "testnet":
+            self._web_assistants_factory = create_testnet_web_factory()
+        else:
+            self._web_assistants_factory = create_stellar_web_factory()
+
         # Stellar-specific components
         network_config = StellarNetworkConfig.get_config(stellar_network)
         self._chain_interface = StellarChainInterface(network_config)
         self._chain_interface.key_manager = self._key_manager
+        
+        # Integrate modern patterns with chain interface
+        self._chain_interface.throttler = self._throttler
+        self._chain_interface.web_assistant = self._web_assistants_factory.get_rest_assistant()
 
         # Order and market data management
         self._order_manager = None  # Initialized after wallet setup
@@ -87,6 +106,9 @@ class StellarExchange(ExchangeBase):
             ),
             "stellar_connection": self._chain_interface.is_connected,
             "wallet_initialized": self._wallet_address is not None,
+            # Phase 2 modern patterns status
+            "throttler_initialized": self._throttler is not None,
+            "web_assistant_initialized": self._web_assistants_factory is not None,
         }
 
     @property
@@ -133,6 +155,10 @@ class StellarExchange(ExchangeBase):
 
         if self._user_stream_tracker:
             await self._user_stream_tracker.stop()
+
+        # Cleanup modern Hummingbot patterns (Phase 2)
+        if hasattr(self._web_assistants_factory, 'close_shared_session'):
+            await self._web_assistants_factory.close_shared_session()
 
         await self._chain_interface.disconnect()
 
