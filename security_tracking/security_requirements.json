@@ -19,11 +19,11 @@
     ],
     "regulatory_mapping": [],
     "acceptance_criteria": [],
-    "completion_percentage": 60,
+    "completion_percentage": 85,
     "effort_estimate_days": 0,
     "actual_effort_days": 0,
-    "last_updated": 1757170702.199783,
-    "update_count": 1,
+    "last_updated": 1757182568.89268,
+    "update_count": 3,
     "blocked_reason": null
   },
   "SR-CRIT-002": {
@@ -32,7 +32,7 @@
     "description": "All privileged operations MUST require multi-factor authentication",
     "category": "authentication",
     "priority": "P0",
-    "status": "in_progress",
+    "status": "not_started",
     "owner": "Security Team",
     "assignee": null,
     "implementation_file": null,
@@ -46,11 +46,11 @@
     ],
     "regulatory_mapping": [],
     "acceptance_criteria": [],
-    "completion_percentage": 60,
+    "completion_percentage": 0,
     "effort_estimate_days": 0,
     "actual_effort_days": 0,
-    "last_updated": 1757170702.1889403,
-    "update_count": 0,
+    "last_updated": 1757182568.9394019,
+    "update_count": 1,
     "blocked_reason": null
   },
   "SR-CRIT-003": {
@@ -59,7 +59,7 @@
     "description": "All transaction signing MUST implement secure signing workflows",
     "category": "key_management",
     "priority": "P0",
-    "status": "completed",
+    "status": "in_progress",
     "owner": "Security Team",
     "assignee": null,
     "implementation_file": "stellar_hardware_wallets.py",
@@ -73,11 +73,11 @@
     ],
     "regulatory_mapping": [],
     "acceptance_criteria": [],
-    "completion_percentage": 100,
+    "completion_percentage": 70,
     "effort_estimate_days": 0,
     "actual_effort_days": 0,
-    "last_updated": 1757170702.1889448,
-    "update_count": 0,
+    "last_updated": 1757182568.945118,
+    "update_count": 1,
     "blocked_reason": null
   },
   "SR-CRIT-004": {
@@ -100,11 +100,11 @@
     ],
     "regulatory_mapping": [],
     "acceptance_criteria": [],
-    "completion_percentage": 80,
+    "completion_percentage": 60,
     "effort_estimate_days": 0,
     "actual_effort_days": 0,
-    "last_updated": 1757170702.1889493,
-    "update_count": 0,
+    "last_updated": 1757182568.9509141,
+    "update_count": 1,
     "blocked_reason": null
   },
   "SR-HIGH-005": {
@@ -113,7 +113,7 @@
     "description": "System MUST implement real-time threat detection with automated response",
     "category": "monitoring",
     "priority": "P1",
-    "status": "completed",
+    "status": "not_started",
     "owner": "Security Team",
     "assignee": null,
     "implementation_file": null,
@@ -127,11 +127,11 @@
     ],
     "regulatory_mapping": [],
     "acceptance_criteria": [],
-    "completion_percentage": 100,
+    "completion_percentage": 0,
     "effort_estimate_days": 0,
     "actual_effort_days": 0,
-    "last_updated": 1757170702.2887056,
-    "update_count": 1,
+    "last_updated": 1757182568.9574418,
+    "update_count": 2,
     "blocked_reason": null
   },
   "SR-HIGH-006": {
@@ -148,7 +148,7 @@
     "config_file": null,
     "created_date": 1757170702.188957,
     "due_date": null,
-    "completed_date": null,
+    "completed_date": 1757182568.9635289,
     "threat_addressed": [
       "Data Breach"
     ],
@@ -157,8 +157,8 @@
     "completion_percentage": 100,
     "effort_estimate_days": 0,
     "actual_effort_days": 0,
-    "last_updated": 1757170702.1889575,
-    "update_count": 0,
+    "last_updated": 1757182568.9635248,
+    "update_count": 1,
     "blocked_reason": null
   },
   "SR-HIGH-007": {
@@ -175,7 +175,7 @@
     "config_file": null,
     "created_date": 1757170702.188962,
     "due_date": null,
-    "completed_date": null,
+    "completed_date": 1757182568.9701602,
     "threat_addressed": [
       "Compliance and Forensics"
     ],
@@ -184,8 +184,8 @@
     "completion_percentage": 100,
     "effort_estimate_days": 0,
     "actual_effort_days": 0,
-    "last_updated": 1757170702.1889622,
-    "update_count": 0,
+    "last_updated": 1757182568.9701555,
+    "update_count": 1,
     "blocked_reason": null
   },
   "SR-REG-010": {
@@ -255,16 +255,16 @@
     "implementation_file": null,
     "test_file": null,
     "config_file": null,
-    "created_date": 1757170702.2582295,
-    "due_date": 1759762702.258216,
-    "completed_date": 1757170702.2694857,
+    "created_date": 1757170867.8920302,
+    "due_date": 1759762867.8920214,
+    "completed_date": 1757170867.9037223,
     "threat_addressed": [],
     "regulatory_mapping": [],
     "acceptance_criteria": [],
     "completion_percentage": 100,
     "effort_estimate_days": 0,
     "actual_effort_days": 0,
-    "last_updated": 1757170702.2694826,
+    "last_updated": 1757170867.9037194,
     "update_count": 3,
     "blocked_reason": null
   }

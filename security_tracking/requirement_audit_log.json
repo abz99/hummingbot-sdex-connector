@@ -43,5 +43,104 @@
     "completion_percentage": 100,
     "user": "test",
     "notes": "Test completion"
+  },
+  {
+    "timestamp": 1757170867.8621702,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757170867.8957214,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757170867.901804,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757170867.9073856,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757182568.8969355,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 85,
+    "user": "security_review",
+    "notes": "Framework excellent, HSM production integration needed"
+  },
+  {
+    "timestamp": 1757182568.943053,
+    "requirement_id": "SR-CRIT-002",
+    "old_status": "in_progress",
+    "new_status": "not_started",
+    "completion_percentage": 0,
+    "user": "security_review",
+    "notes": "No MFA implementation found - critical gap"
+  },
+  {
+    "timestamp": 1757182568.9488232,
+    "requirement_id": "SR-CRIT-003",
+    "old_status": "completed",
+    "new_status": "in_progress",
+    "completion_percentage": 70,
+    "user": "security_review",
+    "notes": "Hardware wallet framework in place, production integration needed"
+  },
+  {
+    "timestamp": 1757182568.9552836,
+    "requirement_id": "SR-CRIT-004",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "security_review",
+    "notes": "Input validation excellent, mTLS and network segmentation missing"
+  },
+  {
+    "timestamp": 1757182568.9614701,
+    "requirement_id": "SR-HIGH-005",
+    "old_status": "completed",
+    "new_status": "not_started",
+    "completion_percentage": 0,
+    "user": "security_review",
+    "notes": "No SIEM integration or threat detection found"
+  },
+  {
+    "timestamp": 1757182568.9671977,
+    "requirement_id": "SR-HIGH-006",
+    "old_status": "completed",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "security_review",
+    "notes": "AES-256-GCM properly implemented across all components"
+  },
+  {
+    "timestamp": 1757182568.973969,
+    "requirement_id": "SR-HIGH-007",
+    "old_status": "completed",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "security_review",
+    "notes": "Comprehensive structured logging with audit trails"
   }
 ]
