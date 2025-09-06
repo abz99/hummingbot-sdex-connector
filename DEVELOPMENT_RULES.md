@@ -82,6 +82,7 @@ Tests may only be temporarily marked as skipped if:
 - Small, focused commits that tell a story
 - Squash related commits before merging
 - Always include co-authorship for AI assistance
+- **MANDATORY: Sync with remote on every commit** (`git push origin main` after each successful commit)
 
 ---
 
