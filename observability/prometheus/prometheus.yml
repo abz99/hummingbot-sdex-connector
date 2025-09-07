@@ -1,0 +1,70 @@
+# Prometheus Configuration for Stellar Hummingbot Connector
+# Production observability configuration
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'stellar-hummingbot'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Rules files
+rule_files:
+  - "stellar_alerts.yml"
+  - "stellar_recording_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Stellar Connector metrics
+  - job_name: 'stellar-connector'
+    static_configs:
+      - targets: ['localhost:8000']
+    scrape_interval: 5s
+    metrics_path: /metrics
+    scrape_timeout: 5s
+    honor_labels: true
+    
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+      
+  # Node Exporter for system metrics  
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+    scrape_interval: 10s
+    
+  # cAdvisor for container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['localhost:8080']
+    scrape_interval: 10s
+    
+  # Grafana metrics
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['localhost:3000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+# Remote write configuration for long-term storage
+remote_write:
+  - url: "http://localhost:9201/api/prom/push"
+    queue_config:
+      max_samples_per_send: 10000
+      max_shards: 200
+      capacity: 100000
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 30d
+    retention.size: 10GB

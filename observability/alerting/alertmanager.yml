@@ -1,0 +1,176 @@
+# Alertmanager Configuration for Stellar Hummingbot Connector
+# Production alerting and notification configuration
+
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@stellar-hummingbot.com'
+  smtp_auth_username: 'alerts@stellar-hummingbot.com'
+  smtp_auth_password: 'your-smtp-password'
+
+# Templates
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Routing tree
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'web.hook.default'
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 1s
+      repeat_interval: 5m
+      
+    # Security alerts - immediate notification  
+    - match:
+        category: security
+      receiver: 'security-team'
+      group_wait: 1s
+      repeat_interval: 2m
+      
+    # Warning alerts - standard notification
+    - match:
+        severity: warning
+      receiver: 'warning-alerts' 
+      group_wait: 30s
+      repeat_interval: 30m
+      
+    # Info alerts - daily digest
+    - match:
+        severity: info
+      receiver: 'info-digest'
+      group_wait: 5m
+      repeat_interval: 24h
+
+# Receivers
+receivers:
+  - name: 'web.hook.default'
+    webhook_configs:
+      - url: 'http://localhost:5000/webhook'
+        
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'ops-team@stellar-hummingbot.com'
+        from: 'alerts@stellar-hummingbot.com' 
+        subject: '🚨 CRITICAL: {{ .GroupLabels.alertname }} - Stellar Connector'
+        body: |
+          {{ range .Alerts }}
+          **Alert:** {{ .Annotations.summary }}
+          **Description:** {{ .Annotations.description }}
+          **Severity:** {{ .Labels.severity }}
+          **Service:** {{ .Labels.service }}
+          **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          
+          **Labels:**
+          {{ range .Labels.SortedPairs }}
+          - {{ .Name }}: {{ .Value }}
+          {{ end }}
+          {{ end }}
+          
+    slack_configs:
+      - api_url: 'your-slack-webhook-url'
+        channel: '#ops-critical'
+        title: '🚨 Critical Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *{{ .Annotations.summary }}*
+          {{ .Annotations.description }}
+          Service: {{ .Labels.service }}
+          {{ end }}
+        color: 'danger'
+        
+    pagerduty_configs:
+      - routing_key: 'your-pagerduty-integration-key'
+        description: '{{ .GroupLabels.alertname }} - Stellar Connector Critical'
+        
+  - name: 'security-team'
+    email_configs:
+      - to: 'security@stellar-hummingbot.com'
+        from: 'alerts@stellar-hummingbot.com'
+        subject: '🔒 SECURITY: {{ .GroupLabels.alertname }} - Stellar Connector'
+        body: |
+          **SECURITY ALERT**
+          
+          {{ range .Alerts }}
+          **Alert:** {{ .Annotations.summary }}
+          **Description:** {{ .Annotations.description }}
+          **Category:** {{ .Labels.category }}
+          **Operation:** {{ .Labels.operation }}
+          **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{ end }}
+          
+    slack_configs:
+      - api_url: 'your-slack-webhook-url'
+        channel: '#security-alerts'
+        title: '🔒 Security Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *{{ .Annotations.summary }}*
+          {{ .Annotations.description }}
+          Category: {{ .Labels.category }}
+          {{ end }}
+        color: '#ff6600'
+        
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'ops-team@stellar-hummingbot.com'
+        from: 'alerts@stellar-hummingbot.com'
+        subject: '⚠️ WARNING: {{ .GroupLabels.alertname }} - Stellar Connector'
+        body: |
+          {{ range .Alerts }}
+          **Alert:** {{ .Annotations.summary }}
+          **Description:** {{ .Annotations.description }}
+          **Severity:** {{ .Labels.severity }}
+          **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{ end }}
+          
+    slack_configs:
+      - api_url: 'your-slack-webhook-url'
+        channel: '#ops-warnings'
+        title: '⚠️ Warning: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          {{ .Annotations.summary }}
+          {{ end }}
+        color: 'warning'
+        
+  - name: 'info-digest'
+    email_configs:
+      - to: 'team@stellar-hummingbot.com'
+        from: 'alerts@stellar-hummingbot.com'
+        subject: '📊 Daily Digest - Stellar Connector ({{ .Alerts | len }} alerts)'
+        body: |
+          **Daily Alert Digest - {{ .Alerts.Firing | len }} active alerts**
+          
+          {{ range .Alerts.Firing }}
+          - {{ .Annotations.summary }}
+          {{ end }}
+          
+          Generated at: {{ now.Format "2006-01-02 15:04:05 UTC" }}
+
+# Inhibition rules - suppress redundant alerts
+inhibit_rules:
+  # Suppress warning alerts when critical alerts are firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
+    
+  # Suppress individual component alerts when system is down
+  - source_match:
+      alertname: 'StellarConnectorDown'
+    target_match_re:
+      alertname: '(HighErrorRate|HighAPILatency|HealthCheckFailure)'
+    equal: ['service']
+
+# Global configuration
+global_config:
+  resolve_timeout: 5m
+  http_config:
+    proxy_url: 'http://proxy.example.com:8080'

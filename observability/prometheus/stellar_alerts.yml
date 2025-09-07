@@ -1,0 +1,181 @@
+# Stellar Hummingbot Connector Alert Rules
+# Production alerting configuration
+
+groups:
+  - name: stellar_connector_critical
+    interval: 30s
+    rules:
+      - alert: StellarConnectorDown
+        expr: up{job="stellar-connector"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: stellar-connector
+        annotations:
+          summary: "Stellar Connector is down"
+          description: "Stellar Connector has been down for more than 1 minute"
+
+      - alert: HighErrorRate
+        expr: rate(stellar_errors_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: stellar-connector
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      - alert: CircuitBreakerOpen
+        expr: stellar_circuit_breaker_state >= 1
+        for: 0s
+        labels:
+          severity: critical
+          service: stellar-connector
+        annotations:
+          summary: "Circuit breaker is open"
+          description: "Circuit breaker for {{ $labels.network }}/{{ $labels.endpoint }} is open"
+
+      - alert: HealthCheckFailure
+        expr: stellar_health_check_status < 2
+        for: 2m
+        labels:
+          severity: critical
+          service: stellar-connector
+        annotations:
+          summary: "Health check failure"
+          description: "Health check for {{ $labels.component }} is failing"
+
+  - name: stellar_connector_warning
+    interval: 30s
+    rules:
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.95, rate(stellar_network_request_duration_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: stellar-connector
+        annotations:
+          summary: "High API latency"
+          description: "95th percentile latency is {{ $value }}s for {{ $labels.network }}/{{ $labels.endpoint_type }}"
+
+      - alert: LowAccountBalance
+        expr: stellar_account_balance_xlm < 10
+        for: 1m
+        labels:
+          severity: warning
+          service: stellar-connector
+        annotations:
+          summary: "Low account balance"
+          description: "Account {{ $labels.account_id }} balance is {{ $value }} XLM"
+
+      - alert: HighResourceUsage
+        expr: stellar_resource_utilization_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: stellar-connector
+        annotations:
+          summary: "High resource usage"
+          description: "{{ $labels.resource_type }} usage is {{ $value }}% for {{ $labels.component }}"
+
+      - alert: LowCacheHitRate
+        expr: rate(stellar_cache_hits_total[5m]) / (rate(stellar_cache_hits_total[5m]) + rate(stellar_cache_misses_total[5m])) < 0.7
+        for: 10m
+        labels:
+          severity: warning
+          service: stellar-connector
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate for {{ $labels.cache_type }} is {{ $value | humanizePercentage }}"
+
+  - name: stellar_connector_info
+    interval: 1m
+    rules:
+      - alert: TradingVolumeSpike
+        expr: rate(stellar_trading_volume_xlm[1m]) > rate(stellar_trading_volume_xlm[1h]) * 5
+        for: 2m
+        labels:
+          severity: info
+          service: stellar-connector
+        annotations:
+          summary: "Trading volume spike detected"
+          description: "Trading volume for {{ $labels.trading_pair }} increased significantly"
+
+      - alert: NewTradingPair
+        expr: increase(stellar_orders_placed_total[1h]) by (trading_pair) and ON() (count by (trading_pair) (stellar_orders_placed_total) unless count by (trading_pair) (stellar_orders_placed_total offset 1h))
+        for: 0s
+        labels:
+          severity: info
+          service: stellar-connector
+        annotations:
+          summary: "New trading pair detected"
+          description: "New trading activity detected for {{ $labels.trading_pair }}"
+
+  - name: stellar_connector_performance
+    interval: 1m
+    rules:
+      - alert: OrderProcessingDelay
+        expr: histogram_quantile(0.95, rate(stellar_order_fill_duration_seconds_bucket[5m])) > 300
+        for: 5m
+        labels:
+          severity: warning
+          service: stellar-connector
+        annotations:
+          summary: "Order processing delay"
+          description: "95th percentile order fill time is {{ $value }}s for {{ $labels.trading_pair }}"
+
+      - alert: HighConcurrentOperations
+        expr: stellar_concurrent_operations > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: stellar-connector
+        annotations:
+          summary: "High concurrent operations"
+          description: "{{ $labels.operation_type }} has {{ $value }} concurrent operations"
+
+  - name: stellar_connector_security
+    interval: 30s
+    rules:
+      - alert: SecurityMetricAnomaly
+        expr: rate(stellar_errors_total{category="security"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: stellar-connector
+        annotations:
+          summary: "Security error detected"
+          description: "Security-related error in {{ $labels.operation }}: {{ $labels.severity }}"
+
+      - alert: KeyRotationRequired
+        expr: time() - stellar_security_key_age_seconds > 86400 * 30  # 30 days
+        for: 0s
+        labels:
+          severity: warning
+          service: stellar-connector
+        annotations:
+          summary: "Key rotation required"
+          description: "Security keys are {{ $value | humanizeDuration }} old and require rotation"
+
+  - name: stellar_connector_business
+    interval: 2m
+    rules:
+      - alert: ArbitrageOpportunityMissed
+        expr: increase(stellar_arbitrage_opportunities_total{executed="false"}[10m]) > 5
+        for: 0s
+        labels:
+          severity: info
+          service: stellar-connector
+        annotations:
+          summary: "Multiple arbitrage opportunities missed"
+          description: "{{ $value }} arbitrage opportunities for {{ $labels.asset_pair }} were not executed"
+
+      - alert: TradingProfitLoss
+        expr: stellar_profit_loss_xlm < -100
+        for: 5m
+        labels:
+          severity: warning
+          service: stellar-connector
+        annotations:
+          summary: "Significant trading loss"
+          description: "P&L for {{ $labels.strategy }} on {{ $labels.trading_pair }} is {{ $value }} XLM"
