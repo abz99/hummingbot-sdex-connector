@@ -1,0 +1,513 @@
+---
+# Quality Requirement Catalogue - Stellar Hummingbot Connector v3.0
+# Machine-readable mapping of requirements to tests
+# Generated: 2025-09-07
+# Maintainer: QA Engineering Team
+
+metadata:
+  version: "3.0.0"
+  last_updated: "2025-09-07"
+  total_requirements: 35
+  coverage_target: 85.0
+  critical_module_target: 95.0
+
+# Core Module Requirements
+modules:
+  stellar_exchange:
+    file: "hummingbot/connector/exchange/stellar/stellar_exchange.py"
+    owner: "exchange_module"
+    coverage_target: 95.0
+    
+  stellar_chain_interface:
+    file: "hummingbot/connector/exchange/stellar/stellar_chain_interface.py" 
+    owner: "chain_interface_module"
+    coverage_target: 90.0
+    
+  stellar_order_manager:
+    file: "hummingbot/connector/exchange/stellar/stellar_order_manager.py"
+    owner: "order_manager_module"
+    coverage_target: 95.0
+    
+  stellar_security_manager:
+    file: "hummingbot/connector/exchange/stellar/stellar_security_manager.py"
+    owner: "security_module"
+    coverage_target: 100.0
+    
+  stellar_soroban_manager:
+    file: "hummingbot/connector/exchange/stellar/stellar_soroban_manager.py"
+    owner: "soroban_module"
+    coverage_target: 90.0
+    
+  stellar_path_payment_engine:
+    file: "hummingbot/connector/exchange/stellar/stellar_path_payment_engine.py"
+    owner: "path_engine_module"
+    coverage_target: 90.0
+
+# Quality Requirements Catalogue
+requirements:
+  # Exchange Module Requirements
+  - id: "REQ-EXC-001"
+    module: "stellar_exchange"
+    owner: "exchange_module"
+    title: "Exchange connector initialization"
+    description: "StellarExchange must initialize with valid configuration and establish network connections"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-EXC-001"
+        path: "tests/unit/test_stellar_exchange_contract.py::test_exchange_initialization"
+        criteria: "assert exchange.status == ConnectorStatus.CONNECTED"
+        automation: true
+        severity: "must"
+      - type: "integration"  
+        test_id: "TST-EXC-001-INT"
+        path: "tests/integration/test_stellar_exchange_integration.py::test_exchange_network_connection"
+        criteria: "assert exchange.network_status == NetworkStatus.CONNECTED"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-EXC-002"
+    module: "stellar_exchange"
+    owner: "exchange_module"
+    title: "Trading pair validation"
+    description: "Exchange must validate and normalize trading pairs according to Stellar asset format"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-EXC-002"
+        path: "tests/unit/test_stellar_exchange_contract.py::test_trading_pair_validation"
+        criteria: "assert 'XLM-USDC' in exchange.trading_pairs"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-EXC-003"
+    module: "stellar_exchange"
+    owner: "exchange_module" 
+    title: "Balance querying accuracy"
+    description: "Exchange must return accurate account balances for all supported assets"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-EXC-003"
+        path: "tests/unit/test_stellar_exchange_contract.py::test_balance_query_accuracy"
+        criteria: "assert balance.amount == Decimal('1000.0')"
+        automation: true
+        severity: "must"
+      - type: "integration"
+        test_id: "TST-EXC-003-INT" 
+        path: "tests/integration/test_stellar_exchange_integration.py::test_real_balance_query"
+        criteria: "assert isinstance(balance, Decimal) and balance >= Decimal('0')"
+        automation: true
+        severity: "should"
+
+  # Order Manager Requirements  
+  - id: "REQ-ORD-001"
+    module: "stellar_order_manager"
+    owner: "order_manager_module"
+    title: "Order placement contract"
+    description: "place_order() must return ExchangeOrder with deterministic fields and proper state"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-ORD-001"
+        path: "tests/unit/test_order_lifecycle.py::test_order_placement_success"
+        criteria: "assert order.status == OrderStatus.NEW and order.order_id is not None"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-ORD-002" 
+    module: "stellar_order_manager"
+    owner: "order_manager_module"
+    title: "Order status transitions"
+    description: "Order status must transition correctly: NEW -> PARTIALLY_FILLED -> FILLED"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-ORD-002"
+        path: "tests/unit/test_order_lifecycle.py::test_order_partial_fill_transition"
+        criteria: "assert order.status == OrderStatus.PARTIALLY_FILLED and order.filled_amount > Decimal('0')"
+        automation: true
+        severity: "must"
+      - type: "unit"
+        test_id: "TST-ORD-002B"
+        path: "tests/unit/test_order_lifecycle.py::test_order_full_fill_transition"
+        criteria: "assert order.status == OrderStatus.FILLED and order.filled_amount == order.amount"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-ORD-003"
+    module: "stellar_order_manager"
+    owner: "order_manager_module"
+    title: "Order cancellation idempotency"
+    description: "Cancelling the same order multiple times must be idempotent and not raise exceptions"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-ORD-003"
+        path: "tests/unit/test_order_lifecycle.py::test_order_cancellation_idempotency"
+        criteria: "assert cancel_result.success == True"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-ORD-004"
+    module: "stellar_order_manager"
+    owner: "order_manager_module"
+    title: "External order cancellation protection"
+    description: "Attempting to cancel orders not created by this connector must return clear error without exception"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-ORD-004" 
+        path: "tests/unit/test_order_lifecycle.py::test_external_order_cancellation"
+        criteria: "assert result.error_code == 'ExternalOrderCancellationAttempt'"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-ORD-005"
+    module: "stellar_order_manager"
+    owner: "order_manager_module"
+    title: "Order history correlation tracking"
+    description: "All order operations must include correlation_id for tracing and debugging"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-ORD-005"
+        path: "tests/unit/test_order_lifecycle.py::test_order_correlation_tracking"  
+        criteria: "assert order.correlation_id is not None and len(order_history) > 0"
+        automation: true
+        severity: "should"
+
+  # Chain Interface Requirements
+  - id: "REQ-CHAIN-001"
+    module: "stellar_chain_interface"
+    owner: "chain_interface_module"
+    title: "Transaction building accuracy"
+    description: "Transaction builder must create valid Stellar transactions with correct sequence numbers"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-CHAIN-001"
+        path: "tests/unit/test_stellar_chain_contract.py::test_transaction_building"
+        criteria: "assert transaction.sequence_number == account_sequence + 1"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-CHAIN-002"
+    module: "stellar_chain_interface"
+    owner: "chain_interface_module"
+    title: "Sequence number conflict handling"
+    description: "Chain interface must detect and resolve sequence number conflicts automatically"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-CHAIN-002"
+        path: "tests/unit/test_stellar_chain_contract.py::test_sequence_conflict_resolution"
+        criteria: "assert retry_result.success == True and retry_count <= 3"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-CHAIN-003"
+    module: "stellar_chain_interface"
+    owner: "chain_interface_module"
+    title: "Fee bumping mechanism"
+    description: "Stuck transactions must be automatically fee-bumped with exponential increase"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-CHAIN-003"
+        path: "tests/unit/test_stellar_chain_contract.py::test_automatic_fee_bumping"
+        criteria: "assert bumped_tx.base_fee > original_tx.base_fee"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-CHAIN-004"
+    module: "stellar_chain_interface"
+    owner: "chain_interface_module"
+    title: "Network failover capability"
+    description: "Chain interface must failover to backup Horizon servers on primary failure"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-CHAIN-004"
+        path: "tests/unit/test_stellar_chain_contract.py::test_horizon_failover"
+        criteria: "assert active_server != primary_server and connection.status == 'connected'"
+        automation: true
+        severity: "should"
+
+  # Security Manager Requirements
+  - id: "REQ-SEC-001"
+    module: "stellar_security_manager"
+    owner: "security_module"
+    title: "No secrets in codebase"
+    description: "Repository must contain no hardcoded private keys, passwords, or API tokens"
+    acceptance_tests:
+      - type: "security"
+        test_id: "TST-SEC-001"
+        path: "tests/security/test_stellar_security_compliance.py::test_no_hardcoded_secrets"
+        criteria: "assert len(found_secrets) == 0"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-SEC-002"
+    module: "stellar_security_manager"
+    owner: "security_module"
+    title: "Deterministic transaction signing"
+    description: "Transaction signing must be deterministic and reproducible with same inputs"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-SEC-002"
+        path: "tests/unit/test_stellar_security_contract.py::test_deterministic_signing"
+        criteria: "assert signature1 == signature2"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-SEC-003"
+    module: "stellar_security_manager"
+    owner: "security_module"
+    title: "HSM failure graceful handling"
+    description: "HSM unavailability must not crash system, must gracefully degrade to software signing"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-SEC-003"
+        path: "tests/unit/test_stellar_security_contract.py::test_hsm_failure_handling"
+        criteria: "assert fallback_result.method == 'software' and fallback_result.success == True"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-SEC-004"
+    module: "stellar_security_manager"
+    owner: "security_module"
+    title: "Key rotation support"
+    description: "Security manager must support hot key rotation without service interruption"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-SEC-004"
+        path: "tests/unit/test_stellar_security_contract.py::test_key_rotation_seamless"
+        criteria: "assert old_key != new_key and service_uptime == True"
+        automation: true
+        severity: "should"
+
+  # Soroban Manager Requirements  
+  - id: "REQ-SOROBAN-001"
+    module: "stellar_soroban_manager"
+    owner: "soroban_module"
+    title: "Smart contract simulation accuracy"
+    description: "Contract simulation must accurately preview operation results before execution"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-SOROBAN-001"
+        path: "tests/unit/test_stellar_soroban_contract.py::test_contract_simulation_accuracy"
+        criteria: "assert simulation.success == True and simulation.gas_used > 0"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-SOROBAN-002"
+    module: "stellar_soroban_manager"
+    owner: "soroban_module"
+    title: "Cross-contract atomic execution"
+    description: "Multiple contract operations must execute atomically with rollback on any failure"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-SOROBAN-002"
+        path: "tests/unit/test_stellar_soroban_contract.py::test_atomic_cross_contract_execution"
+        criteria: "assert len(results) == len(operations) and all(r.success for r in results)"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-SOROBAN-003"
+    module: "stellar_soroban_manager"
+    owner: "soroban_module"
+    title: "Gas estimation accuracy"
+    description: "Gas estimation must be within 10% of actual gas consumption"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-SOROBAN-003"
+        path: "tests/unit/test_stellar_soroban_contract.py::test_gas_estimation_accuracy"
+        criteria: "assert abs(estimated - actual) / actual <= 0.1"
+        automation: true
+        severity: "should"
+
+  # Path Payment Engine Requirements
+  - id: "REQ-PATH-001"
+    module: "stellar_path_payment_engine"
+    owner: "path_engine_module"
+    title: "Optimal path finding"
+    description: "Path engine must find cost-optimal routes for payment paths"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-PATH-001"
+        path: "tests/unit/test_stellar_path_engine_contract.py::test_optimal_path_finding"
+        criteria: "assert route.estimated_cost <= direct_cost"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-PATH-002"
+    module: "stellar_path_payment_engine"
+    owner: "path_engine_module"
+    title: "Arbitrage opportunity detection"
+    description: "Engine must detect profitable arbitrage opportunities with risk assessment"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-PATH-002"
+        path: "tests/unit/test_stellar_path_engine_contract.py::test_arbitrage_detection"
+        criteria: "assert opportunity.profit_percentage > Decimal('0.001') and opportunity.risk_score < 0.7"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-PATH-003"
+    module: "stellar_path_payment_engine"
+    owner: "path_engine_module"
+    title: "MEV protection implementation"
+    description: "Path payments must be protected against MEV attacks via private mempool"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-PATH-003"
+        path: "tests/unit/test_stellar_path_engine_contract.py::test_mev_protection"
+        criteria: "assert protection_result.method == 'private_mempool' and protection_result.protected == True"
+        automation: true
+        severity: "should"
+
+  # Performance Requirements
+  - id: "REQ-PERF-001"
+    module: "stellar_exchange"
+    owner: "exchange_module"
+    title: "Order placement latency SLA"
+    description: "Order placement must complete within 2 seconds (95th percentile)"
+    acceptance_tests:
+      - type: "performance"
+        test_id: "TST-PERF-001"
+        path: "tests/performance/test_stellar_performance_benchmarks.py::test_order_placement_latency"
+        criteria: "assert percentile_95 < 2.0"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-PERF-002"
+    module: "stellar_exchange"
+    owner: "exchange_module"
+    title: "Concurrent operation throughput"
+    description: "System must handle 50 concurrent operations without degradation"
+    acceptance_tests:
+      - type: "performance"
+        test_id: "TST-PERF-002"
+        path: "tests/performance/test_stellar_performance_benchmarks.py::test_concurrent_operations"
+        criteria: "assert success_rate >= 0.95 and avg_latency <= sla_threshold"
+        automation: true
+        severity: "should"
+
+  # Error Handling Requirements
+  - id: "REQ-ERR-001"
+    module: "stellar_chain_interface"
+    owner: "chain_interface_module"
+    title: "Network error classification"
+    description: "All network errors must be classified as retryable or non-retryable"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-ERR-001"
+        path: "tests/unit/test_stellar_error_handling.py::test_error_classification"
+        criteria: "assert error.type in [ErrorType.RETRYABLE_NETWORK, ErrorType.NON_RETRYABLE_CLIENT]"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-ERR-002"  
+    module: "stellar_chain_interface"
+    owner: "chain_interface_module"
+    title: "Exponential backoff implementation"
+    description: "Retryable errors must implement exponential backoff with jitter"
+    acceptance_tests:
+      - type: "unit"
+        test_id: "TST-ERR-002"
+        path: "tests/unit/test_stellar_error_handling.py::test_exponential_backoff"
+        criteria: "assert retry_delays == [1, 2, 4, 8] and max(jitter) <= 0.1"
+        automation: true
+        severity: "must"
+
+  # Integration Requirements
+  - id: "REQ-INT-001"
+    module: "stellar_exchange"
+    owner: "exchange_module"
+    title: "End-to-end order lifecycle"
+    description: "Complete order flow from placement to settlement must work on testnet"
+    acceptance_tests:
+      - type: "e2e"
+        test_id: "TST-INT-001"
+        path: "tests/integration/test_stellar_e2e_flow.py::test_complete_order_lifecycle"
+        criteria: "assert final_order.status == OrderStatus.FILLED"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-INT-002"
+    module: "stellar_soroban_manager"
+    owner: "soroban_module"
+    title: "Soroban contract interaction flow"
+    description: "Smart contract operations must work end-to-end on futurenet"
+    acceptance_tests:
+      - type: "e2e"
+        test_id: "TST-INT-002"
+        path: "tests/integration/test_stellar_soroban_e2e.py::test_contract_interaction_flow"
+        criteria: "assert contract_result.success == True and transaction.status == 'success'"
+        automation: false
+        severity: "should"
+
+  # Monitoring Requirements
+  - id: "REQ-MON-001"
+    module: "stellar_exchange"
+    owner: "exchange_module"
+    title: "Health check endpoint availability"
+    description: "Health check endpoint must return service status and dependency health"
+    acceptance_tests:
+      - type: "integration"
+        test_id: "TST-MON-001"
+        path: "tests/integration/test_stellar_monitoring.py::test_health_check_endpoint"
+        criteria: "assert health_status.status == 'healthy' and all(dep.status == 'up' for dep in dependencies)"
+        automation: true
+        severity: "must"
+
+  - id: "REQ-MON-002"
+    module: "stellar_exchange" 
+    owner: "exchange_module"
+    title: "Prometheus metrics export"
+    description: "System must export standardized Prometheus metrics for monitoring"
+    acceptance_tests:
+      - type: "integration"
+        test_id: "TST-MON-002"
+        path: "tests/integration/test_stellar_monitoring.py::test_prometheus_metrics_export"
+        criteria: "assert 'stellar_orders_total' in metrics and 'stellar_order_latency_seconds' in metrics"
+        automation: true
+        severity: "should"
+
+# Test Execution Mapping
+test_execution:
+  unit_tests:
+    command: "pytest tests/unit/ -v --cov=hummingbot/connector/exchange/stellar --cov-report=term-missing"
+    timeout: 120
+    parallel: true
+    coverage_threshold: 85.0
+    
+  integration_tests:
+    command: "pytest tests/integration/ -v -m integration"
+    timeout: 600
+    parallel: false
+    requires_env: ["STELLAR_INTEGRATION_TESTS=true"]
+    
+  security_tests:
+    command: "pytest tests/security/ -v"
+    timeout: 60
+    parallel: true
+    
+  performance_tests:
+    command: "pytest tests/performance/ -v -m performance"
+    timeout: 300
+    parallel: false
+    requires_env: ["STELLAR_PERFORMANCE_TESTS=true"]
+
+# Quality Gates
+quality_gates:
+  pre_commit:
+    - black_formatting: true
+    - flake8_linting: true  
+    - mypy_type_checking: true
+    - unit_tests: true
+    - security_tests: true
+    
+  pre_merge:
+    - all_unit_tests: true
+    - coverage_threshold: 85.0
+    - integration_tests: false  # Optional
+    - security_scan: true
+    - performance_regression: false  # Optional
+    
+  pre_release:
+    - all_tests: true
+    - coverage_threshold: 85.0
+    - integration_tests: true
+    - security_scan: true
+    - performance_benchmarks: true
+    - manual_qa_approval: true

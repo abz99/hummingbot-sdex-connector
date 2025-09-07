@@ -1,0 +1,440 @@
+name: Stellar Hummingbot Connector CI
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**', 'hotfix/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+
+env:
+  PYTHONPATH: ${{ github.workspace }}
+  PYTEST_TIMEOUT: 300
+  COVERAGE_THRESHOLD: 80
+  CRITICAL_COVERAGE_THRESHOLD: 90
+
+jobs:
+  security-scan:
+    name: Security & Compliance Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for security scanning
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install security tools
+      run: |
+        pip install safety bandit semgrep
+        npm install -g @gitguardian/ggshield
+    
+    - name: Run secret scanning
+      run: |
+        python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_no_hardcoded_secrets_in_repository -v
+    
+    - name: Run dependency vulnerability scan
+      run: |
+        safety check --json --output safety-report.json || echo "Safety scan completed"
+        python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_dependency_security_scan -v
+    
+    - name: Run static security analysis
+      run: |
+        bandit -r hummingbot/connector/exchange/stellar/ -f json -o bandit-report.json
+        semgrep --config=auto hummingbot/connector/exchange/stellar/ --json --output=semgrep-report.json
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+          semgrep-report.json
+
+  code-quality:
+    name: Code Quality & Style
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black flake8 mypy isort
+        pip install -r requirements.txt
+    
+    - name: Run code formatting check
+      run: |
+        black --check --line-length=100 --target-version=py311 hummingbot/connector/exchange/stellar/
+        isort --check-only --profile=black hummingbot/connector/exchange/stellar/
+    
+    - name: Run linting
+      run: |
+        flake8 hummingbot/connector/exchange/stellar/ --max-line-length=100 --extend-ignore=E203,W503 --max-complexity=12
+    
+    - name: Run type checking
+      run: |
+        mypy hummingbot/connector/exchange/stellar/ --strict --ignore-missing-imports --no-implicit-optional
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+        stellar-sdk-version: ['7.17.0', '8.0.0', '8.1.0', '8.2.0']
+        exclude:
+          # Exclude incompatible combinations
+          - python-version: '3.9'
+            stellar-sdk-version: '8.2.0'
+          - python-version: '3.12'
+            stellar-sdk-version: '7.17.0'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install stellar-sdk==${{ matrix.stellar-sdk-version }}
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio pytest-mock pytest-timeout
+    
+    - name: Run SDK compatibility check
+      run: |
+        python scripts/check_sdk_compatibility.py --sdk-version=${{ matrix.stellar-sdk-version }}
+    
+    - name: Run unit tests with coverage
+      run: |
+        pytest tests/unit/ \
+          --cov=hummingbot.connector.exchange.stellar \
+          --cov-report=xml \
+          --cov-report=html \
+          --cov-fail-under=${{ env.COVERAGE_THRESHOLD }} \
+          --junitxml=pytest-results-${{ matrix.python-version }}-${{ matrix.stellar-sdk-version }}.xml \
+          --timeout=${{ env.PYTEST_TIMEOUT }} \
+          -v
+    
+    - name: Check critical module coverage
+      run: |
+        python scripts/check_critical_coverage.py \
+          --threshold=${{ env.CRITICAL_COVERAGE_THRESHOLD }} \
+          --coverage-file=coverage.xml
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.python-version }}-${{ matrix.stellar-sdk-version }}
+        path: |
+          pytest-results-*.xml
+          htmlcov/
+          coverage.xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml
+        flags: unit-tests
+        name: codecov-${{ matrix.python-version }}-${{ matrix.stellar-sdk-version }}
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      stellar-quickstart:
+        image: stellar/quickstart:soroban-dev
+        ports:
+          - 8000:8000
+          - 11626:11626
+        options: --standalone --enable-soroban-rpc --enable-soroban-diagnostic-events
+        env:
+          ENABLE_SOROBAN_RPC: "true"
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install Soroban CLI
+      run: |
+        curl -L https://github.com/stellar/soroban-cli/releases/download/v21.0.0/soroban-cli-21.0.0-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        sudo mv soroban /usr/local/bin/
+        soroban version
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-timeout
+    
+    - name: Wait for Stellar network
+      run: |
+        timeout 60 bash -c 'until curl -s http://localhost:8000/friendbot > /dev/null; do sleep 2; done'
+        timeout 60 bash -c 'until curl -s http://localhost:8000/soroban/rpc -X POST -H "Content-Type: application/json" -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"getHealth\"}" | grep -q "healthy"; do sleep 2; done'
+    
+    - name: Setup test accounts
+      run: |
+        soroban keys generate --global test-account-1 --network standalone
+        soroban keys generate --global test-account-2 --network standalone
+        soroban keys fund test-account-1 --network standalone
+        soroban keys fund test-account-2 --network standalone
+    
+    - name: Deploy test contracts
+      run: |
+        # Build and deploy AMM contract for testing
+        cd contracts/ || echo "No contracts directory, using pre-built"
+        if [ -f "amm_pool.wasm" ]; then
+          soroban contract deploy --wasm amm_pool.wasm --source test-account-1 --network standalone
+        fi
+    
+    - name: Run integration tests
+      run: |
+        pytest tests/integration/ \
+          --network=ci \
+          --soroban-rpc=http://localhost:8000/soroban/rpc \
+          --horizon-url=http://localhost:8000 \
+          --timeout=${{ env.PYTEST_TIMEOUT }} \
+          -v -s
+      env:
+        STELLAR_NETWORK_PASSPHRASE: "Standalone Network ; February 2017"
+        SOROBAN_RPC_URL: "http://localhost:8000/soroban/rpc"
+        HORIZON_URL: "http://localhost:8000"
+
+  performance-tests:
+    name: Performance & Load Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-benchmark pytest-asyncio locust
+    
+    - name: Run performance tests
+      run: |
+        pytest tests/performance/ \
+          --benchmark-min-rounds=10 \
+          --benchmark-warmup=on \
+          --benchmark-json=performance-results.json \
+          -v
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-results
+        path: performance-results.json
+
+  testnet-validation:
+    name: Testnet Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-timeout
+    
+    - name: Setup testnet credentials
+      run: |
+        echo "${{ secrets.TESTNET_SECRET_KEY }}" | base64 -d > testnet-key.txt
+        soroban keys add testnet-account --secret-key "$(cat testnet-key.txt)" --global --network testnet
+      env:
+        TESTNET_SECRET_KEY: ${{ secrets.TESTNET_SECRET_KEY }}
+    
+    - name: Fund testnet account
+      run: |
+        soroban keys fund testnet-account --network testnet
+    
+    - name: Run testnet validation tests
+      run: |
+        pytest tests/testnet/ \
+          --network=testnet \
+          --soroban-rpc=https://soroban-testnet.stellar.org \
+          --horizon-url=https://horizon-testnet.stellar.org \
+          --timeout=600 \
+          -v -s --tb=short
+      env:
+        STELLAR_NETWORK_PASSPHRASE: "Test SDF Network ; September 2015"
+        SOROBAN_RPC_URL: "https://soroban-testnet.stellar.org"
+        HORIZON_URL: "https://horizon-testnet.stellar.org"
+
+  build-and-package:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [security-scan, code-quality, unit-tests]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install build tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine wheel
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Check package
+      run: |
+        twine check dist/*
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: package-dist
+        path: dist/
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [integration-tests, build-and-package]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: staging
+    
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: package-dist
+        path: dist/
+    
+    - name: Deploy to staging environment
+      run: |
+        echo "Deploying to staging environment..."
+        # Add actual deployment commands here
+    
+    - name: Run smoke tests
+      run: |
+        echo "Running smoke tests against staging..."
+        # Add smoke test commands here
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [testnet-validation, performance-tests, build-and-package]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: package-dist
+        path: dist/
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        draft: false
+        prerelease: false
+    
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/stellar-hummingbot-connector-${{ github.run_number }}.tar.gz
+        asset_name: stellar-hummingbot-connector-${{ github.run_number }}.tar.gz
+        asset_content_type: application/gzip
+
+  notify:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: [security-scan, code-quality, unit-tests, integration-tests]
+    if: always()
+    
+    steps:
+    - name: Notify on failure
+      if: needs.security-scan.result == 'failure' || needs.code-quality.result == 'failure' || needs.unit-tests.result == 'failure' || needs.integration-tests.result == 'failure'
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: 'Stellar Hummingbot Connector CI failed'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    - name: Notify on success
+      if: needs.security-scan.result == 'success' && needs.code-quality.result == 'success' && needs.unit-tests.result == 'success' && needs.integration-tests.result == 'success'
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: 'Stellar Hummingbot Connector CI passed successfully'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

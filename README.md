@@ -35,11 +35,12 @@ A production-ready, enterprise-grade connector for integrating Stellar Lumens (X
 - Connection health monitoring with alerting
 - HTTP/2 optimized connection management
 
-### ✅ **Quality Assurance**
-- 100% test coverage (84/84 tests passing)
-- Comprehensive error scenario testing
-- Performance benchmarking
-- Security validation tests
+### ✅ **Quality Assurance Framework**
+- **Comprehensive QA System**: Machine-readable quality catalogue with 35+ requirements
+- **Test Coverage**: 80%+ baseline, 90%+ for critical modules (security, chain, orders)
+- **Multi-layer Testing**: Unit, integration, security compliance, and performance tests
+- **Automated Validation**: CI pipeline with matrix testing across Python/SDK versions
+- **Traceability**: QA ID mapping from requirements to test implementations
 
 ## Quick Start
 
@@ -94,8 +95,14 @@ We maintain strict test quality with automated enforcement:
 # Run full test suite
 python -m pytest
 
-# Run with coverage
-python -m pytest --cov=hummingbot --cov-report=html
+# Run with coverage (enforce thresholds)
+python -m pytest --cov=hummingbot --cov-report=html --cov-fail-under=80
+
+# Check critical module coverage (90%+ required)
+python scripts/check_critical_coverage.py --coverage-file=coverage.xml
+
+# Validate SDK compatibility
+python scripts/check_sdk_compatibility.py --sdk-version=$(pip show stellar-sdk | grep Version | cut -d' ' -f2)
 ```
 
 ### Code Quality Tools
@@ -117,11 +124,14 @@ pre-commit run --all-files
 ### Security Testing
 
 ```bash
-# Run security-specific tests
-python -m pytest -m security
+# Run security compliance tests
+python -m pytest tests/security/test_stellar_security_compliance.py -v
 
-# Test all security components
-python -m pytest test/unit/test_stellar_security_comprehensive.py
+# Comprehensive secret scanning
+python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_no_hardcoded_secrets_in_repository -v
+
+# Git history security scan
+python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_git_history_secret_scan -v
 ```
 
 ## Architecture
@@ -149,14 +159,64 @@ python -m pytest test/unit/test_stellar_security_comprehensive.py
 
 ## Contributing
 
+### QA Framework & Quality Assurance
+
+Our comprehensive QA framework ensures production-ready code quality:
+
+#### **Quality Catalogue** 📋
+- **Location**: `qa/quality_catalogue.yml` (machine-readable) and `qa/quality_catalogue.json`
+- **Requirements**: 35+ traced requirements with QA IDs (REQ-EXC-001, REQ-ORD-001, etc.)
+- **Mapping**: Each requirement maps to specific test functions with acceptance criteria
+
+#### **Test Structure** 🧪
+```
+tests/
+├── unit/                          # Unit tests (mock-based, no external calls)
+│   ├── test_stellar_exchange_contract.py      # QA_IDs: REQ-EXC-001 to REQ-EXC-005
+│   ├── test_order_lifecycle.py                # QA_IDs: REQ-ORD-001 to REQ-ORD-006
+│   ├── test_stellar_chain_contract.py         # QA_IDs: REQ-CHAIN-001 to REQ-CHAIN-007
+│   ├── test_stellar_security_contract.py      # QA_IDs: REQ-SEC-006 to REQ-SEC-012
+│   ├── test_stellar_soroban_contract.py       # QA_IDs: REQ-SOB-001 to REQ-SOB-007
+│   └── test_stellar_path_engine_contract.py   # QA_IDs: REQ-PATH-001 to REQ-PATH-006
+├── integration/                   # Integration tests with local/testnet networks
+│   └── integration_test_soroban_flow.md       # Comprehensive Soroban test guide
+└── security/                      # Security compliance tests
+    └── test_stellar_security_compliance.py    # QA_IDs: REQ-SEC-001 to REQ-SEC-005
+```
+
+#### **Coverage Requirements** 📊
+- **Baseline**: 80% coverage for all modules
+- **Critical Modules**: 90%+ coverage required
+  - `stellar_security*` modules: 95%+
+  - `stellar_chain_interface`: 90%+
+  - `stellar_order_manager`: 90%+
+
+#### **Quality Tools** ⚙️
+```bash
+# Run comprehensive pre-commit checks
+./run_pr_checks.sh
+
+# QA catalogue maintenance
+python -c "import yaml, json; json.dump(yaml.safe_load(open('qa/quality_catalogue.yml')), open('qa/quality_catalogue.json', 'w'), indent=2)"
+```
+
 ### Development Workflow
 
 1. **Read** [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) thoroughly
-2. **Create** feature branch from `master`
-3. **Write** tests first (TDD approach)
-4. **Implement** functionality with proper error handling
-5. **Ensure** all tests pass (100% success rate required)
-6. **Submit** pull request with descriptive commits
+2. **Review** [`PR_CHECKLIST.md`](./PR_CHECKLIST.md) for requirements  
+3. **Create** feature branch from `develop`
+4. **Write** tests first with proper QA ID mapping:
+   ```python
+   def test_new_feature(self):
+       """New feature test.
+       
+       QA_ID: REQ-NEW-001
+       Acceptance Criteria: assert new_feature.result == expected_result
+       """
+   ```
+5. **Implement** functionality with comprehensive error handling
+6. **Ensure** all PR checklist items pass (security, coverage, quality)
+7. **Submit** pull request following the checklist
 
 ### Commit Standards
 
@@ -175,9 +235,11 @@ python -m pytest test/unit/test_stellar_security_comprehensive.py
 ## Support
 
 ### Documentation
-- API documentation: `docs/api/`  
-- Architecture decisions: `docs/adr/`
-- Security guidelines: `docs/security/`
+- **Quality Guidelines**: [`docs/QUALITY_GUIDELINES.md`](./docs/QUALITY_GUIDELINES.md) - Comprehensive quality standards
+- **QA Framework**: [`qa/quality_catalogue.yml`](./qa/quality_catalogue.yml) - Machine-readable requirements
+- **Testing Guide**: [`CONFIGURATION.md`](./CONFIGURATION.md) - Local testing and setup instructions
+- **PR Process**: [`PR_CHECKLIST.md`](./PR_CHECKLIST.md) - Complete pull request checklist
+- **Integration Tests**: [`tests/integration/integration_test_soroban_flow.md`](./tests/integration/integration_test_soroban_flow.md)
 
 ### Getting Help
 - Create GitHub issue for bugs
