@@ -187,5 +187,248 @@
     "completion_percentage": 100,
     "user": "test",
     "notes": "Test completion"
+  },
+  {
+    "timestamp": 1757183499.817486,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757183499.844459,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757183499.852728,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757183499.8617373,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757183499.879864,
+    "requirement_id": "SR-DEV-002",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "test",
+    "notes": "Test completion"
+  },
+  {
+    "timestamp": 1757183871.7421722,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757183871.7690375,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757183871.7778087,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757183871.7864027,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757183871.8060668,
+    "requirement_id": "SR-DEV-003",
+    "old_status": "not_started",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "test",
+    "notes": "Test completion"
+  },
+  {
+    "timestamp": 1757184263.7290397,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757184263.7554474,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757184263.7646158,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757184263.7745492,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757184263.7954717,
+    "requirement_id": "SR-DEV-007",
+    "old_status": "not_started",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "test",
+    "notes": "Test completion"
+  },
+  {
+    "timestamp": 1757185512.6345744,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757185512.6674316,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757185512.6857598,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757185512.6970558,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757185653.7403896,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757185653.764818,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757185653.7769399,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757185653.785933,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757186158.3996966,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757186158.440387,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757186158.452658,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757186158.463504,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
   }
 ]

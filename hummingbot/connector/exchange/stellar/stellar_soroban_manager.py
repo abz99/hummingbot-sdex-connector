@@ -250,6 +250,105 @@ class SorobanContractManager:
             )
             raise
 
+    async def simulate_contract(
+        self,
+        contract_address: str,
+        function_name: str,
+        parameters: Dict[str, Any],
+        source_account: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Simulate smart contract function for preview."""
+        try:
+            # Create simulation operation
+            operation = ContractOperation(
+                operation_type=ContractOperationType.INVOKE,
+                contract_address=contract_address,
+                function_name=function_name,
+                parameters=parameters,
+            )
+
+            # Implementation stub - actual simulation in Phase 3
+            simulation_result = {
+                "success": True,
+                "gas_used": await self.estimate_gas(contract_address, function_name, parameters),
+                "return_value": {"preview": "simulation_result"},
+                "state_changes": [],
+                "events": [],
+            }
+
+            await self.observability.log_event(
+                "contract_simulated",
+                {"contract": contract_address, "function": function_name, "success": True},
+            )
+
+            return simulation_result
+
+        except Exception as e:
+            await self.observability.log_error(
+                "contract_simulation_failed",
+                e,
+                {"contract": contract_address, "function": function_name},
+            )
+            raise
+
+    async def execute_cross_contract_operation(
+        self,
+        operations: List[ContractOperation],
+        source_account: str,
+        atomic: bool = True,
+    ) -> List[str]:
+        """Execute multiple contract operations atomically."""
+        try:
+            transaction_ids = []
+            
+            if atomic:
+                # Create atomic transaction with multiple operations
+                transaction_id = f"cross_contract_atomic_{time.time()}"
+                
+                # Implementation stub - actual atomic execution in Phase 3
+                for operation in operations:
+                    # Simulate each operation first
+                    simulation = await self.simulate_contract(
+                        operation.contract_address,
+                        operation.function_name,
+                        operation.parameters,
+                        source_account
+                    )
+                    
+                    if not simulation["success"]:
+                        raise ValueError(f"Operation simulation failed: {operation}")
+                
+                transaction_ids.append(transaction_id)
+                
+                await self.observability.log_event(
+                    "cross_contract_executed",
+                    {
+                        "transaction_id": transaction_id,
+                        "operations_count": len(operations),
+                        "atomic": atomic,
+                    },
+                )
+            else:
+                # Execute operations individually
+                for operation in operations:
+                    result = await self.invoke_contract(
+                        operation.contract_address,
+                        operation.function_name,
+                        operation.parameters,
+                        source_account
+                    )
+                    transaction_ids.append(f"individual_{time.time()}")
+
+            return transaction_ids
+
+        except Exception as e:
+            await self.observability.log_error(
+                "cross_contract_execution_failed",
+                e,
+                {"operations_count": len(operations), "atomic": atomic},
+            )
+            raise
+
     async def estimate_gas(
         self, contract_address: str, function_name: str, parameters: Dict[str, Any]
     ) -> int:
