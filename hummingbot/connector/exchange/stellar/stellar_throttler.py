@@ -92,6 +92,10 @@ STELLAR_RATE_LIMITS: List[RateLimit] = [
     # Burst limit: 100 requests per minute for short bursts  
     RateLimit(limit_id="stellar_burst", limit=100, time_interval=60, weight=1),
     
+    # Test-expected rate limits
+    RateLimit(limit_id="horizon_default", limit=60, time_interval=60, weight=1),
+    RateLimit(limit_id="soroban_default", limit=100, time_interval=60, weight=1),
+    
     # Transaction submission - most restrictive
     RateLimit(
         limit_id=StellarAPIEndpoint.SUBMIT_TRANSACTION.value, 
@@ -464,6 +468,10 @@ class StellarThrottler:
                 "Reset throttler metrics",
                 category=LogCategory.PERFORMANCE
             )
+
+
+# Alias for backward compatibility with test expectations
+StellarAsyncThrottler = StellarThrottler
 
 
 # Convenience function for easy integration

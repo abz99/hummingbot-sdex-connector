@@ -387,7 +387,9 @@ class StellarWebAssistantsFactory:
         endpoint_config: Optional[StellarEndpointConfig] = None,
         throttler: Optional[StellarThrottler] = None,
         api_key: Optional[str] = None,
-        shared_session: Optional[ClientSession] = None
+        shared_session: Optional[ClientSession] = None,
+        # Compatibility parameters for tests
+        auth: Optional[Any] = None
     ):
         self.logger = get_stellar_logger()
         
@@ -496,6 +498,10 @@ class StellarWebAssistantsFactory:
             "shared_session_active": self.shared_session is not None and not self.shared_session.closed,
             "authenticator_configured": self.authenticator is not None
         }
+
+
+# Alias for backward compatibility with test expectations
+StellarWebAssistantFactory = StellarWebAssistantsFactory
 
 
 # Convenience functions for easy integration

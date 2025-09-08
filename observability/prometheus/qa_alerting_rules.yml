@@ -1,0 +1,298 @@
+groups:
+  - name: stellar_qa_alerts
+    rules:
+      # Test Coverage Alerts
+      - alert: LowOverallTestCoverage
+        expr: stellar_qa_test_coverage_percentage{coverage_type="overall"} < 80
+        for: 5m
+        labels:
+          severity: warning
+          category: qa
+          component: testing
+        annotations:
+          summary: "Overall test coverage is below 80%"
+          description: "Test coverage for {{ $labels.module }} is {{ $value }}%, which is below the required 80% threshold"
+          runbook_url: "https://docs.internal/runbooks/qa/coverage-alerts"
+          
+      - alert: CriticalModuleCoverageFailed
+        expr: stellar_qa_test_coverage_percentage{coverage_type="critical"} < 90
+        for: 2m
+        labels:
+          severity: critical
+          category: qa
+          component: testing
+        annotations:
+          summary: "Critical module {{ $labels.module }} below coverage threshold"
+          description: "Critical module {{ $labels.module }} has {{ $value }}% coverage, below required 90%"
+          runbook_url: "https://docs.internal/runbooks/qa/critical-coverage"
+          
+      - alert: SecurityModuleCoverageFailed
+        expr: stellar_qa_test_coverage_percentage{coverage_type="critical",module=~"stellar_security.*"} < 95
+        for: 1m
+        labels:
+          severity: critical
+          category: qa
+          component: security
+        annotations:
+          summary: "Security module {{ $labels.module }} below 95% coverage"
+          description: "Security module {{ $labels.module }} has {{ $value }}% coverage, below required 95%"
+          runbook_url: "https://docs.internal/runbooks/qa/security-coverage"
+          
+      # Test Execution Alerts
+      - alert: LowTestSuccessRate
+        expr: stellar_qa_test_success_rate < 0.95
+        for: 3m
+        labels:
+          severity: warning
+          category: qa
+          component: testing
+        annotations:
+          summary: "Test success rate below 95%"
+          description: "Test suite {{ $labels.test_suite }} ({{ $labels.test_type }}) has success rate of {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.internal/runbooks/qa/test-failures"
+          
+      - alert: CriticalTestFailures
+        expr: stellar_qa_test_success_rate < 0.90
+        for: 1m
+        labels:
+          severity: critical
+          category: qa
+          component: testing
+        annotations:
+          summary: "Critical test failure rate detected"
+          description: "Test suite {{ $labels.test_suite }} ({{ $labels.test_type }}) has success rate of {{ $value | humanizePercentage }}, indicating critical issues"
+          runbook_url: "https://docs.internal/runbooks/qa/critical-failures"
+          
+      - alert: LongTestExecutionTime
+        expr: stellar_qa_test_execution_time_seconds > 300
+        for: 5m
+        labels:
+          severity: warning
+          category: qa
+          component: performance
+        annotations:
+          summary: "Test execution time exceeding 5 minutes"
+          description: "Test suite {{ $labels.test_suite }} ({{ $labels.test_type }}) taking {{ $value }}s to execute"
+          runbook_url: "https://docs.internal/runbooks/qa/slow-tests"
+          
+      # Code Quality Alerts
+      - alert: LowCodeQualityScore
+        expr: stellar_qa_code_quality_score < 7.0
+        for: 10m
+        labels:
+          severity: warning
+          category: qa
+          component: quality
+        annotations:
+          summary: "Code quality score below acceptable threshold"
+          description: "Code quality score for {{ $labels.quality_type }} is {{ $value }}/10, below required 7.0"
+          runbook_url: "https://docs.internal/runbooks/qa/code-quality"
+          
+      - alert: CriticalCodeQualityIssues
+        expr: stellar_qa_code_quality_score < 5.0
+        for: 2m
+        labels:
+          severity: critical
+          category: qa
+          component: quality
+        annotations:
+          summary: "Critical code quality issues detected"
+          description: "Code quality score for {{ $labels.quality_type }} is {{ $value }}/10, indicating critical issues"
+          runbook_url: "https://docs.internal/runbooks/qa/critical-quality"
+          
+      # Compliance Alerts
+      - alert: NonCompliantRequirements
+        expr: stellar_qa_compliance_status == 0
+        for: 5m
+        labels:
+          severity: warning
+          category: qa
+          component: compliance
+        annotations:
+          summary: "Non-compliant requirement detected"
+          description: "Requirement {{ $labels.requirement_id }} in category {{ $labels.requirement_category }} is non-compliant"
+          runbook_url: "https://docs.internal/runbooks/qa/compliance"
+          
+      - alert: CriticalComplianceFailure
+        expr: |
+          (
+            count(stellar_qa_compliance_status{requirement_category="security"} == 0) > 0
+          ) or (
+            count(stellar_qa_compliance_status == 0) / count(stellar_qa_compliance_status) > 0.20
+          )
+        for: 1m
+        labels:
+          severity: critical
+          category: qa
+          component: compliance
+        annotations:
+          summary: "Critical compliance failure"
+          description: "Security requirements non-compliant or >20% of all requirements failing"
+          runbook_url: "https://docs.internal/runbooks/qa/critical-compliance"
+          
+      # Requirement Coverage Alerts
+      - alert: LowRequirementCoverage
+        expr: stellar_qa_requirement_coverage_percentage < 85
+        for: 10m
+        labels:
+          severity: warning
+          category: qa
+          component: coverage
+        annotations:
+          summary: "Requirement coverage below 85%"
+          description: "Coverage for {{ $labels.requirement_category }} requirements is {{ $value }}%"
+          runbook_url: "https://docs.internal/runbooks/qa/requirement-coverage"
+          
+      # Defect Alerts
+      - alert: HighDefectRate
+        expr: rate(stellar_qa_defect_count[1h]) > 0.5
+        for: 15m
+        labels:
+          severity: warning
+          category: qa
+          component: quality
+        annotations:
+          summary: "High defect discovery rate"
+          description: "Defect rate for {{ $labels.component }} ({{ $labels.severity }}) is {{ $value }} defects/hour"
+          runbook_url: "https://docs.internal/runbooks/qa/defects"
+          
+      - alert: CriticalDefectDetected
+        expr: increase(stellar_qa_defect_count{severity="critical"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          category: qa
+          component: quality
+        annotations:
+          summary: "Critical defect detected"
+          description: "Critical severity defect detected in {{ $labels.component }}"
+          runbook_url: "https://docs.internal/runbooks/qa/critical-defects"
+          
+      # QA Process Alerts
+      - alert: QAMetricsCollectionDown
+        expr: up{job="stellar-qa-metrics"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: qa
+          component: monitoring
+        annotations:
+          summary: "QA metrics collection is down"
+          description: "QA metrics collector has been down for more than 2 minutes"
+          runbook_url: "https://docs.internal/runbooks/qa/metrics-down"
+          
+      - alert: QAMetricsStale
+        expr: (time() - stellar_qa_last_update_timestamp) > 3600
+        for: 5m
+        labels:
+          severity: warning
+          category: qa
+          component: monitoring
+        annotations:
+          summary: "QA metrics are stale"
+          description: "QA metrics haven't been updated for {{ $value | humanizeDuration }}"
+          runbook_url: "https://docs.internal/runbooks/qa/stale-metrics"
+          
+      # Performance Regression Alerts
+      - alert: TestPerformanceRegression
+        expr: |
+          (
+            stellar_qa_test_execution_time_seconds > 
+            stellar_qa_test_execution_time_seconds offset 1d * 1.5
+          )
+        for: 10m
+        labels:
+          severity: warning
+          category: qa
+          component: performance
+        annotations:
+          summary: "Test performance regression detected"
+          description: "Test suite {{ $labels.test_suite }} execution time increased by >50% compared to 24h ago"
+          runbook_url: "https://docs.internal/runbooks/qa/performance-regression"
+          
+      # Coverage Trend Alerts
+      - alert: CoverageTrendDecreasing
+        expr: |
+          (
+            avg_over_time(stellar_qa_test_coverage_percentage{coverage_type="overall"}[24h]) -
+            avg_over_time(stellar_qa_test_coverage_percentage{coverage_type="overall"}[24h] offset 24h)
+          ) < -2
+        for: 1h
+        labels:
+          severity: warning
+          category: qa
+          component: testing
+        annotations:
+          summary: "Test coverage trend is decreasing"
+          description: "Overall test coverage has decreased by more than 2% over the last 24 hours"
+          runbook_url: "https://docs.internal/runbooks/qa/coverage-trends"
+          
+      # Integration Status Alerts
+      - alert: QAIntegrationPartialFailure
+        expr: stellar_qa_integration_status{component="coverage_checker"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          category: qa
+          component: integration
+        annotations:
+          summary: "QA integration component failure"
+          description: "QA integration component {{ $labels.component }} is not functional"
+          runbook_url: "https://docs.internal/runbooks/qa/integration-failure"
+          
+      - alert: QAIntegrationTotalFailure
+        expr: count(stellar_qa_integration_status == 0) >= 2
+        for: 2m
+        labels:
+          severity: critical
+          category: qa
+          component: integration
+        annotations:
+          summary: "Multiple QA integration components failing"
+          description: "{{ $value }} QA integration components are not functional"
+          runbook_url: "https://docs.internal/runbooks/qa/integration-critical"
+
+  # QA-specific recording rules for better performance
+  - name: stellar_qa_recording_rules
+    interval: 30s
+    rules:
+      # Overall QA health score (0-100)
+      - record: stellar_qa_health_score
+        expr: |
+          (
+            (stellar_qa_test_coverage_percentage{coverage_type="overall"} / 100 * 25) +
+            (stellar_qa_test_success_rate * 100 * 25) +
+            (stellar_qa_code_quality_score / 10 * 100 * 25) +
+            (
+              count(stellar_qa_compliance_status == 2) /
+              count(stellar_qa_compliance_status) * 100 * 25
+            )
+          )
+          
+      # Critical modules compliance rate
+      - record: stellar_qa_critical_compliance_rate
+        expr: |
+          count(stellar_qa_test_coverage_percentage{coverage_type="critical"} >= 90) /
+          count(stellar_qa_test_coverage_percentage{coverage_type="critical"})
+          
+      # Security modules compliance rate (should be 100%)
+      - record: stellar_qa_security_compliance_rate
+        expr: |
+          count(stellar_qa_test_coverage_percentage{coverage_type="critical",module=~"stellar_security.*"} >= 95) /
+          count(stellar_qa_test_coverage_percentage{coverage_type="critical",module=~"stellar_security.*"})
+          
+      # Average test execution time by test type
+      - record: stellar_qa_avg_execution_time_by_type
+        expr: |
+          avg by (test_type) (stellar_qa_test_execution_time_seconds)
+          
+      # Defect rate by severity (per hour)
+      - record: stellar_qa_defect_rate_by_severity
+        expr: |
+          rate(stellar_qa_defect_count[1h])
+          
+      # QA integration health (percentage of components working)
+      - record: stellar_qa_integration_health
+        expr: |
+          count(stellar_qa_integration_status == 1) /
+          count(stellar_qa_integration_status) * 100

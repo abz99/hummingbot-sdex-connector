@@ -232,6 +232,64 @@ class StellarMetrics:
             registry=self.registry,
         )
 
+        # QA and Testing metrics
+        self.qa_test_coverage = Gauge(
+            "stellar_qa_test_coverage_percentage",
+            "Test coverage percentage by module",
+            ["module", "coverage_type"],
+            registry=self.registry,
+        )
+
+        self.qa_test_success_rate = Gauge(
+            "stellar_qa_test_success_rate",
+            "QA test success rate",
+            ["test_suite", "test_type"],
+            registry=self.registry,
+        )
+
+        self.qa_critical_module_coverage = Gauge(
+            "stellar_qa_critical_module_coverage_percentage",
+            "Critical module test coverage percentage",
+            ["module", "threshold_type"],
+            registry=self.registry,
+        )
+
+        self.qa_test_execution_duration = Histogram(
+            "stellar_qa_test_execution_duration_seconds",
+            "QA test execution duration in seconds",
+            ["test_suite", "test_category"],
+            buckets=[0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 30.0, 60.0],
+            registry=self.registry,
+        )
+
+        self.qa_test_failures_total = Counter(
+            "stellar_qa_test_failures_total",
+            "Total number of QA test failures",
+            ["test_suite", "failure_type", "module"],
+            registry=self.registry,
+        )
+
+        self.qa_code_quality_score = Gauge(
+            "stellar_qa_code_quality_score",
+            "Code quality score from static analysis",
+            ["module", "metric_type"],
+            registry=self.registry,
+        )
+
+        self.qa_requirements_compliance = Gauge(
+            "stellar_qa_requirements_compliance_percentage",
+            "Requirements compliance percentage",
+            ["requirement_category", "priority"],
+            registry=self.registry,
+        )
+
+        self.qa_security_compliance_score = Gauge(
+            "stellar_qa_security_compliance_score",
+            "Security compliance score",
+            ["security_category", "requirement_level"],
+            registry=self.registry,
+        )
+
         # Store metrics for easy access
         self._metrics.update(
             {
@@ -257,6 +315,14 @@ class StellarMetrics:
                 "cpu_usage_percent": self.cpu_usage_percent,
                 "profit_loss_xlm": self.profit_loss_xlm,
                 "arbitrage_opportunities": self.arbitrage_opportunities,
+                "qa_test_coverage": self.qa_test_coverage,
+                "qa_test_success_rate": self.qa_test_success_rate,
+                "qa_critical_module_coverage": self.qa_critical_module_coverage,
+                "qa_test_execution_duration": self.qa_test_execution_duration,
+                "qa_test_failures_total": self.qa_test_failures_total,
+                "qa_code_quality_score": self.qa_code_quality_score,
+                "qa_requirements_compliance": self.qa_requirements_compliance,
+                "qa_security_compliance_score": self.qa_security_compliance_score,
             }
         )
 
@@ -407,6 +473,85 @@ class StellarMetrics:
         self.arbitrage_opportunities.labels(
             network=network, asset_pair=asset_pair, executed=str(executed).lower()
         ).inc()
+
+    # QA and Testing metrics methods
+    def update_test_coverage(self, module: str, coverage_percentage: float, coverage_type: str = "line"):
+        """Update test coverage percentage for a module."""
+        self.qa_test_coverage.labels(
+            module=module, coverage_type=coverage_type
+        ).set(coverage_percentage)
+        
+        self.logger.debug(
+            f"Updated test coverage for {module}: {coverage_percentage}%",
+            category=LogCategory.METRICS,
+            module=module,
+            coverage=coverage_percentage,
+            type=coverage_type
+        )
+
+    def update_test_success_rate(self, test_suite: str, success_rate: float, test_type: str = "unit"):
+        """Update test success rate for a test suite."""
+        self.qa_test_success_rate.labels(
+            test_suite=test_suite, test_type=test_type
+        ).set(success_rate)
+
+    def update_critical_module_coverage(self, module: str, coverage_percentage: float, threshold_type: str = "critical"):
+        """Update critical module coverage percentage."""
+        self.qa_critical_module_coverage.labels(
+            module=module, threshold_type=threshold_type
+        ).set(coverage_percentage)
+
+    def record_test_execution(self, test_suite: str, duration_seconds: float, test_category: str = "unit"):
+        """Record test execution duration."""
+        self.qa_test_execution_duration.labels(
+            test_suite=test_suite, test_category=test_category
+        ).observe(duration_seconds)
+
+    def record_test_failure(self, test_suite: str, failure_type: str, module: str = "unknown"):
+        """Record a test failure."""
+        self.qa_test_failures_total.labels(
+            test_suite=test_suite, failure_type=failure_type, module=module
+        ).inc()
+
+    def update_code_quality_score(self, module: str, score: float, metric_type: str = "complexity"):
+        """Update code quality score for a module."""
+        self.qa_code_quality_score.labels(
+            module=module, metric_type=metric_type
+        ).set(score)
+
+    def update_requirements_compliance(self, requirement_category: str, compliance_percentage: float, priority: str = "high"):
+        """Update requirements compliance percentage."""
+        self.qa_requirements_compliance.labels(
+            requirement_category=requirement_category, priority=priority
+        ).set(compliance_percentage)
+
+    def update_security_compliance(self, security_category: str, score: float, requirement_level: str = "mandatory"):
+        """Update security compliance score."""
+        self.qa_security_compliance_score.labels(
+            security_category=security_category, requirement_level=requirement_level
+        ).set(score)
+
+    def get_qa_metrics_summary(self) -> Dict[str, Any]:
+        """Get a summary of all QA metrics."""
+        summary = {
+            "coverage_metrics": {
+                "overall_coverage": self.qa_test_coverage,
+                "critical_module_coverage": self.qa_critical_module_coverage
+            },
+            "quality_metrics": {
+                "test_success_rate": self.qa_test_success_rate,
+                "code_quality_score": self.qa_code_quality_score
+            },
+            "compliance_metrics": {
+                "requirements_compliance": self.qa_requirements_compliance,
+                "security_compliance": self.qa_security_compliance_score
+            },
+            "failure_metrics": {
+                "test_failures": self.qa_test_failures_total,
+                "execution_duration": self.qa_test_execution_duration
+            }
+        }
+        return summary
 
     @asynccontextmanager
     async def time_operation(self, metric_name: str, **labels):

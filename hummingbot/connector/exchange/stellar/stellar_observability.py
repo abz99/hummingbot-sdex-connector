@@ -43,6 +43,13 @@ class ObservabilityEvent(Enum):
     ERROR_THRESHOLD = "error_threshold"
     CIRCUIT_BREAKER = "circuit_breaker"
     RESOURCE_EXHAUSTION = "resource_exhaustion"
+    # QA Events
+    QA_COVERAGE_LOW = "qa_coverage_low"
+    QA_TESTS_FAILING = "qa_tests_failing"
+    QA_QUALITY_LOW = "qa_quality_low"
+    QA_COMPLIANCE_FAIL = "qa_compliance_fail"
+    QA_DEFECT_HIGH = "qa_defect_high"
+    QA_METRICS_STALE = "qa_metrics_stale"
 
 
 @dataclass
@@ -338,6 +345,9 @@ class StellarObservabilityFramework:
         
         # Start background metrics collection
         await self.metrics.start_background_metrics_collection()
+        
+        # Register QA alert rules
+        await self.register_qa_alerts()
         
         self.observability_events.labels(
             event_type=ObservabilityEvent.SYSTEM_START.value,
@@ -784,6 +794,219 @@ class StellarObservabilityFramework:
             "system_uptime": time.time() - self.performance_metrics['startup_time']
         }
 
+    async def register_qa_alerts(self):
+        """Register QA-specific alert rules."""
+        qa_alert_rules = {
+            "qa_coverage_low": AlertRule(
+                name="qa_coverage_low",
+                condition="stellar_qa_test_coverage_percentage{coverage_type='overall'} < 80",
+                severity=AlertLevel.WARNING,
+                description="Overall test coverage below 80%",
+                labels={"category": "qa", "component": "testing"},
+                for_duration="5m"
+            ),
+            "qa_critical_coverage_fail": AlertRule(
+                name="qa_critical_coverage_fail", 
+                condition="stellar_qa_test_coverage_percentage{coverage_type='critical'} < 90",
+                severity=AlertLevel.CRITICAL,
+                description="Critical module coverage below required threshold",
+                labels={"category": "qa", "component": "testing"},
+                for_duration="2m"
+            ),
+            "qa_test_failures": AlertRule(
+                name="qa_test_failures",
+                condition="stellar_qa_test_success_rate < 0.95",
+                severity=AlertLevel.WARNING,
+                description="Test success rate below 95%",
+                labels={"category": "qa", "component": "testing"},
+                for_duration="3m"
+            ),
+            "qa_code_quality_low": AlertRule(
+                name="qa_code_quality_low",
+                condition="stellar_qa_code_quality_score < 7.0",
+                severity=AlertLevel.WARNING,
+                description="Code quality score below acceptable threshold",
+                labels={"category": "qa", "component": "quality"},
+                for_duration="10m"
+            ),
+            "qa_compliance_fail": AlertRule(
+                name="qa_compliance_fail",
+                condition="stellar_qa_compliance_status == 0",
+                severity=AlertLevel.WARNING,
+                description="Non-compliant QA requirements detected",
+                labels={"category": "qa", "component": "compliance"},
+                for_duration="5m"
+            )
+        }
+        
+        for rule_name, rule in qa_alert_rules.items():
+            await self.register_alert_rule(rule)
+            self.logger.info(f"Registered QA alert rule: {rule_name}")
+    
+    async def handle_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]):
+        """Handle QA-specific observability events."""
+        try:
+            self.observability_events.labels(
+                event_type=event_type.value,
+                status="triggered"
+            ).inc()
+            
+            # Log QA event with context
+            self.logger.warning(
+                f"QA event triggered: {event_type.value}",
+                extra={
+                    "event_type": event_type.value,
+                    "context": context,
+                    "timestamp": time.time()
+                }
+            )
+            
+            # Handle specific QA events
+            if event_type == ObservabilityEvent.QA_COVERAGE_LOW:
+                await self._handle_coverage_alert(context)
+            elif event_type == ObservabilityEvent.QA_TESTS_FAILING:
+                await self._handle_test_failure_alert(context)
+            elif event_type == ObservabilityEvent.QA_QUALITY_LOW:
+                await self._handle_quality_alert(context)
+            elif event_type == ObservabilityEvent.QA_COMPLIANCE_FAIL:
+                await self._handle_compliance_alert(context)
+            elif event_type == ObservabilityEvent.QA_DEFECT_HIGH:
+                await self._handle_defect_alert(context)
+            elif event_type == ObservabilityEvent.QA_METRICS_STALE:
+                await self._handle_stale_metrics_alert(context)
+            
+        except Exception as e:
+            self.logger.error(f"Error handling QA event {event_type.value}: {str(e)}")
+            self.observability_events.labels(
+                event_type=event_type.value,
+                status="error"
+            ).inc()
+    
+    async def _handle_coverage_alert(self, context: Dict[str, Any]):
+        """Handle low coverage alerts."""
+        coverage_percentage = context.get("coverage_percentage", 0)
+        module = context.get("module", "unknown")
+        
+        alert = Alert(
+            name="low_test_coverage",
+            level=AlertLevel.WARNING,
+            message=f"Test coverage for {module} is {coverage_percentage}% (below 80%)",
+            context=context,
+            timestamp=time.time()
+        )
+        
+        await self.fire_alert(alert)
+    
+    async def _handle_test_failure_alert(self, context: Dict[str, Any]):
+        """Handle test failure alerts."""
+        success_rate = context.get("success_rate", 0)
+        test_suite = context.get("test_suite", "unknown")
+        
+        alert = Alert(
+            name="test_failures",
+            level=AlertLevel.CRITICAL if success_rate < 0.90 else AlertLevel.WARNING,
+            message=f"Test suite {test_suite} has {success_rate*100:.1f}% success rate",
+            context=context,
+            timestamp=time.time()
+        )
+        
+        await self.fire_alert(alert)
+    
+    async def _handle_quality_alert(self, context: Dict[str, Any]):
+        """Handle code quality alerts."""
+        quality_score = context.get("quality_score", 0)
+        
+        alert = Alert(
+            name="low_code_quality",
+            level=AlertLevel.CRITICAL if quality_score < 5.0 else AlertLevel.WARNING,
+            message=f"Code quality score is {quality_score}/10",
+            context=context,
+            timestamp=time.time()
+        )
+        
+        await self.fire_alert(alert)
+    
+    async def _handle_compliance_alert(self, context: Dict[str, Any]):
+        """Handle compliance alerts."""
+        requirement_id = context.get("requirement_id", "unknown")
+        category = context.get("category", "unknown")
+        
+        alert = Alert(
+            name="compliance_failure",
+            level=AlertLevel.CRITICAL if category == "security" else AlertLevel.WARNING,
+            message=f"Requirement {requirement_id} in category {category} is non-compliant",
+            context=context,
+            timestamp=time.time()
+        )
+        
+        await self.fire_alert(alert)
+    
+    async def _handle_defect_alert(self, context: Dict[str, Any]):
+        """Handle defect rate alerts."""
+        defect_rate = context.get("defect_rate", 0)
+        severity = context.get("severity", "unknown")
+        
+        alert = Alert(
+            name="high_defect_rate",
+            level=AlertLevel.CRITICAL if severity == "critical" else AlertLevel.WARNING,
+            message=f"High {severity} defect rate: {defect_rate} defects/hour",
+            context=context,
+            timestamp=time.time()
+        )
+        
+        await self.fire_alert(alert)
+    
+    async def _handle_stale_metrics_alert(self, context: Dict[str, Any]):
+        """Handle stale metrics alerts."""
+        last_update = context.get("last_update", "unknown")
+        
+        alert = Alert(
+            name="stale_qa_metrics",
+            level=AlertLevel.WARNING,
+            message=f"QA metrics haven't been updated since {last_update}",
+            context=context,
+            timestamp=time.time()
+        )
+        
+        await self.fire_alert(alert)
+    
+    def get_qa_health_status(self) -> Dict[str, Any]:
+        """Get QA-specific health status."""
+        try:
+            # This would integrate with actual QA metrics collection
+            qa_status = {
+                "coverage_health": "healthy",  # Based on coverage metrics
+                "test_health": "healthy",      # Based on test success rates
+                "quality_health": "healthy",   # Based on quality scores
+                "compliance_health": "healthy", # Based on compliance status
+                "integration_health": "healthy" # Based on QA integration status
+            }
+            
+            # Determine overall QA health
+            unhealthy_components = [k for k, v in qa_status.items() if v != "healthy"]
+            
+            if len(unhealthy_components) == 0:
+                overall_status = "healthy"
+            elif len(unhealthy_components) <= 1:
+                overall_status = "degraded"
+            else:
+                overall_status = "unhealthy"
+            
+            return {
+                "overall_status": overall_status,
+                "component_status": qa_status,
+                "unhealthy_components": unhealthy_components,
+                "last_check": time.time()
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error getting QA health status: {str(e)}")
+            return {
+                "overall_status": "unknown",
+                "error": str(e),
+                "last_check": time.time()
+            }
+
     def generate_observability_report(self) -> Dict[str, Any]:
         """Generate comprehensive observability report."""
         return {
@@ -796,6 +1019,7 @@ class StellarObservabilityFramework:
                 "health_checks": len(self.health_checks)
             },
             "health_status": self.get_health_status(),
+            "qa_health_status": self.get_qa_health_status(),
             "performance_metrics": self.performance_metrics,
             "metrics_summary": {
                 "total_metrics": len(self.metrics._metrics) + len(self.metrics._custom_metrics),

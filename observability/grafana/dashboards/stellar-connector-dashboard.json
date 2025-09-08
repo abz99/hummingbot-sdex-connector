@@ -296,6 +296,271 @@
           "yBucketNumber": null
         },
         "gridPos": {"h": 8, "w": 24, "x": 0, "y": 56}
+      },
+      {
+        "id": 16,
+        "title": "QA - Overall Test Coverage",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "stellar_qa_test_coverage_percentage{coverage_type=\"overall\"}",
+            "legendFormat": "{{module}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 80},
+                {"color": "green", "value": 85}
+              ]
+            },
+            "custom": {
+              "displayMode": "gradient"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 64}
+      },
+      {
+        "id": 17,
+        "title": "QA - Critical Module Coverage",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "stellar_qa_test_coverage_percentage{coverage_type=\"critical\"}",
+            "legendFormat": "{{module}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 90},
+                {"color": "green", "value": 95}
+              ]
+            },
+            "custom": {
+              "orientation": "horizontal",
+              "displayMode": "gradient"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 64}
+      },
+      {
+        "id": 18,
+        "title": "QA - Test Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "stellar_qa_test_success_rate",
+            "legendFormat": "{{test_suite}} - {{test_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 0.95},
+                {"color": "green", "value": 0.98}
+              ]
+            },
+            "custom": {
+              "displayMode": "lcd"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 64}
+      },
+      {
+        "id": 19,
+        "title": "QA - Code Quality Score",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "stellar_qa_code_quality_score",
+            "legendFormat": "{{quality_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "min": 0,
+            "max": 10,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 7},
+                {"color": "green", "value": 8.5}
+              ]
+            },
+            "custom": {
+              "drawStyle": "line"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 72}
+      },
+      {
+        "id": 20,
+        "title": "QA - Compliance Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "stellar_qa_compliance_status",
+            "legendFormat": "{{requirement_category}} - {{requirement_id}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {"type": "value", "value": 0, "text": "Non-Compliant"},
+              {"type": "value", "value": 1, "text": "Partially Compliant"},
+              {"type": "value", "value": 2, "text": "Fully Compliant"}
+            ],
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 1},
+                {"color": "green", "value": 2}
+              ]
+            },
+            "custom": {
+              "displayMode": "table"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 72}
+      },
+      {
+        "id": 21,
+        "title": "QA - Test Execution Time Trend",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "stellar_qa_test_execution_time_seconds",
+            "legendFormat": "{{test_suite}} - {{test_type}}"
+          }
+        ],
+        "yAxes": [
+          {"label": "Execution Time (s)", "min": 0},
+          {"show": false}
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"params": [300], "type": "gt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"type": "avg"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "30s",
+          "handler": 1,
+          "name": "Long Test Execution Time Alert",
+          "noDataState": "no_data"
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 80}
+      },
+      {
+        "id": 22,
+        "title": "QA - Requirements Coverage Matrix",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "stellar_qa_requirement_coverage_percentage",
+            "format": "heatmap",
+            "legendFormat": "{{requirement_category}}"
+          }
+        ],
+        "heatmap": {
+          "xBucketSize": null,
+          "yBucketSize": null,
+          "yBucketNumber": null,
+          "colorMode": "spectrum"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "custom": {
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              }
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 88}
+      },
+      {
+        "id": 23,
+        "title": "QA - Defect Density Trend",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(stellar_qa_defect_count[1h])",
+            "legendFormat": "{{severity}} - {{component}}"
+          }
+        ],
+        "yAxes": [
+          {"label": "Defects/hour", "min": 0},
+          {"show": false}
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"params": [0.5], "type": "gt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "1h", "now"]},
+              "reducer": {"type": "avg"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "High Defect Rate Alert",
+          "noDataState": "no_data"
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 88}
+      },
+      {
+        "id": 24,
+        "title": "QA - Coverage Trend (7 days)",
+        "type": "graph", 
+        "targets": [
+          {
+            "expr": "stellar_qa_test_coverage_percentage{coverage_type=\"overall\"}[7d:1h]",
+            "legendFormat": "Overall Coverage"
+          },
+          {
+            "expr": "avg(stellar_qa_test_coverage_percentage{coverage_type=\"critical\"})[7d:1h]",
+            "legendFormat": "Critical Modules Avg"
+          }
+        ],
+        "yAxes": [
+          {"label": "Coverage %", "min": 75, "max": 100},
+          {"show": false}
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 96}
       }
     ],
     "time": {
@@ -312,6 +577,30 @@
           "datasource": "Prometheus",
           "enable": true,
           "expr": "ALERTS{alertname=\"DeploymentAlert\"}"
+        },
+        {
+          "name": "QA Test Runs",
+          "datasource": "Prometheus", 
+          "enable": true,
+          "expr": "increase(stellar_qa_test_execution_time_seconds[1h]) > 0",
+          "iconColor": "blue",
+          "textFormat": "Test Suite: {{test_suite}} ({{test_type}})"
+        },
+        {
+          "name": "Coverage Changes",
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "delta(stellar_qa_test_coverage_percentage[1h]) != 0",
+          "iconColor": "green",
+          "textFormat": "Coverage changed for {{module}}: {{coverage_type}}"
+        },
+        {
+          "name": "QA Alerts",
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "ALERTS{alertname=~\".*QA.*|.*Test.*|.*Coverage.*\"}",
+          "iconColor": "red",
+          "textFormat": "QA Alert: {{alertname}} - {{severity}}"
         }
       ]
     },
@@ -329,6 +618,30 @@
           "name": "trading_pair", 
           "type": "query",
           "query": "label_values(stellar_orders_placed_total, trading_pair)",
+          "refresh": 1,
+          "includeAll": true,
+          "multi": true
+        },
+        {
+          "name": "test_suite",
+          "type": "query",
+          "query": "label_values(stellar_qa_test_success_rate, test_suite)",
+          "refresh": 1,
+          "includeAll": true,
+          "multi": true
+        },
+        {
+          "name": "module",
+          "type": "query", 
+          "query": "label_values(stellar_qa_test_coverage_percentage, module)",
+          "refresh": 1,
+          "includeAll": true,
+          "multi": true
+        },
+        {
+          "name": "requirement_category",
+          "type": "query",
+          "query": "label_values(stellar_qa_compliance_status, requirement_category)",
           "refresh": 1,
           "includeAll": true,
           "multi": true
