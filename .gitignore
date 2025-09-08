@@ -1,0 +1,4 @@
+test/defi_performance_benchmarks.py
+test/run_defi_tests.py
+test/qa/
+test/stellar_defi_integration_tests.py

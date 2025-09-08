@@ -38,12 +38,12 @@ jobs:
     
     - name: Run secret scanning
       run: |
-        python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_no_hardcoded_secrets_in_repository -v
+        python -m pytest test/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_no_hardcoded_secrets_in_repository -v
     
     - name: Run dependency vulnerability scan
       run: |
         safety check --json --output safety-report.json || echo "Safety scan completed"
-        python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_dependency_security_scan -v
+        python -m pytest test/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_dependency_security_scan -v
     
     - name: Run static security analysis
       run: |
@@ -51,7 +51,7 @@ jobs:
         semgrep --config=auto hummingbot/connector/exchange/stellar/ --json --output=semgrep-report.json
     
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-reports
@@ -118,7 +118,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     
     - name: Cache pip dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
@@ -138,7 +138,7 @@ jobs:
     
     - name: Run unit tests with coverage
       run: |
-        pytest tests/unit/ \
+        pytest test/unit/ \
           --cov=hummingbot.connector.exchange.stellar \
           --cov-report=xml \
           --cov-report=html \
@@ -154,7 +154,7 @@ jobs:
           --coverage-file=coverage.xml
     
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results-${{ matrix.python-version }}-${{ matrix.stellar-sdk-version }}
@@ -164,7 +164,7 @@ jobs:
           coverage.xml
     
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./coverage.xml
         flags: unit-tests
@@ -227,7 +227,7 @@ jobs:
     
     - name: Run integration tests
       run: |
-        pytest tests/integration/ \
+        pytest test/integration/ \
           --network=ci \
           --soroban-rpc=http://localhost:8000/soroban/rpc \
           --horizon-url=http://localhost:8000 \
@@ -268,7 +268,7 @@ jobs:
           -v
     
     - name: Upload performance results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: performance-results
         path: performance-results.json
@@ -293,6 +293,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-asyncio pytest-timeout
+    
+    - name: Install Soroban CLI
+      run: |
+        curl -L https://github.com/stellar/soroban-cli/releases/download/v21.0.0/soroban-cli-21.0.0-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        sudo mv soroban /usr/local/bin/
+        soroban version
     
     - name: Setup testnet credentials
       run: |
@@ -347,7 +353,7 @@ jobs:
         twine check dist/*
     
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: package-dist
         path: dist/
@@ -362,7 +368,7 @@ jobs:
     
     steps:
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: package-dist
         path: dist/
@@ -389,30 +395,23 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: package-dist
         path: dist/
     
     - name: Create GitHub Release
-      uses: actions/create-release@v1
+      id: create_release
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ github.run_number }}
-        release_name: Release v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
         draft: false
         prerelease: false
-    
-    - name: Upload release assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dist/stellar-hummingbot-connector-${{ github.run_number }}.tar.gz
-        asset_name: stellar-hummingbot-connector-${{ github.run_number }}.tar.gz
-        asset_content_type: application/gzip
+        files: dist/*
+        generate_release_notes: true
 
   notify:
     name: Notification

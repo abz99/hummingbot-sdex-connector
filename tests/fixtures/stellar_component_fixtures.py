@@ -399,3 +399,50 @@ def pytest_configure(config):
         "markers",
         "requires_network: mark test as requiring network access"
     )
+    config.addinivalue_line(
+        "markers",
+        "benchmark: mark test as performance benchmark"
+    )
+    config.addinivalue_line(
+        "markers", 
+        "testnet: mark test as testnet validation test"
+    )
+
+
+# Additional fixtures for performance and testnet tests
+@pytest.fixture
+def mock_stellar_exchange():
+    """Mock Stellar exchange for testing."""
+    mock_exchange = AsyncMock()
+    mock_exchange.buy = AsyncMock(return_value="test_order_id_123")
+    mock_exchange.get_order_book = AsyncMock(return_value={"bids": [], "asks": []})
+    mock_exchange.get_trading_fees = AsyncMock(return_value={"maker": 0.001, "taker": 0.002})
+    mock_exchange.get_account_balance = AsyncMock(return_value={"XLM": 1000, "USDC": 500})
+    mock_exchange.get_trading_pairs = AsyncMock(return_value=["XLM-USDC", "XLM-BTC"])
+    mock_exchange.cancel_order = AsyncMock(return_value=True)
+    mock_exchange.check_network_status = AsyncMock(return_value=Mock(is_connected=True))
+    mock_exchange.start_network = AsyncMock()
+    mock_exchange.stop_network = AsyncMock()
+    mock_exchange.start_user_stream = AsyncMock()
+    mock_exchange.stop_user_stream = AsyncMock()
+    mock_exchange.security_manager = Mock(validate_keys=Mock(return_value=True))
+    mock_exchange.user_stream_tracker = Mock(data_source=Mock(ready=True))
+    return mock_exchange
+
+
+@pytest.fixture
+def mock_trading_pair():
+    """Mock trading pair for testing."""
+    return "XLM-USDC"
+
+
+def create_testnet_config():
+    """Create testnet configuration for validation tests."""
+    return {
+        "network": "testnet",
+        "horizon_url": "https://horizon-testnet.stellar.org",
+        "soroban_rpc_url": "https://soroban-testnet.stellar.org",
+        "network_passphrase": "Test SDF Network ; September 2015",
+        "account_secret": "SBPQUZ6G4FZNWFHKUWC5BEYWF6R52E3SEP7R3GWYSM2XTKGF5LNTWW4R",  # Test key
+        "security_level": "testing"
+    }
