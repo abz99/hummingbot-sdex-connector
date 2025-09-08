@@ -5,8 +5,8 @@ Types, enums, and data classes for key derivation system.
 
 import time
 from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Dict, List, Optional, Any, Tuple
+from enum import auto, Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class DerivationType(Enum):
@@ -75,7 +75,7 @@ class DerivationPath:
 
         return cls(
             purpose=parsed_parts[0],
-            coin_type=parsed_parts[1], 
+            coin_type=parsed_parts[1],
             account=parsed_parts[2],
             change=parsed_parts[3],
             address_index=parsed_parts[4],
@@ -122,7 +122,9 @@ class DerivationPath:
                 account=index,
                 change=0,
                 address_index=0,
-                hardened_levels=self.hardened_levels if not hardened else min(self.hardened_levels + 1, 3),
+                hardened_levels=(
+                    self.hardened_levels if not hardened else min(self.hardened_levels + 1, 3)
+                ),
             )
 
 
@@ -134,7 +136,7 @@ class MasterSeed:
     mnemonic: Optional[str] = None
     passphrase: Optional[str] = None
     created_at: float = field(default_factory=time.time)
-    
+
     def __post_init__(self) -> None:
         if len(self.seed_bytes) < 16:
             raise ValueError("Master seed must be at least 16 bytes")
@@ -149,47 +151,49 @@ class ExtendedKey:
     depth: int = 0
     parent_fingerprint: int = 0
     child_number: int = 0
-    
+
     def __post_init__(self) -> None:
         if len(self.key) != 32:
             raise ValueError("Key must be exactly 32 bytes")
         if len(self.chain_code) != 32:
             raise ValueError("Chain code must be exactly 32 bytes")
-    
+
     @property
     def fingerprint(self) -> int:
         """Get fingerprint of this key."""
         import hashlib
-        hash160 = hashlib.new('ripemd160', hashlib.sha256(self.key).digest()).digest()
-        return int.from_bytes(hash160[:4], 'big')
-    
+
+        hash160 = hashlib.new("ripemd160", hashlib.sha256(self.key).digest()).digest()
+        return int.from_bytes(hash160[:4], "big")
+
     @property
     def is_private(self) -> bool:
         """Check if this is a private key."""
         # For extended keys, we assume all keys are private unless specified otherwise
         # This is a simplified implementation
         return True
-    
+
     def to_stellar_keypair(self) -> Optional["Keypair"]:
         """Convert to Stellar keypair if possible."""
         try:
             from stellar_sdk import Keypair
+
             return Keypair.from_raw_ed25519_seed(self.key)
         except Exception:
             return Keypair.random()
 
 
-@dataclass 
+@dataclass
 class DerivationConfig:
     """Configuration for key derivation operations."""
-    
+
     algorithm: KeyDerivationAlgorithm = KeyDerivationAlgorithm.PBKDF2_SHA256
     iterations: int = 100000
     salt_length: int = 16
     key_length: int = 32
     memory_cost: Optional[int] = None  # For Scrypt/Argon2
     parallelization: Optional[int] = None  # For Scrypt/Argon2
-    
+
     def __post_init__(self) -> None:
         if self.iterations < 10000:
             raise ValueError("Iterations must be at least 10,000 for security")
@@ -200,7 +204,7 @@ class DerivationConfig:
 @dataclass
 class KeyDerivationResult:
     """Result of key derivation operation."""
-    
+
     extended_key: ExtendedKey
     derivation_path: DerivationPath
     stellar_keypair: Optional["Keypair"] = None

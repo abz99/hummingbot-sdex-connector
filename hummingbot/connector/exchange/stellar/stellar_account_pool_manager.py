@@ -4,18 +4,18 @@ Pool-based account allocation and management for high-throughput operations.
 """
 
 import time
-from typing import Dict, List, Optional, Any
 from collections import defaultdict
+from typing import Any, Dict, List, Optional
 
+from .stellar_account_factory import StellarAccountFactory
 from .stellar_logging import get_stellar_logger, LogCategory
+from .stellar_network_manager import StellarNetwork
 from .stellar_test_account_types import (
+    AccountStatus,
     TestAccount,
     TestAccountConfig,
     TestAccountType,
-    AccountStatus,
 )
-from .stellar_network_manager import StellarNetwork
-from .stellar_account_factory import StellarAccountFactory
 
 
 class StellarAccountPoolManager:
@@ -24,19 +24,21 @@ class StellarAccountPoolManager:
     def __init__(self, account_factory: StellarAccountFactory):
         self.account_factory = account_factory
         self.logger = get_stellar_logger()
-        
+
         # Account pools
         self._account_pools: Dict[str, List[str]] = defaultdict(list)
         self._pool_configs: Dict[str, Dict[str, Any]] = {}
         self._accounts_in_use: Dict[str, str] = {}  # account_id -> pool_name
-        
+
         # Pool statistics
-        self._pool_stats: Dict[str, Dict[str, int]] = defaultdict(lambda: {
-            "total_created": 0,
-            "currently_available": 0,
-            "currently_in_use": 0,
-            "total_allocations": 0,
-        })
+        self._pool_stats: Dict[str, Dict[str, int]] = defaultdict(
+            lambda: {
+                "total_created": 0,
+                "currently_available": 0,
+                "currently_in_use": 0,
+                "total_allocations": 0,
+            }
+        )
 
     async def create_account_pool(
         self,
@@ -102,7 +104,8 @@ class StellarAccountPoolManager:
             return None
 
         available_accounts = [
-            account_id for account_id in self._account_pools[pool_name]
+            account_id
+            for account_id in self._account_pools[pool_name]
             if account_id not in self._accounts_in_use
         ]
 
@@ -111,7 +114,9 @@ class StellarAccountPoolManager:
                 f"No available accounts in pool: {pool_name}",
                 category=LogCategory.SECURITY,
                 total_in_pool=len(self._account_pools[pool_name]),
-                in_use=len([a for a in self._account_pools[pool_name] if a in self._accounts_in_use]),
+                in_use=len(
+                    [a for a in self._account_pools[pool_name] if a in self._accounts_in_use]
+                ),
             )
             return None
 
@@ -126,10 +131,12 @@ class StellarAccountPoolManager:
 
         # Check if we need to refill the pool
         pool_config = self._pool_configs[pool_name]
-        if (pool_config.get("auto_refill", False) and 
-            len(available_accounts) - 1 < pool_config.get("min_available", 2)):
+        if pool_config.get("auto_refill", False) and len(available_accounts) - 1 < pool_config.get(
+            "min_available", 2
+        ):
             # Schedule async refill (don't await to avoid blocking)
             import asyncio
+
             asyncio.create_task(self._refill_pool(pool_name))
 
         self.logger.debug(
@@ -172,10 +179,13 @@ class StellarAccountPoolManager:
                 return
 
             pool_config = self._pool_configs[pool_name]
-            available_count = len([
-                account_id for account_id in self._account_pools[pool_name]
-                if account_id not in self._accounts_in_use
-            ])
+            available_count = len(
+                [
+                    account_id
+                    for account_id in self._account_pools[pool_name]
+                    if account_id not in self._accounts_in_use
+                ]
+            )
 
             min_available = pool_config.get("min_available", 2)
             if available_count >= min_available:
@@ -188,9 +198,7 @@ class StellarAccountPoolManager:
             for i in range(accounts_to_create):
                 account_name = f"{pool_name}_refill_{current_size + i:03d}"
                 account = await self.account_factory.create_test_account(
-                    pool_config["network"],
-                    pool_config["config"],
-                    account_name
+                    pool_config["network"], pool_config["config"], account_name
                 )
                 self._account_pools[pool_name].append(account.account_id)
 
@@ -217,7 +225,7 @@ class StellarAccountPoolManager:
         if pool_name:
             if pool_name not in self._pool_stats:
                 return {}
-            
+
             stats = dict(self._pool_stats[pool_name])
             stats["pool_name"] = pool_name
             stats["pool_config"] = self._pool_configs.get(pool_name, {})
@@ -242,17 +250,17 @@ class StellarAccountPoolManager:
             return {}
 
         pool_accounts = self._account_pools[pool_name]
-        
+
         return {
             "pool_name": pool_name,
             "total_accounts": len(pool_accounts),
             "available_accounts": [
-                account_id for account_id in pool_accounts
+                account_id
+                for account_id in pool_accounts
                 if account_id not in self._accounts_in_use
             ],
             "in_use_accounts": [
-                account_id for account_id in pool_accounts
-                if account_id in self._accounts_in_use
+                account_id for account_id in pool_accounts if account_id in self._accounts_in_use
             ],
             "pool_config": self._pool_configs.get(pool_name, {}),
             "statistics": self._pool_stats[pool_name],
@@ -265,10 +273,11 @@ class StellarAccountPoolManager:
 
         # Return all in-use accounts from this pool
         in_use_accounts = [
-            account_id for account_id in self._account_pools[pool_name]
+            account_id
+            for account_id in self._account_pools[pool_name]
             if account_id in self._accounts_in_use
         ]
-        
+
         for account_id in in_use_accounts:
             self.return_pool_account(account_id)
 

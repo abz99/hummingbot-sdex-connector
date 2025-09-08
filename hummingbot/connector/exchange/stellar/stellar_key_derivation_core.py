@@ -8,25 +8,25 @@ import hmac
 import secrets
 import struct
 import time
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives import hashes
 from stellar_sdk import Keypair
 
+from .stellar_key_derivation_types import (
+    DerivationConfig,
+    DerivationPath,
+    DerivationType,
+    ExtendedKey,
+    KeyDerivationAlgorithm,
+    KeyDerivationResult,
+    MasterSeed,
+)
 from .stellar_logging import get_stellar_logger, LogCategory
 from .stellar_security_types import SecurityLevel
-from .stellar_key_derivation_types import (
-    DerivationType,
-    KeyDerivationAlgorithm,
-    DerivationPath,
-    MasterSeed,
-    ExtendedKey,
-    DerivationConfig,
-    KeyDerivationResult,
-)
 
 
 class SecureKeyDerivation:
@@ -87,11 +87,10 @@ class SecureKeyDerivation:
         # Create seed using PBKDF2 (BIP-39 standard)
         salt = ("mnemonic" + passphrase).encode("utf-8")
         seed_bytes = hashlib.pbkdf2_hmac(
-            "sha512", 
-            normalized_mnemonic.encode("utf-8"), 
-            salt, 
-            2048  # BIP-39 standard iterations
-        )[:32]  # Take first 32 bytes
+            "sha512", normalized_mnemonic.encode("utf-8"), salt, 2048  # BIP-39 standard iterations
+        )[
+            :32
+        ]  # Take first 32 bytes
 
         self.logger.info(
             "Generated master seed from mnemonic",
@@ -101,9 +100,7 @@ class SecureKeyDerivation:
         )
 
         return MasterSeed(
-            seed_bytes=seed_bytes, 
-            mnemonic=normalized_mnemonic, 
-            passphrase=passphrase
+            seed_bytes=seed_bytes, mnemonic=normalized_mnemonic, passphrase=passphrase
         )
 
     def derive_master_key(self, master_seed: MasterSeed) -> ExtendedKey:
@@ -129,7 +126,9 @@ class SecureKeyDerivation:
             child_number=0,
         )
 
-    def derive_child_key(self, parent_key: ExtendedKey, index: int, hardened: bool = False) -> ExtendedKey:
+    def derive_child_key(
+        self, parent_key: ExtendedKey, index: int, hardened: bool = False
+    ) -> ExtendedKey:
         """Derive child extended key from parent."""
         if hardened and index >= 2**31:
             raise ValueError("Hardened derivation index must be < 2^31")
@@ -149,7 +148,7 @@ class SecureKeyDerivation:
 
         # Derive child key material
         key_material = hmac.new(parent_key.chain_code, data, hashlib.sha512).digest()
-        
+
         child_key = key_material[:32]
         child_chain_code = key_material[32:]
 
@@ -164,51 +163,51 @@ class SecureKeyDerivation:
     def derive_path(self, master_key: ExtendedKey, path: DerivationPath) -> ExtendedKey:
         """Derive extended key following a derivation path."""
         current_key = master_key
-        
+
         # Define path components and their hardened status
         path_components = [
-            (path.purpose, True),   # m/44'
-            (path.coin_type, True), # /148'  
-            (path.account, True),   # /0'
-            (path.change, False),   # /0
-            (path.address_index, False), # /0
+            (path.purpose, True),  # m/44'
+            (path.coin_type, True),  # /148'
+            (path.account, True),  # /0'
+            (path.change, False),  # /0
+            (path.address_index, False),  # /0
         ]
-        
+
         for index, is_hardened in path_components:
             current_key = self.derive_child_key(current_key, index, is_hardened)
-        
+
         self.logger.info(
             f"Derived key for path: {path}",
             category=LogCategory.SECURITY,
             path_str=str(path),
             final_depth=current_key.depth,
         )
-        
+
         return current_key
 
     def derive_path(self, master_key: ExtendedKey, path: DerivationPath) -> ExtendedKey:
         """Derive extended key following a derivation path."""
         current_key = master_key
-        
+
         # Define path components and their hardened status
         path_components = [
-            (path.purpose, True),   # m/44'
-            (path.coin_type, True), # /148'  
-            (path.account, True),   # /0'
-            (path.change, False),   # /0
-            (path.address_index, False), # /0
+            (path.purpose, True),  # m/44'
+            (path.coin_type, True),  # /148'
+            (path.account, True),  # /0'
+            (path.change, False),  # /0
+            (path.address_index, False),  # /0
         ]
-        
+
         for index, is_hardened in path_components:
             current_key = self.derive_child_key(current_key, index, is_hardened)
-        
+
         self.logger.info(
             f"Derived key for path: {path}",
             category=LogCategory.SECURITY,
             path_str=str(path),
             final_depth=current_key.depth,
         )
-        
+
         return current_key
 
     def derive_stellar_keypair(self, extended_key: ExtendedKey) -> Keypair:
@@ -225,18 +224,18 @@ class SecureKeyDerivation:
             return Keypair.random()
 
     def derive_key_with_algorithm(
-        self, 
-        password: bytes, 
-        salt: bytes, 
+        self,
+        password: bytes,
+        salt: bytes,
         algorithm: KeyDerivationAlgorithm,
-        config: Optional[DerivationConfig] = None
+        config: Optional[DerivationConfig] = None,
     ) -> bytes:
         """Derive key using specified algorithm."""
         if config is None:
             config = DerivationConfig(algorithm=algorithm)
-        
+
         start_time = time.time()
-        
+
         try:
             if algorithm == KeyDerivationAlgorithm.PBKDF2_SHA256:
                 kdf = PBKDF2HMAC(
@@ -246,7 +245,7 @@ class SecureKeyDerivation:
                     iterations=config.iterations,
                 )
                 derived_key = kdf.derive(password)
-                
+
             elif algorithm == KeyDerivationAlgorithm.PBKDF2_SHA512:
                 kdf = PBKDF2HMAC(
                     algorithm=hashes.SHA512(),
@@ -255,7 +254,7 @@ class SecureKeyDerivation:
                     iterations=config.iterations,
                 )
                 derived_key = kdf.derive(password)
-                
+
             elif algorithm == KeyDerivationAlgorithm.SCRYPT:
                 kdf = Scrypt(
                     length=config.key_length,
@@ -265,21 +264,21 @@ class SecureKeyDerivation:
                     p=1,
                 )
                 derived_key = kdf.derive(password)
-                
+
             elif algorithm == KeyDerivationAlgorithm.HKDF_SHA256:
                 kdf = HKDF(
                     algorithm=hashes.SHA256(),
                     length=config.key_length,
                     salt=salt,
-                    info=b'stellar-hd-wallet',
+                    info=b"stellar-hd-wallet",
                 )
                 derived_key = kdf.derive(password)
-                
+
             else:
                 raise ValueError(f"Unsupported algorithm: {algorithm}")
-                
+
             derivation_time = (time.time() - start_time) * 1000
-            
+
             self.logger.info(
                 f"Key derivation completed using {algorithm.name}",
                 category=LogCategory.SECURITY,
@@ -287,9 +286,9 @@ class SecureKeyDerivation:
                 derivation_time_ms=round(derivation_time, 2),
                 key_length=len(derived_key),
             )
-            
+
             return derived_key
-            
+
         except Exception as e:
             self.logger.error(
                 f"Key derivation failed: {e}",
@@ -304,60 +303,61 @@ class SecureKeyDerivation:
         password = b"test_password_for_benchmarking"
         salt = secrets.token_bytes(16)
         results = {}
-        
+
         algorithms = [
             KeyDerivationAlgorithm.PBKDF2_SHA256,
             KeyDerivationAlgorithm.PBKDF2_SHA512,
             KeyDerivationAlgorithm.HKDF_SHA256,
         ]
-        
+
         for algorithm in algorithms:
             start_time = time.time()
-            
+
             for _ in range(iterations):
                 try:
                     self.derive_key_with_algorithm(password, salt, algorithm)
                 except Exception:
                     pass
-            
+
             total_time = time.time() - start_time
             avg_time = (total_time / iterations) * 1000
-            
+
             results[algorithm.name] = {
                 "total_time_ms": round(total_time * 1000, 2),
                 "average_time_ms": round(avg_time, 2),
                 "operations_per_second": round(iterations / total_time, 2),
             }
-        
+
         self.logger.info(
             "Key derivation benchmark completed",
             category=LogCategory.PERFORMANCE,
             iterations=iterations,
             algorithms_tested=len(algorithms),
         )
-        
+
         return results
 
 
 # Utility functions
 
+
 def generate_bip39_mnemonic(word_count: int = 24) -> str:
     """Generate BIP-39 compatible mnemonic phrase."""
     if word_count not in [12, 15, 18, 21, 24]:
         raise ValueError("Word count must be 12, 15, 18, 21, or 24")
-    
+
     # This is a simplified implementation
     # In production, use a proper BIP-39 word list
     entropy_bits = (word_count * 11) - (word_count // 3)
     entropy = secrets.token_bytes(entropy_bits // 8)
-    
+
     # Convert entropy to mnemonic (simplified)
     words = []
     for i in range(word_count):
         # Use entropy to generate word indices
-        word_index = int.from_bytes(entropy[i:i+2], 'big') % 2048
+        word_index = int.from_bytes(entropy[i : i + 2], "big") % 2048
         words.append(f"word{word_index:04d}")  # Placeholder words
-    
+
     return " ".join(words)
 
 

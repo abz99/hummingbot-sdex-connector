@@ -5,6 +5,7 @@ Common utility functions for Stellar operations.
 
 from decimal import Decimal
 from typing import Optional
+
 from stellar_sdk import Asset
 
 

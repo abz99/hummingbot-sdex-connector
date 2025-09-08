@@ -4,17 +4,18 @@ Advanced connection health monitoring with alerting and automatic recovery.
 """
 
 import asyncio
-import time
 import json
-from typing import Dict, List, Optional, Any, Callable, Awaitable, Set
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum, auto
+from enum import auto, Enum
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Set
+
 import aiohttp
 
+from .stellar_error_classification import ErrorContext, StellarErrorManager
 from .stellar_logging import get_stellar_logger, LogCategory, with_correlation_id
 from .stellar_metrics import get_stellar_metrics
-from .stellar_error_classification import StellarErrorManager, ErrorContext
 
 
 class HealthStatus(Enum):

@@ -6,15 +6,15 @@ Advanced smart contract integration for AMM and DeFi operations.
 import asyncio
 import json
 import logging
-from typing import Dict, List, Optional, Any, Union, Tuple
-from decimal import Decimal
-from dataclasses import dataclass, field
-from enum import Enum
 import time
+from dataclasses import dataclass, field
+from decimal import Decimal
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import aiohttp
-from stellar_sdk import (
-    Keypair, TransactionBuilder, Network, Account, StrKey, xdr as stellar_xdr
-)
+from stellar_sdk import Account, Keypair, Network, StrKey, TransactionBuilder
+from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import BaseRequestError
 
 # Use standard logging instead of HummingbotLogger for compatibility
@@ -105,13 +105,13 @@ class LiquidityPool:
 
 class SorobanContractManager:
     """Smart Contract Manager for Soroban integration."""
-    
+
     _logger: Optional[logging.Logger] = None
 
     def __init__(
         self,
         soroban_server: Any,  # SorobanServer when available
-        chain_interface: "ModernStellarChainInterface", 
+        chain_interface: "ModernStellarChainInterface",
         observability: "StellarObservabilityFramework",
     ):
         self.soroban_server = soroban_server
@@ -216,28 +216,28 @@ class SorobanContractManager:
         try:
             # Get contract data from Soroban server
             contract_data = await self._get_contract_data(address)
-            
+
             if not contract_data:
                 return False
-                
+
             contract = self._known_contracts.get(address)
             if contract:
                 # Verify contract exists and is valid
                 contract.verified = True
-                contract.deployed_at = contract_data.get('creation_ledger')
+                contract.deployed_at = contract_data.get("creation_ledger")
                 self._verified_contracts[address] = contract
-                
+
                 await self.observability.log_event(
                     "contract_verified",
-                    {"address": address, "creation_ledger": contract.deployed_at}
+                    {"address": address, "creation_ledger": contract.deployed_at},
                 )
                 return True
-                
+
         except Exception as e:
             await self.observability.log_error(
                 "contract_verification_failed", e, {"address": address}
             )
-            
+
         return False
 
     def get_contract_info(self, address: str) -> Optional[ContractInfo]:
@@ -258,73 +258,73 @@ class SorobanContractManager:
             simulation_result = await self.simulate_contract(
                 contract_address, function_name, parameters, source_account
             )
-            
+
             if not simulation_result.get("success"):
                 raise Exception("Contract simulation failed")
-            
+
             # Build and submit transaction
             if source_account:
                 account = await self.chain_interface.get_account_data(source_account)
-                
+
                 # Create transaction builder
                 builder = TransactionBuilder(
                     source_account=account,
                     network_passphrase=self.chain_interface.network_passphrase,
-                    base_fee=int(self._base_fee)
+                    base_fee=int(self._base_fee),
                 )
-                
+
                 # Add contract invocation operation
                 if not self._add_soroban_operation(
                     builder,
                     contract_address=contract_address,
                     function_name=function_name,
-                    parameters=self._convert_parameters_to_scval(parameters)
+                    parameters=self._convert_parameters_to_scval(parameters),
                 ):
                     # Return mock result when Soroban operations aren't supported
                     return {
                         "success": True,
                         "result": {"type": "success", "value": "mock_result"},
                         "transaction_hash": "mock_hash_123",
-                        "cost": {"cpu_insns": 100000, "mem_bytes": 1000}
+                        "cost": {"cpu_insns": 100000, "mem_bytes": 1000},
                     }
-                
+
                 # Build transaction
                 transaction = builder.build()
-                
+
                 # Simulate for final gas estimation
                 simulated_tx = await self.soroban_server.simulate_transaction(transaction)
-                
+
                 # Prepare and submit transaction
                 prepared_tx = await self.soroban_server.prepare_transaction(
                     transaction, simulated_tx
                 )
-                
+
                 # This would require signing in a real implementation
                 # For now, return simulation result with transaction hash
                 tx_hash = f"tx_{contract_address}_{function_name}_{time.time()}"
-                
+
                 result = {
                     "status": "success",
                     "transaction_hash": tx_hash,
                     "gas_used": simulated_tx.cost.cpu_insns,
                     "fee_charged": simulated_tx.cost.mem_bytes,
-                    "return_value": simulation_result.get("return_value")
+                    "return_value": simulation_result.get("return_value"),
                 }
             else:
                 # Read-only contract call
                 result = {
-                    "status": "success", 
+                    "status": "success",
                     "return_value": simulation_result.get("return_value"),
-                    "gas_used": simulation_result.get("gas_used")
+                    "gas_used": simulation_result.get("gas_used"),
                 }
 
             await self.observability.log_event(
                 "contract_invoked",
                 {
-                    "contract": contract_address, 
-                    "function": function_name, 
+                    "contract": contract_address,
+                    "function": function_name,
                     "gas_used": result.get("gas_used"),
-                    "success": True
+                    "success": True,
                 },
             )
 
@@ -352,24 +352,21 @@ class SorobanContractManager:
                 account = await self.chain_interface.get_account_data(source_account)
             else:
                 # Use a placeholder account for simulation
-                account = Account(
-                    account="GABC123...", # Placeholder
-                    sequence=0
-                )
-            
+                account = Account(account="GABC123...", sequence=0)  # Placeholder
+
             # Create transaction builder for simulation
             builder = TransactionBuilder(
                 source_account=account,
                 network_passphrase=self.chain_interface.network_passphrase,
-                base_fee=int(self._base_fee)
+                base_fee=int(self._base_fee),
             )
-            
+
             # Add contract invocation operation
             if not self._add_soroban_operation(
                 builder,
                 contract_address=contract_address,
                 function_name=function_name,
-                parameters=self._convert_parameters_to_scval(parameters)
+                parameters=self._convert_parameters_to_scval(parameters),
             ):
                 # Return mock simulation result when Soroban operations aren't supported
                 result = {
@@ -381,22 +378,22 @@ class SorobanContractManager:
                     "state_changes": [],
                     "events": [],
                 }
-                
+
                 # Log event for observability
                 await self.observability.log_event(
                     "contract_simulated",
-                    {"contract": contract_address, "function": function_name, "success": True}
+                    {"contract": contract_address, "function": function_name, "success": True},
                 )
-                
+
                 return result
-            
+
             # Build transaction for simulation
             transaction = builder.build()
-            
+
             # Simulate transaction
             try:
                 simulation_result = await self.soroban_server.simulate_transaction(transaction)
-                
+
                 result = {
                     "success": True,
                     "gas_used": simulation_result.cost.cpu_insns,
@@ -405,7 +402,7 @@ class SorobanContractManager:
                     "state_changes": [],  # Would parse from simulation_result
                     "events": [],  # Would parse events from simulation_result
                 }
-                
+
             except Exception as se:
                 result = {
                     "success": False,
@@ -419,10 +416,10 @@ class SorobanContractManager:
             await self.observability.log_event(
                 "contract_simulated",
                 {
-                    "contract": contract_address, 
-                    "function": function_name, 
+                    "contract": contract_address,
+                    "function": function_name,
                     "success": result["success"],
-                    "gas_used": result.get("gas_used", 0)
+                    "gas_used": result.get("gas_used", 0),
                 },
             )
 
@@ -445,11 +442,11 @@ class SorobanContractManager:
         """Execute multiple contract operations atomically."""
         try:
             transaction_ids = []
-            
+
             if atomic:
                 # Create atomic transaction with multiple operations
                 transaction_id = f"cross_contract_atomic_{time.time()}"
-                
+
                 # Implementation stub - actual atomic execution in Phase 3
                 for operation in operations:
                     # Simulate each operation first
@@ -457,14 +454,14 @@ class SorobanContractManager:
                         operation.contract_address,
                         operation.function_name,
                         operation.parameters,
-                        source_account
+                        source_account,
                     )
-                    
+
                     if not simulation["success"]:
                         raise ValueError(f"Operation simulation failed: {operation}")
-                
+
                 transaction_ids.append(transaction_id)
-                
+
                 await self.observability.log_event(
                     "cross_contract_executed",
                     {
@@ -480,7 +477,7 @@ class SorobanContractManager:
                         operation.contract_address,
                         operation.function_name,
                         operation.parameters,
-                        source_account
+                        source_account,
                     )
                     transaction_ids.append(f"individual_{time.time()}")
 
@@ -726,39 +723,41 @@ class SorobanContractManager:
             contract_data = await self.soroban_server.get_contract_data(
                 contract_address, stellar_xdr.SCVal.scv_ledger_key_contract_data()
             )
-            
+
             if contract_data:
                 return {
                     "exists": True,
-                    "creation_ledger": getattr(contract_data, 'last_modified_ledger', None),
-                    "code_hash": getattr(contract_data, 'val', None)
+                    "creation_ledger": getattr(contract_data, "last_modified_ledger", None),
+                    "code_hash": getattr(contract_data, "val", None),
                 }
-                
+
         except Exception as e:
             await self.observability.log_error(
                 "contract_data_fetch_failed", e, {"contract": contract_address}
             )
-            
+
         return None
 
     def _convert_parameters_to_scval(self, parameters: Dict[str, Any]) -> List:
         """Convert parameters to Soroban SCVal format."""
         try:
             # Check if Soroban types are available
-            if not hasattr(stellar_xdr, 'SCVal'):
+            if not hasattr(stellar_xdr, "SCVal"):
                 # Fallback: return mock format for compatibility
                 return [{"mock_param": key, "value": value} for key, value in parameters.items()]
-                
+
             scval_params = []
-            
+
             for key, value in parameters.items():
                 if isinstance(value, str):
                     scval_params.append(stellar_xdr.SCVal.scv_symbol(value.encode()))
                 elif isinstance(value, int):
                     scval_params.append(stellar_xdr.SCVal.scv_i64(value))
                 elif isinstance(value, Decimal):
-                    # Convert decimal to Soroban native format 
-                    scval_params.append(stellar_xdr.SCVal.scv_i128(int(value * 10**7)))  # 7 decimal places
+                    # Convert decimal to Soroban native format
+                    scval_params.append(
+                        stellar_xdr.SCVal.scv_i128(int(value * 10**7))
+                    )  # 7 decimal places
                 elif isinstance(value, bool):
                     scval_params.append(stellar_xdr.SCVal.scv_bool(value))
                 elif isinstance(value, bytes):
@@ -766,9 +765,9 @@ class SorobanContractManager:
                 else:
                     # Fallback to string representation
                     scval_params.append(stellar_xdr.SCVal.scv_symbol(str(value).encode()))
-                    
+
             return scval_params
-            
+
         except AttributeError:
             # Fallback for when Soroban types are not available
             return [{"mock_param": key, "value": value} for key, value in parameters.items()]
@@ -788,10 +787,10 @@ class SorobanContractManager:
         """Parse Soroban contract result."""
         if not result:
             return None
-            
+
         try:
             # Parse different SCVal types
-            if hasattr(result, 'type'):
+            if hasattr(result, "type"):
                 if result.type == stellar_xdr.SCValType.SCV_I64:
                     return int(result.i64)
                 elif result.type == stellar_xdr.SCValType.SCV_I128:
@@ -802,9 +801,9 @@ class SorobanContractManager:
                     return bool(result.b)
                 elif result.type == stellar_xdr.SCValType.SCV_BYTES:
                     return result.bytes
-                    
+
         except Exception as e:
             # Note: Cannot use await in non-async function
             self.logger().warning(f"Failed to parse Soroban result: {e}, result: {str(result)}")
-            
+
         return str(result)  # Fallback to string representation

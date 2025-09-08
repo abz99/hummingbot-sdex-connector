@@ -4,29 +4,32 @@ Production-ready implementation with connection pooling and failover.
 """
 
 import asyncio
-from decimal import Decimal
-from typing import Dict, List, Optional, Union, Any, TYPE_CHECKING
 from dataclasses import dataclass
+from decimal import Decimal
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
+
 import aiohttp
-from stellar_sdk import ServerAsync, Keypair, Account, TransactionBuilder, Network, Asset
+from stellar_sdk import Account, Asset, Keypair, Network, ServerAsync, TransactionBuilder
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 
 if TYPE_CHECKING:
-    from .stellar_security import EnterpriseSecurityFramework
     from .stellar_observability import StellarObservabilityFramework
+    from .stellar_security import EnterpriseSecurityFramework
+
 
 # Define StellarNetworkConfig for type checking
 @dataclass
 class StellarNetworkConfig:
     """Network configuration for Stellar."""
+
     horizon_url: str
     network_passphrase: str
     fallback_urls: List[str] = None
-    
+
     def __post_init__(self):
         if self.fallback_urls is None:
             self.fallback_urls = []
-    
+
     @property
     def horizon_urls(self) -> List[str]:
         """Get all horizon URLs (primary + fallbacks)."""
@@ -162,7 +165,7 @@ class ModernStellarChainInterface:
 
                     if self.current_horizon is None:
                         return None
-                        
+
                     account_call_builder = self.current_horizon.accounts().account_id(account_id)
                     account = await account_call_builder.call()
 
@@ -243,25 +246,27 @@ class ModernStellarChainInterface:
 
             # Count account entries
             subentry_count = (
-                len(getattr(account, 'signers', []))
+                len(getattr(account, "signers", []))
                 - 1  # Signers (excluding master key)
-                + len(getattr(account, 'balances', []))
+                + len(getattr(account, "balances", []))
                 - 1  # Trustlines (excluding native)
-                + len(getattr(account, 'data', {}))  # Data entries
+                + len(getattr(account, "data", {}))  # Data entries
                 + len(getattr(account, "offers", []))  # Open offers
             )
 
             minimum_balance = account_reserve + (base_reserve * subentry_count)
 
             # Cache result
-            account_id = getattr(account, 'account_id', getattr(account, 'id', ''))
+            account_id = getattr(account, "account_id", getattr(account, "id", ""))
             self._reserve_cache[account_id] = minimum_balance
 
             return minimum_balance
 
         except Exception as e:
             await self.observability.log_error(
-                "reserve_calculation_failed", e, {"account_id": getattr(account, 'account_id', getattr(account, 'id', 'unknown'))}
+                "reserve_calculation_failed",
+                e,
+                {"account_id": getattr(account, "account_id", getattr(account, "id", "unknown"))},
             )
             # Return conservative estimate
             return Decimal("5.0")

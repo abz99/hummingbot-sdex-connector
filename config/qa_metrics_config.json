@@ -1,0 +1,36 @@
+{
+  "collector_mode": "optimized",
+  "performance_profile": "development",
+  "max_workers": 6,
+  "cache_ttl_seconds": 600.0,
+  "batch_size": 10,
+  "incremental_threshold": 60.0,
+  "collect_coverage": true,
+  "collect_test_metrics": true,
+  "collect_quality_metrics": true,
+  "collect_compliance_metrics": true,
+  "subprocess_timeout": 60.0,
+  "lightweight_test_timeout": 30.0,
+  "max_file_size_mb": 10.0,
+  "enable_file_caching": true,
+  "enable_incremental_updates": true,
+  "cache_directory": null,
+  "enable_performance_logging": true,
+  "log_cache_effectiveness": false,
+  "log_execution_time": true,
+  "critical_module_thresholds": {
+    "stellar_security_manager": 95.0,
+    "stellar_chain_interface": 90.0,
+    "stellar_network_manager": 90.0,
+    "stellar_order_manager": 90.0,
+    "stellar_exchange": 85.0,
+    "stellar_soroban_manager": 85.0,
+    "stellar_security": 95.0
+  },
+  "auto_selection_rules": {
+    "file_count_threshold": 50,
+    "memory_limit_mb": 512,
+    "execution_time_threshold": 30.0,
+    "concurrent_requests_threshold": 2
+  }
+}

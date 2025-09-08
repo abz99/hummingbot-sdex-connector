@@ -3,24 +3,25 @@ Stellar Metrics Collection
 Comprehensive metrics collection using Prometheus for monitoring and alerting.
 """
 
-import time
 import asyncio
-from typing import Dict, Any, Optional, List, Union
-from enum import Enum, auto
-from dataclasses import dataclass
-from contextlib import asynccontextmanager
-from prometheus_client import (
-    Counter,
-    Histogram,
-    Gauge,
-    Summary,
-    Info,
-    CollectorRegistry,
-    generate_latest,
-    CONTENT_TYPE_LATEST,
-    start_http_server,
-)
 import threading
+import time
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from enum import auto, Enum
+from typing import Any, Dict, List, Optional, Union
+
+from prometheus_client import (
+    CollectorRegistry,
+    CONTENT_TYPE_LATEST,
+    Counter,
+    Gauge,
+    generate_latest,
+    Histogram,
+    Info,
+    start_http_server,
+    Summary,
+)
 
 from .stellar_logging import get_stellar_logger, LogCategory
 
@@ -475,33 +476,41 @@ class StellarMetrics:
         ).inc()
 
     # QA and Testing metrics methods
-    def update_test_coverage(self, module: str, coverage_percentage: float, coverage_type: str = "line"):
+    def update_test_coverage(
+        self, module: str, coverage_percentage: float, coverage_type: str = "line"
+    ):
         """Update test coverage percentage for a module."""
-        self.qa_test_coverage.labels(
-            module=module, coverage_type=coverage_type
-        ).set(coverage_percentage)
-        
+        self.qa_test_coverage.labels(module=module, coverage_type=coverage_type).set(
+            coverage_percentage
+        )
+
         self.logger.debug(
             f"Updated test coverage for {module}: {coverage_percentage}%",
             category=LogCategory.METRICS,
             module=module,
             coverage=coverage_percentage,
-            type=coverage_type
+            type=coverage_type,
         )
 
-    def update_test_success_rate(self, test_suite: str, success_rate: float, test_type: str = "unit"):
+    def update_test_success_rate(
+        self, test_suite: str, success_rate: float, test_type: str = "unit"
+    ):
         """Update test success rate for a test suite."""
-        self.qa_test_success_rate.labels(
-            test_suite=test_suite, test_type=test_type
-        ).set(success_rate)
+        self.qa_test_success_rate.labels(test_suite=test_suite, test_type=test_type).set(
+            success_rate
+        )
 
-    def update_critical_module_coverage(self, module: str, coverage_percentage: float, threshold_type: str = "critical"):
+    def update_critical_module_coverage(
+        self, module: str, coverage_percentage: float, threshold_type: str = "critical"
+    ):
         """Update critical module coverage percentage."""
-        self.qa_critical_module_coverage.labels(
-            module=module, threshold_type=threshold_type
-        ).set(coverage_percentage)
+        self.qa_critical_module_coverage.labels(module=module, threshold_type=threshold_type).set(
+            coverage_percentage
+        )
 
-    def record_test_execution(self, test_suite: str, duration_seconds: float, test_category: str = "unit"):
+    def record_test_execution(
+        self, test_suite: str, duration_seconds: float, test_category: str = "unit"
+    ):
         """Record test execution duration."""
         self.qa_test_execution_duration.labels(
             test_suite=test_suite, test_category=test_category
@@ -515,17 +524,19 @@ class StellarMetrics:
 
     def update_code_quality_score(self, module: str, score: float, metric_type: str = "complexity"):
         """Update code quality score for a module."""
-        self.qa_code_quality_score.labels(
-            module=module, metric_type=metric_type
-        ).set(score)
+        self.qa_code_quality_score.labels(module=module, metric_type=metric_type).set(score)
 
-    def update_requirements_compliance(self, requirement_category: str, compliance_percentage: float, priority: str = "high"):
+    def update_requirements_compliance(
+        self, requirement_category: str, compliance_percentage: float, priority: str = "high"
+    ):
         """Update requirements compliance percentage."""
         self.qa_requirements_compliance.labels(
             requirement_category=requirement_category, priority=priority
         ).set(compliance_percentage)
 
-    def update_security_compliance(self, security_category: str, score: float, requirement_level: str = "mandatory"):
+    def update_security_compliance(
+        self, security_category: str, score: float, requirement_level: str = "mandatory"
+    ):
         """Update security compliance score."""
         self.qa_security_compliance_score.labels(
             security_category=security_category, requirement_level=requirement_level
@@ -536,20 +547,20 @@ class StellarMetrics:
         summary = {
             "coverage_metrics": {
                 "overall_coverage": self.qa_test_coverage,
-                "critical_module_coverage": self.qa_critical_module_coverage
+                "critical_module_coverage": self.qa_critical_module_coverage,
             },
             "quality_metrics": {
                 "test_success_rate": self.qa_test_success_rate,
-                "code_quality_score": self.qa_code_quality_score
+                "code_quality_score": self.qa_code_quality_score,
             },
             "compliance_metrics": {
                 "requirements_compliance": self.qa_requirements_compliance,
-                "security_compliance": self.qa_security_compliance_score
+                "security_compliance": self.qa_security_compliance_score,
             },
             "failure_metrics": {
                 "test_failures": self.qa_test_failures_total,
-                "execution_duration": self.qa_test_execution_duration
-            }
+                "execution_duration": self.qa_test_execution_duration,
+            },
         }
         return summary
 
@@ -609,8 +620,9 @@ class StellarMetrics:
 
     async def _collect_system_metrics(self):
         """Collect system-level metrics in the background."""
-        import psutil
         import gc
+
+        import psutil
 
         while True:
             try:

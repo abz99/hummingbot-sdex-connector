@@ -4,26 +4,27 @@ Optimized connection management with HTTP/2 support, connection pooling, and int
 """
 
 import asyncio
-import time
 import ssl
-from typing import Dict, List, Optional, Any, Union, Callable, Awaitable
+import time
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import auto, Enum
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
 from urllib.parse import urlparse
+
 import aiohttp
 
 # import aiofiles  # Not used in current implementation
-from aiohttp import TCPConnector, ClientTimeout, TraceConfig
+from aiohttp import ClientTimeout, TCPConnector, TraceConfig
 from aiohttp.client_exceptions import ClientError
 
+from .stellar_error_classification import ErrorContext, StellarErrorManager
 from .stellar_logging import (
+    get_request_logger,
     get_stellar_logger,
     LogCategory,
     with_correlation_id,
-    get_request_logger,
 )
 from .stellar_metrics import get_stellar_metrics
-from .stellar_error_classification import StellarErrorManager, ErrorContext
 
 
 class ConnectionProtocol(Enum):

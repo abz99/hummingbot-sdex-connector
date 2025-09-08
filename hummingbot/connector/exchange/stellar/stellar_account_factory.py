@@ -6,20 +6,21 @@ Core account creation and funding operations.
 import asyncio
 import hashlib
 import time
-from typing import Optional, Dict, Any
-from stellar_sdk import Keypair, Server, TransactionBuilder, Payment, Asset
+from typing import Any, Dict, Optional
+
+from stellar_sdk import Asset, Keypair, Payment, Server, TransactionBuilder
 from stellar_sdk.exceptions import NotFoundError
 
+from .stellar_key_derivation import HierarchicalKeyManager
 from .stellar_logging import get_stellar_logger, LogCategory
+from .stellar_network_manager import StellarNetwork, StellarNetworkManager
 from .stellar_security_types import SecurityLevel
 from .stellar_test_account_types import (
+    AccountStatus,
     TestAccount,
     TestAccountConfig,
     TestAccountType,
-    AccountStatus,
 )
-from .stellar_network_manager import StellarNetwork, StellarNetworkManager
-from .stellar_key_derivation import HierarchicalKeyManager
 
 
 class StellarAccountFactory:
@@ -111,31 +112,27 @@ class StellarAccountFactory:
             self._account_counter += 1
             return keypair
 
-    async def _get_named_account_keypair(
-        self, name: str, network: StellarNetwork
-    ) -> Keypair:
+    async def _get_named_account_keypair(self, name: str, network: StellarNetwork) -> Keypair:
         """Generate deterministic keypair from name and network."""
         seed_material = f"{name}:{network.value}:stellar_test_account"
         seed_hash = hashlib.sha256(seed_material.encode()).digest()
         return Keypair.from_raw_ed25519_seed(seed_hash[:32])
 
-    async def _fund_test_account(
-        self, account: TestAccount, config: TestAccountConfig
-    ) -> bool:
+    async def _fund_test_account(self, account: TestAccount, config: TestAccountConfig) -> bool:
         """Fund test account using friendbot."""
         try:
             server = self.network_manager.get_server(account.network)
-            
+
             # Use friendbot to fund the account
             friendbot_url = self._get_friendbot_url(account.network)
             if not friendbot_url:
                 return False
 
             import aiohttp
+
             async with aiohttp.ClientSession() as session:
                 async with session.get(
-                    friendbot_url,
-                    params={"addr": account.account_id}
+                    friendbot_url, params={"addr": account.account_id}
                 ) as response:
                     if response.status == 200:
                         self.logger.info(
@@ -169,9 +166,7 @@ class StellarAccountFactory:
         elif config.account_type == TestAccountType.DEX_TRADER:
             await self._setup_dex_trader_account(account, config)
 
-    async def _configure_multisig(
-        self, account: TestAccount, config: TestAccountConfig
-    ) -> None:
+    async def _configure_multisig(self, account: TestAccount, config: TestAccountConfig) -> None:
         """Configure multisignature settings."""
         if not config.multisig_signers or not config.multisig_threshold:
             return
@@ -179,7 +174,7 @@ class StellarAccountFactory:
         try:
             server = self.network_manager.get_server(account.network)
             account_obj = server.load_account(account.account_id)
-            
+
             builder = TransactionBuilder(
                 source_account=account_obj,
                 network_passphrase=self.network_manager.get_network_passphrase(account.network),
@@ -199,9 +194,9 @@ class StellarAccountFactory:
 
             transaction = builder.build()
             transaction.sign(account.keypair)
-            
+
             response = server.submit_transaction(transaction)
-            
+
             account.multisig_config = {
                 "threshold": config.multisig_threshold,
                 "signers": config.multisig_signers,
@@ -216,9 +211,7 @@ class StellarAccountFactory:
                 exception=e,
             )
 
-    async def _setup_issuer_account(
-        self, account: TestAccount, config: TestAccountConfig
-    ) -> None:
+    async def _setup_issuer_account(self, account: TestAccount, config: TestAccountConfig) -> None:
         """Set up asset issuer account."""
         account.metadata["issuer_assets"] = []
         for asset_config in config.custom_assets:

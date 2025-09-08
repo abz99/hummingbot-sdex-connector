@@ -4,11 +4,13 @@ Advanced error classification and recovery.
 """
 
 import asyncio
-from typing import Dict, Optional, Any, Union, TYPE_CHECKING
+from typing import Any, Dict, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from .stellar_observability import StellarObservabilityFramework
+
 from enum import Enum
+
 from stellar_sdk import exceptions as stellar_exceptions
 
 
@@ -110,13 +112,13 @@ class ModernStellarErrorHandler:
                 if self.observability:
                     await self.observability.log_event(
                         "error_classified",
-                    {
-                        "pattern": pattern,
-                        "category": classification.category.value,
-                        "severity": classification.severity.value,
-                        "recoverable": classification.recoverable,
-                    },
-                )
+                        {
+                            "pattern": pattern,
+                            "category": classification.category.value,
+                            "severity": classification.severity.value,
+                            "recoverable": classification.recoverable,
+                        },
+                    )
                 return classification
 
         # Handle network errors
@@ -154,15 +156,15 @@ class ModernStellarErrorHandler:
         if self.observability:
             await self.observability.log_error(
                 "stellar_error_handled",
-            error,
-            {
-                "category": classification.category.value,
-                "severity": classification.severity.value,
-                "recoverable": classification.recoverable,
-                "action": classification.action,
-                "context": context or {},
-            },
-        )
+                error,
+                {
+                    "category": classification.category.value,
+                    "severity": classification.severity.value,
+                    "recoverable": classification.recoverable,
+                    "action": classification.action,
+                    "context": context or {},
+                },
+            )
 
         # Update error counts for monitoring
         error_key = f"{classification.category.value}_{type(error).__name__}"
@@ -178,8 +180,8 @@ class ModernStellarErrorHandler:
             if self.observability:
                 await self.observability.log_event(
                     "startup_failure_critical",
-                {"error_type": type(error).__name__, "message": str(error)},
-            )
+                    {"error_type": type(error).__name__, "message": str(error)},
+                )
             raise error
 
     async def should_retry(self, error: Exception, attempt: int, max_attempts: int = 3) -> bool:

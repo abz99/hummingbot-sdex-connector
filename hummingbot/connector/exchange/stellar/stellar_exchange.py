@@ -4,23 +4,24 @@ Production-ready implementation with enhanced error handling and observability.
 """
 
 import asyncio
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Dict, List, Optional, Set, Tuple
-from dataclasses import dataclass
 
 # Hummingbot imports (using stubs for development)
 from src.hummingbot_stubs.connector.exchange_base import ExchangeBase
 from src.hummingbot_stubs.core.api_throttler.async_throttler import AsyncThrottler
+from src.hummingbot_stubs.core.data_type.common import OrderType, TradeType
 from src.hummingbot_stubs.core.web_assistant.web_assistants_factory import WebAssistantsFactory
-from src.hummingbot_stubs.core.data_type.common import TradeType, OrderType
+
+from .stellar_asset_manager import ModernAssetManager
 
 # Stellar connector imports
 from .stellar_chain_interface import ModernStellarChainInterface
-from .stellar_security import EnterpriseSecurityFramework
-from .stellar_order_manager import ModernStellarOrderManager
-from .stellar_asset_manager import ModernAssetManager
-from .stellar_observability import StellarObservabilityFramework
 from .stellar_error_handler import ModernStellarErrorHandler
+from .stellar_observability import StellarObservabilityFramework
+from .stellar_order_manager import ModernStellarOrderManager
+from .stellar_security import EnterpriseSecurityFramework
 
 
 @dataclass

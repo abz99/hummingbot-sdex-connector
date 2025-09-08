@@ -4,14 +4,15 @@ Connection pooling, caching, and request batching.
 """
 
 import asyncio
-import time
-from typing import Dict, List, Optional, Any, Callable, Tuple, TYPE_CHECKING
-from dataclasses import dataclass
-from decimal import Decimal
-import aiohttp
-from collections import defaultdict, deque
 import hashlib
 import json
+import time
+from collections import defaultdict, deque
+from dataclasses import dataclass
+from decimal import Decimal
+from typing import Any, Callable, Dict, List, Optional, Tuple, TYPE_CHECKING
+
+import aiohttp
 
 if TYPE_CHECKING:
     from .stellar_observability import StellarObservabilityFramework

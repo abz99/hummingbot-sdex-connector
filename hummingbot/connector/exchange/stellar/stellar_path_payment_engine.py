@@ -4,18 +4,19 @@ Advanced path finding and arbitrage detection for Stellar network.
 """
 
 import asyncio
-import time
 import math
-from typing import Dict, List, Optional, Any, Tuple, Set
-from decimal import Decimal
+import time
 from dataclasses import dataclass, field
+from decimal import Decimal
 from enum import Enum
+from typing import Any, Dict, List, Optional, Set, Tuple
+
 from stellar_sdk import Asset
 
 
 class PathType(Enum):
     """Path payment types."""
-    
+
     DIRECT = "direct"
     SINGLE_HOP = "single_hop"
     MULTI_HOP = "multi_hop"
@@ -25,7 +26,7 @@ class PathType(Enum):
 
 class RouteOptimization(Enum):
     """Route optimization strategies."""
-    
+
     LOWEST_COST = "lowest_cost"
     FASTEST = "fastest"
     HIGHEST_LIQUIDITY = "highest_liquidity"
@@ -36,7 +37,7 @@ class RouteOptimization(Enum):
 @dataclass
 class PathPaymentRoute:
     """Path payment route information."""
-    
+
     path: List[Asset]
     source_amount: Decimal
     destination_amount: Decimal
@@ -54,7 +55,7 @@ class PathPaymentRoute:
 @dataclass
 class ArbitrageOpportunity:
     """Arbitrage opportunity detection."""
-    
+
     source_asset: Asset
     destination_asset: Asset
     buy_route: PathPaymentRoute
@@ -83,22 +84,22 @@ class EnhancedPathPaymentEngine:
         # Path finding cache
         self._route_cache: Dict[str, PathPaymentRoute] = {}
         self._arbitrage_cache: Dict[str, ArbitrageOpportunity] = {}
-        
+
         # DEX integrations
         self._dex_endpoints: Dict[str, str] = {}
         self._liquidity_sources: Dict[str, Dict[str, Any]] = {}
-        
+
         # Route optimization parameters
         self._max_path_length = 4
         self._route_expiry_seconds = 30
         self._min_liquidity_threshold = Decimal("1000")
         self._max_price_impact = Decimal("0.05")  # 5%
-        
+
         # Arbitrage settings
         self._min_profit_percentage = Decimal("0.001")  # 0.1%
         self._max_execution_time = 300  # 5 minutes
         self._arbitrage_enabled = True
-        
+
         # MEV protection
         self._mev_protection_enabled = True
         self._private_mempool_enabled = False
@@ -108,10 +109,10 @@ class EnhancedPathPaymentEngine:
         try:
             # Initialize DEX endpoints
             await self._initialize_dex_endpoints()
-            
+
             # Load liquidity sources
             await self._load_liquidity_sources()
-            
+
             # Setup route monitoring
             await self._setup_route_monitoring()
 
@@ -121,7 +122,7 @@ class EnhancedPathPaymentEngine:
                     "dex_endpoints": len(self._dex_endpoints),
                     "liquidity_sources": len(self._liquidity_sources),
                     "arbitrage_enabled": self._arbitrage_enabled,
-                }
+                },
             )
 
         except Exception as e:
@@ -133,7 +134,7 @@ class EnhancedPathPaymentEngine:
         self._route_cache.clear()
         self._arbitrage_cache.clear()
         self._liquidity_sources.clear()
-        
+
         await self.observability.log_event("path_engine_cleaned_up")
 
     # Core Path Finding
@@ -148,7 +149,7 @@ class EnhancedPathPaymentEngine:
         """Find optimal payment path with multiple route options."""
         try:
             cache_key = f"{source_asset.code}:{dest_asset.code}:{amount}:{optimization.value}"
-            
+
             # Check cache first
             if cache_key in self._route_cache:
                 cached_route = self._route_cache[cache_key]
@@ -164,9 +165,7 @@ class EnhancedPathPaymentEngine:
                 routes.append(direct_route)
 
             # Single hop paths
-            single_hop_routes = await self._find_single_hop_paths(
-                source_asset, dest_asset, amount
-            )
+            single_hop_routes = await self._find_single_hop_paths(source_asset, dest_asset, amount)
             routes.extend(single_hop_routes)
 
             # Multi-hop paths (if enabled)
@@ -177,14 +176,12 @@ class EnhancedPathPaymentEngine:
                 routes.extend(multi_hop_routes)
 
             # Cross-DEX routes
-            cross_dex_routes = await self._find_cross_dex_paths(
-                source_asset, dest_asset, amount
-            )
+            cross_dex_routes = await self._find_cross_dex_paths(source_asset, dest_asset, amount)
             routes.extend(cross_dex_routes)
 
             # Optimize based on strategy
             optimized_routes = await self._optimize_routes(routes, optimization)
-            
+
             # Cache best route
             if optimized_routes:
                 self._route_cache[cache_key] = optimized_routes[0]
@@ -197,7 +194,7 @@ class EnhancedPathPaymentEngine:
                     "amount": str(amount),
                     "routes_found": len(optimized_routes),
                     "optimization": optimization.value,
-                }
+                },
             )
 
             return optimized_routes
@@ -206,7 +203,7 @@ class EnhancedPathPaymentEngine:
             await self.observability.log_error(
                 "path_finding_failed",
                 e,
-                {"source_asset": source_asset.code, "dest_asset": dest_asset.code}
+                {"source_asset": source_asset.code, "dest_asset": dest_asset.code},
             )
             raise
 
@@ -254,7 +251,7 @@ class EnhancedPathPaymentEngine:
                     "source_amount": str(route.source_amount),
                     "destination_amount": str(route.destination_amount),
                     "mev_protected": mev_protection,
-                }
+                },
             )
 
             return transaction_id
@@ -263,7 +260,7 @@ class EnhancedPathPaymentEngine:
             await self.observability.log_error(
                 "path_payment_execution_failed",
                 e,
-                {"route": route, "source_account": source_account}
+                {"route": route, "source_account": source_account},
             )
             raise
 
@@ -275,10 +272,10 @@ class EnhancedPathPaymentEngine:
     ) -> List[ArbitrageOpportunity]:
         """
         Optimized arbitrage detection using graph-based algorithms and parallel processing.
-        
+
         Improvements from O(n²) to O(n log n + m) where m is edges in the price graph:
         - Pre-compute price matrices for all DEXes
-        - Use Floyd-Warshall for multi-hop arbitrage detection  
+        - Use Floyd-Warshall for multi-hop arbitrage detection
         - Parallel processing for independent calculations
         - Smart filtering to reduce search space
         """
@@ -288,29 +285,33 @@ class EnhancedPathPaymentEngine:
         try:
             min_profit = min_profit_percentage or self._min_profit_percentage
             start_time = time.time()
-            
+
             # Step 1: Pre-filter assets by volume and liquidity (reduces search space)
-            filtered_assets = await self._filter_assets_by_liquidity(assets, min_volume=Decimal("10000"))
-            
+            filtered_assets = await self._filter_assets_by_liquidity(
+                assets, min_volume=Decimal("10000")
+            )
+
             if len(filtered_assets) < 2:
                 return []
-            
+
             # Step 2: Build price graph matrix for all DEXes in parallel
             price_matrices = await self._build_price_matrices_parallel(filtered_assets)
-            
+
             # Step 3: Use graph algorithms for efficient arbitrage detection
             opportunities = await self._detect_arbitrage_graph_based(
                 filtered_assets, price_matrices, min_profit
             )
-            
+
             # Step 4: Parallel validation of top opportunities
             validated_opportunities = await self._validate_opportunities_parallel(opportunities)
-            
+
             # Step 5: Filter by risk and execution constraints
-            filtered_opportunities = await self._filter_arbitrage_opportunities(validated_opportunities)
-            
+            filtered_opportunities = await self._filter_arbitrage_opportunities(
+                validated_opportunities
+            )
+
             execution_time = time.time() - start_time
-            
+
             await self.observability.log_event(
                 "optimized_arbitrage_scan_completed",
                 {
@@ -319,8 +320,8 @@ class EnhancedPathPaymentEngine:
                     "min_profit_threshold": str(min_profit),
                     "execution_time_ms": execution_time * 1000,
                     "algorithm_efficiency": f"O(n log n) vs O(n²)",
-                    "performance_improvement": f"{((len(assets)**2 - len(filtered_assets) * math.log2(max(2, len(filtered_assets)))) / max(1, len(assets)**2) * 100):.1f}%"
-                }
+                    "performance_improvement": f"{((len(assets)**2 - len(filtered_assets) * math.log2(max(2, len(filtered_assets)))) / max(1, len(assets)**2) * 100):.1f}%",
+                },
             )
 
             return filtered_opportunities
@@ -330,17 +331,15 @@ class EnhancedPathPaymentEngine:
             raise
 
     async def _filter_assets_by_liquidity(
-        self, 
-        assets: List[Asset], 
-        min_volume: Decimal = Decimal("10000")
+        self, assets: List[Asset], min_volume: Decimal = Decimal("10000")
     ) -> List[Asset]:
         """Filter assets by liquidity to reduce search space."""
         try:
             filtered = []
-            
+
             # Use concurrent processing for liquidity checks
             semaphore = asyncio.Semaphore(10)  # Limit concurrent calls
-            
+
             async def check_asset_liquidity(asset: Asset) -> Optional[Asset]:
                 async with semaphore:
                     try:
@@ -351,106 +350,110 @@ class EnhancedPathPaymentEngine:
                         return None
                     except Exception:
                         return None
-            
+
             # Execute liquidity checks in parallel
             results = await asyncio.gather(
-                *[check_asset_liquidity(asset) for asset in assets],
-                return_exceptions=True
+                *[check_asset_liquidity(asset) for asset in assets], return_exceptions=True
             )
-            
+
             # Collect valid assets
             for result in results:
                 if isinstance(result, Asset):
                     filtered.append(result)
-            
+
             # Always include native XLM if not already present
             if not any(asset.is_native() for asset in filtered):
                 native_xlm = Asset.native()
                 if native_xlm not in filtered:
                     filtered.append(native_xlm)
-            
+
             return filtered
-            
+
         except Exception as e:
             self.logger().warning(f"Asset filtering failed, using all assets: {e}")
             return assets
 
-    async def _build_price_matrices_parallel(self, assets: List[Asset]) -> Dict[str, Dict[str, Dict[str, Decimal]]]:
+    async def _build_price_matrices_parallel(
+        self, assets: List[Asset]
+    ) -> Dict[str, Dict[str, Dict[str, Decimal]]]:
         """Build price matrices for all DEXes using parallel processing."""
         try:
             price_matrices = {}
             dex_sources = ["stellar_dex", "amm_pools", "external_dex"]  # Known DEX sources
-            
+
             # Build matrices for each DEX source in parallel
             matrix_tasks = [
-                self._build_price_matrix_for_dex(assets, dex_source) 
-                for dex_source in dex_sources
+                self._build_price_matrix_for_dex(assets, dex_source) for dex_source in dex_sources
             ]
-            
+
             results = await asyncio.gather(*matrix_tasks, return_exceptions=True)
-            
+
             for i, result in enumerate(results):
                 if not isinstance(result, Exception) and result:
                     price_matrices[dex_sources[i]] = result
-            
+
             return price_matrices
-            
+
         except Exception as e:
             self.logger().warning(f"Price matrix building failed: {e}")
             return {}
 
-    async def _build_price_matrix_for_dex(self, assets: List[Asset], dex_source: str) -> Dict[str, Dict[str, Decimal]]:
+    async def _build_price_matrix_for_dex(
+        self, assets: List[Asset], dex_source: str
+    ) -> Dict[str, Dict[str, Decimal]]:
         """Build price matrix for a specific DEX."""
         try:
             matrix = {}
             n_assets = len(assets)
-            
+
             # Initialize matrix
             for asset in assets:
                 matrix[str(asset)] = {}
                 for target_asset in assets:
                     matrix[str(asset)][str(target_asset)] = Decimal("0")
-            
+
             # Use semaphore to limit concurrent price fetches
             semaphore = asyncio.Semaphore(20)
-            
+
             async def fetch_price(source_asset: Asset, target_asset: Asset):
                 if source_asset == target_asset:
                     matrix[str(source_asset)][str(target_asset)] = Decimal("1")
                     return
-                
+
                 async with semaphore:
                     try:
-                        price = await self._get_price_between_assets(source_asset, target_asset, dex_source)
+                        price = await self._get_price_between_assets(
+                            source_asset, target_asset, dex_source
+                        )
                         if price and price > 0:
                             matrix[str(source_asset)][str(target_asset)] = price
                     except Exception:
                         pass  # Price not available
-            
+
             # Fetch all prices in parallel
             price_tasks = []
             for source_asset in assets:
                 for target_asset in assets:
                     price_tasks.append(fetch_price(source_asset, target_asset))
-            
+
             await asyncio.gather(*price_tasks, return_exceptions=True)
-            
+
             return matrix
-            
+
         except Exception as e:
             self.logger().warning(f"Price matrix building failed for {dex_source}: {e}")
             return {}
 
     async def _detect_arbitrage_graph_based(
-        self, 
-        assets: List[Asset], 
-        price_matrices: Dict[str, Dict[str, Dict[str, Decimal]]], 
-        min_profit: Decimal
+        self,
+        assets: List[Asset],
+        price_matrices: Dict[str, Dict[str, Dict[str, Decimal]]],
+        min_profit: Decimal,
     ) -> List[ArbitrageOpportunity]:
         """Use graph-based algorithms for efficient arbitrage detection."""
         try:
             opportunities = []
-            
+
             # Convert to graph representation with logarithmic edge weights
             # This allows us to find arbitrage cycles using shortest path algorithms
             for dex1_name, dex1_matrix in price_matrices.items():
@@ -461,25 +464,25 @@ class EnhancedPathPaymentEngine:
                             assets, dex1_matrix, dex2_matrix, dex1_name, dex2_name, min_profit
                         )
                         opportunities.extend(cross_dex_opportunities)
-            
+
             # Look for triangular arbitrage within each DEX
             for dex_name, matrix in price_matrices.items():
                 triangular_opportunities = await self._find_triangular_arbitrage(
                     assets, matrix, dex_name, min_profit
                 )
                 opportunities.extend(triangular_opportunities)
-            
+
             # Use Floyd-Warshall for multi-hop arbitrage (up to 4 hops)
             multi_hop_opportunities = await self._find_multi_hop_arbitrage(
                 assets, price_matrices, min_profit, max_hops=4
             )
             opportunities.extend(multi_hop_opportunities)
-            
+
             # Sort by profit potential
             opportunities.sort(key=lambda x: x.profit_percentage, reverse=True)
-            
+
             return opportunities[:50]  # Return top 50 opportunities
-            
+
         except Exception as e:
             self.logger().error(f"Graph-based arbitrage detection failed: {e}")
             return []
@@ -491,42 +494,51 @@ class EnhancedPathPaymentEngine:
         dex2_matrix: Dict[str, Dict[str, Decimal]],
         dex1_name: str,
         dex2_name: str,
-        min_profit: Decimal
+        min_profit: Decimal,
     ) -> List[ArbitrageOpportunity]:
         """Find arbitrage opportunities between two DEXes."""
         opportunities = []
-        
+
         try:
             # Check each asset pair across DEXes
             for source_asset in assets:
                 for target_asset in assets:
                     if source_asset == target_asset:
                         continue
-                    
+
                     source_key = str(source_asset)
                     target_key = str(target_asset)
-                    
+
                     # Get prices from both DEXes
                     price_dex1 = dex1_matrix.get(source_key, {}).get(target_key, Decimal("0"))
                     price_dex2 = dex2_matrix.get(target_key, {}).get(source_key, Decimal("0"))
-                    
+
                     if price_dex1 > 0 and price_dex2 > 0:
                         # Calculate potential profit: buy on DEX1, sell on DEX2
                         # Profit = (1 / price_dex2) / price_dex1 - 1
                         if price_dex1 * price_dex2 < 1:  # Potential arbitrage
-                            profit_percentage = (Decimal("1") - price_dex1 * price_dex2) / (price_dex1 * price_dex2) * Decimal("100")
-                            
+                            profit_percentage = (
+                                (Decimal("1") - price_dex1 * price_dex2)
+                                / (price_dex1 * price_dex2)
+                                * Decimal("100")
+                            )
+
                             if profit_percentage >= min_profit:
                                 # Create opportunity (simplified)
                                 opportunity = await self._create_cross_dex_opportunity(
-                                    source_asset, target_asset, profit_percentage,
-                                    dex1_name, dex2_name, price_dex1, price_dex2
+                                    source_asset,
+                                    target_asset,
+                                    profit_percentage,
+                                    dex1_name,
+                                    dex2_name,
+                                    price_dex1,
+                                    price_dex2,
                                 )
                                 if opportunity:
                                     opportunities.append(opportunity)
-            
+
             return opportunities
-            
+
         except Exception as e:
             self.logger().warning(f"Cross-DEX arbitrage detection failed: {e}")
             return []
@@ -536,11 +548,11 @@ class EnhancedPathPaymentEngine:
         assets: List[Asset],
         price_matrix: Dict[str, Dict[str, Decimal]],
         dex_name: str,
-        min_profit: Decimal
+        min_profit: Decimal,
     ) -> List[ArbitrageOpportunity]:
         """Find triangular arbitrage opportunities within a single DEX."""
         opportunities = []
-        
+
         try:
             # Check all possible triangles (A -> B -> C -> A)
             for i, asset_a in enumerate(assets):
@@ -550,32 +562,36 @@ class EnhancedPathPaymentEngine:
                     for k, asset_c in enumerate(assets):
                         if k == i or k == j:
                             continue
-                        
+
                         key_a = str(asset_a)
                         key_b = str(asset_b)
                         key_c = str(asset_c)
-                        
+
                         # Get prices for the triangle
                         price_ab = price_matrix.get(key_a, {}).get(key_b, Decimal("0"))
                         price_bc = price_matrix.get(key_b, {}).get(key_c, Decimal("0"))
                         price_ca = price_matrix.get(key_c, {}).get(key_a, Decimal("0"))
-                        
+
                         if price_ab > 0 and price_bc > 0 and price_ca > 0:
                             # Check if triangle yields profit
                             final_amount = price_ab * price_bc * price_ca
                             if final_amount > 1:  # Profitable triangle
                                 profit_percentage = (final_amount - Decimal("1")) * Decimal("100")
-                                
+
                                 if profit_percentage >= min_profit:
                                     opportunity = await self._create_triangular_opportunity(
-                                        asset_a, asset_b, asset_c, profit_percentage,
-                                        dex_name, [price_ab, price_bc, price_ca]
+                                        asset_a,
+                                        asset_b,
+                                        asset_c,
+                                        profit_percentage,
+                                        dex_name,
+                                        [price_ab, price_bc, price_ca],
                                     )
                                     if opportunity:
                                         opportunities.append(opportunity)
-            
+
             return opportunities
-            
+
         except Exception as e:
             self.logger().warning(f"Triangular arbitrage detection failed: {e}")
             return []
@@ -585,11 +601,11 @@ class EnhancedPathPaymentEngine:
         assets: List[Asset],
         price_matrices: Dict[str, Dict[str, Dict[str, Decimal]]],
         min_profit: Decimal,
-        max_hops: int = 4
+        max_hops: int = 4,
     ) -> List[ArbitrageOpportunity]:
         """Find multi-hop arbitrage using Floyd-Warshall algorithm."""
         opportunities = []
-        
+
         try:
             # Combine all price matrices into a unified graph
             unified_matrix = {}
@@ -597,7 +613,7 @@ class EnhancedPathPaymentEngine:
                 unified_matrix[str(asset)] = {}
                 for target_asset in assets:
                     unified_matrix[str(asset)][str(target_asset)] = Decimal("0")
-            
+
             # Find best price for each pair across all DEXes
             for dex_matrix in price_matrices.values():
                 for source_key, targets in dex_matrix.items():
@@ -606,11 +622,11 @@ class EnhancedPathPaymentEngine:
                             current_best = unified_matrix[source_key][target_key]
                             if current_best == 0 or price > current_best:
                                 unified_matrix[source_key][target_key] = price
-            
+
             # Apply Floyd-Warshall for path finding
             n = len(assets)
             asset_keys = [str(asset) for asset in assets]
-            
+
             # Use logarithms to convert to shortest path problem
             log_matrix = {}
             for i, key_i in enumerate(asset_keys):
@@ -620,45 +636,55 @@ class EnhancedPathPaymentEngine:
                         # Use negative log to find maximum product paths
                         log_matrix[key_i][key_j] = -float(unified_matrix[key_i][key_j].ln())
                     else:
-                        log_matrix[key_i][key_j] = float('inf')
-            
+                        log_matrix[key_i][key_j] = float("inf")
+
             # Floyd-Warshall algorithm
             for k, key_k in enumerate(asset_keys):
                 for i, key_i in enumerate(asset_keys):
                     for j, key_j in enumerate(asset_keys):
-                        if (log_matrix[key_i][key_k] + log_matrix[key_k][key_j] < 
-                            log_matrix[key_i][key_j]):
-                            log_matrix[key_i][key_j] = log_matrix[key_i][key_k] + log_matrix[key_k][key_j]
-            
+                        if (
+                            log_matrix[key_i][key_k] + log_matrix[key_k][key_j]
+                            < log_matrix[key_i][key_j]
+                        ):
+                            log_matrix[key_i][key_j] = (
+                                log_matrix[key_i][key_k] + log_matrix[key_k][key_j]
+                            )
+
             # Look for negative cycles (arbitrage opportunities)
             for i, key_i in enumerate(asset_keys):
                 if log_matrix[key_i][key_i] < 0:  # Negative cycle found
                     profit = abs(log_matrix[key_i][key_i]) * 100  # Convert to percentage
                     if profit >= float(min_profit):
                         # Reconstruct the arbitrage path
-                        path = await self._reconstruct_arbitrage_path(key_i, log_matrix, unified_matrix)
+                        path = await self._reconstruct_arbitrage_path(
+                            key_i, log_matrix, unified_matrix
+                        )
                         if path and len(path) <= max_hops + 1:
                             opportunity = await self._create_multi_hop_opportunity(
                                 assets[asset_keys.index(key_i)], path, Decimal(str(profit))
                             )
                             if opportunity:
                                 opportunities.append(opportunity)
-            
+
             return opportunities
-            
+
         except Exception as e:
             self.logger().warning(f"Multi-hop arbitrage detection failed: {e}")
             return []
 
-    async def _validate_opportunities_parallel(self, opportunities: List[ArbitrageOpportunity]) -> List[ArbitrageOpportunity]:
+    async def _validate_opportunities_parallel(
+        self, opportunities: List[ArbitrageOpportunity]
+    ) -> List[ArbitrageOpportunity]:
         """Validate opportunities in parallel with real-time data."""
         try:
             if not opportunities:
                 return []
-            
+
             semaphore = asyncio.Semaphore(10)  # Limit concurrent validations
-            
-            async def validate_opportunity(opportunity: ArbitrageOpportunity) -> Optional[ArbitrageOpportunity]:
+
+            async def validate_opportunity(
+                opportunity: ArbitrageOpportunity,
+            ) -> Optional[ArbitrageOpportunity]:
                 async with semaphore:
                     try:
                         # Re-check prices with current market data
@@ -671,20 +697,20 @@ class EnhancedPathPaymentEngine:
                         return None
                     except Exception:
                         return None
-            
+
             # Validate top opportunities in parallel
             top_opportunities = opportunities[:20]  # Limit to top 20 for validation
             validation_tasks = [validate_opportunity(opp) for opp in top_opportunities]
-            
+
             results = await asyncio.gather(*validation_tasks, return_exceptions=True)
-            
+
             validated = []
             for result in results:
                 if isinstance(result, ArbitrageOpportunity):
                     validated.append(result)
-            
+
             return validated
-            
+
         except Exception as e:
             self.logger().warning(f"Opportunity validation failed: {e}")
             return opportunities[:10]  # Return top 10 unvalidated as fallback
@@ -701,13 +727,15 @@ class EnhancedPathPaymentEngine:
         except Exception:
             return Decimal("0")
 
-    async def _get_price_between_assets(self, source_asset: Asset, target_asset: Asset, dex_source: str) -> Optional[Decimal]:
+    async def _get_price_between_assets(
+        self, source_asset: Asset, target_asset: Asset, dex_source: str
+    ) -> Optional[Decimal]:
         """Get price between two assets from specific DEX."""
         try:
             # Placeholder implementation - would query specific DEX
             if source_asset == target_asset:
                 return Decimal("1")
-            
+
             # Mock price data for demonstration
             if source_asset.is_native() and not target_asset.is_native():
                 return Decimal("2.5")  # XLM to other asset
@@ -715,19 +743,19 @@ class EnhancedPathPaymentEngine:
                 return Decimal("0.4")  # Other asset to XLM
             else:
                 return Decimal("1.1")  # Between two non-native assets
-                
+
         except Exception:
             return None
 
     async def _create_cross_dex_opportunity(
-        self, 
-        source_asset: Asset, 
-        target_asset: Asset, 
+        self,
+        source_asset: Asset,
+        target_asset: Asset,
         profit_percentage: Decimal,
-        dex1_name: str, 
-        dex2_name: str, 
-        price_dex1: Decimal, 
-        price_dex2: Decimal
+        dex1_name: str,
+        dex2_name: str,
+        price_dex1: Decimal,
+        price_dex2: Decimal,
     ) -> Optional[ArbitrageOpportunity]:
         """Create cross-DEX arbitrage opportunity."""
         try:
@@ -744,7 +772,7 @@ class EnhancedPathPaymentEngine:
         asset_c: Asset,
         profit_percentage: Decimal,
         dex_name: str,
-        prices: List[Decimal]
+        prices: List[Decimal],
     ) -> Optional[ArbitrageOpportunity]:
         """Create triangular arbitrage opportunity."""
         try:
@@ -755,10 +783,7 @@ class EnhancedPathPaymentEngine:
             return None
 
     async def _create_multi_hop_opportunity(
-        self,
-        start_asset: Asset,
-        path: List[str],
-        profit_percentage: Decimal
+        self, start_asset: Asset, path: List[str], profit_percentage: Decimal
     ) -> Optional[ArbitrageOpportunity]:
         """Create multi-hop arbitrage opportunity."""
         try:
@@ -769,10 +794,10 @@ class EnhancedPathPaymentEngine:
             return None
 
     async def _reconstruct_arbitrage_path(
-        self, 
-        start_key: str, 
-        log_matrix: Dict[str, Dict[str, float]], 
-        price_matrix: Dict[str, Dict[str, Decimal]]
+        self,
+        start_key: str,
+        log_matrix: Dict[str, Dict[str, float]],
+        price_matrix: Dict[str, Dict[str, Decimal]],
     ) -> Optional[List[str]]:
         """Reconstruct arbitrage path from Floyd-Warshall result."""
         try:
@@ -838,16 +863,14 @@ class EnhancedPathPaymentEngine:
                     "sell_transaction": sell_tx_id,
                     "expected_profit": str(opportunity.profit_amount),
                     "profit_percentage": str(opportunity.profit_percentage),
-                }
+                },
             )
 
             return buy_tx_id, sell_tx_id
 
         except Exception as e:
             await self.observability.log_error(
-                "arbitrage_execution_failed",
-                e,
-                {"opportunity": opportunity}
+                "arbitrage_execution_failed", e, {"opportunity": opportunity}
             )
             raise
 
@@ -859,7 +882,7 @@ class EnhancedPathPaymentEngine:
         # Implementation stub - actual orderbook analysis in Phase 3
         if source_asset.code == dest_asset.code:
             return None
-            
+
         route = PathPaymentRoute(
             path=[source_asset, dest_asset],
             source_amount=amount,
@@ -872,7 +895,7 @@ class EnhancedPathPaymentEngine:
             confidence_score=Decimal("0.95"),
             expires_at=time.time() + self._route_expiry_seconds,
         )
-        
+
         return route
 
     async def _find_single_hop_paths(
@@ -882,7 +905,7 @@ class EnhancedPathPaymentEngine:
         # Implementation stub
         intermediate_assets = [Asset.native()]  # XLM as intermediate
         routes = []
-        
+
         for intermediate in intermediate_assets:
             if intermediate.code not in [source_asset.code, dest_asset.code]:
                 route = PathPaymentRoute(
@@ -898,7 +921,7 @@ class EnhancedPathPaymentEngine:
                     expires_at=time.time() + self._route_expiry_seconds,
                 )
                 routes.append(route)
-        
+
         return routes
 
     async def _find_multi_hop_paths(
@@ -935,10 +958,10 @@ class EnhancedPathPaymentEngine:
             # Weighted scoring
             for route in routes:
                 route.confidence_score = (
-                    Decimal("0.3") * (1 - route.estimated_cost / route.source_amount) +
-                    Decimal("0.2") * (1 - Decimal(route.estimated_time_seconds) / 60) +
-                    Decimal("0.3") * (route.liquidity_available / Decimal("10000")) +
-                    Decimal("0.2") * (1 - route.price_impact)
+                    Decimal("0.3") * (1 - route.estimated_cost / route.source_amount)
+                    + Decimal("0.2") * (1 - Decimal(route.estimated_time_seconds) / 60)
+                    + Decimal("0.3") * (route.liquidity_available / Decimal("10000"))
+                    + Decimal("0.2") * (1 - route.price_impact)
                 )
             routes.sort(key=lambda r: r.confidence_score, reverse=True)
 
@@ -954,12 +977,12 @@ class EnhancedPathPaymentEngine:
         """Calculate arbitrage opportunity."""
         # Implementation stub - detailed arbitrage calculation in Phase 3
         profit_amount = sell_route.destination_amount - buy_route.source_amount
-        
+
         if profit_amount <= 0:
             return None
-            
+
         profit_percentage = profit_amount / buy_route.source_amount
-        
+
         opportunity = ArbitrageOpportunity(
             source_asset=source_asset,
             destination_asset=dest_asset,
@@ -971,7 +994,7 @@ class EnhancedPathPaymentEngine:
             execution_time_window=self._max_execution_time,
             required_capital=buy_route.source_amount,
         )
-        
+
         return opportunity
 
     async def _filter_arbitrage_opportunities(
@@ -979,21 +1002,21 @@ class EnhancedPathPaymentEngine:
     ) -> List[ArbitrageOpportunity]:
         """Filter arbitrage opportunities by risk and profitability."""
         filtered = []
-        
+
         for opportunity in opportunities:
             # Risk filtering
             if opportunity.risk_score > Decimal("0.7"):
                 continue
-                
+
             # Profitability filtering
             if opportunity.profit_percentage < self._min_profit_percentage:
                 continue
-                
+
             filtered.append(opportunity)
-        
+
         # Sort by profit percentage
         filtered.sort(key=lambda o: o.profit_percentage, reverse=True)
-        
+
         return filtered[:10]  # Return top 10 opportunities
 
     async def _initialize_dex_endpoints(self):
@@ -1049,7 +1072,7 @@ class EnhancedPathPaymentEngine:
         # Implementation stub
         await self.observability.log_event(
             "mev_protection_applied",
-            {"transaction_id": transaction_id, "route_type": route.path_type.value}
+            {"transaction_id": transaction_id, "route_type": route.path_type.value},
         )
         return transaction_id
 

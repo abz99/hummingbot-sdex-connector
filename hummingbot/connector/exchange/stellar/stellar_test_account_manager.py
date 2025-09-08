@@ -6,22 +6,22 @@ Main interface for hierarchical test account management system.
 import asyncio
 import json
 import time
-from typing import Dict, List, Optional, Any, Union
+from typing import Any, Dict, List, Optional, Union
 
 from stellar_sdk import Keypair
 
-from .stellar_logging import get_stellar_logger, LogCategory
-from .stellar_security_types import SecurityLevel
-from .stellar_network_manager import StellarNetwork, StellarNetworkManager
+from .stellar_account_factory import StellarAccountFactory
+from .stellar_account_pool_manager import StellarAccountPoolManager
 from .stellar_key_derivation import HierarchicalKeyManager
+from .stellar_logging import get_stellar_logger, LogCategory
+from .stellar_network_manager import StellarNetwork, StellarNetworkManager
+from .stellar_security_types import SecurityLevel
 from .stellar_test_account_types import (
+    AccountStatus,
     TestAccount,
     TestAccountConfig,
     TestAccountType,
-    AccountStatus,
 )
-from .stellar_account_factory import StellarAccountFactory
-from .stellar_account_pool_manager import StellarAccountPoolManager
 
 
 class StellarTestAccountManager:
@@ -39,7 +39,7 @@ class StellarTestAccountManager:
         # Core components
         self.hd_manager = HierarchicalKeyManager(SecurityLevel.DEVELOPMENT)
         self._master_wallet_id = "test_accounts_master"
-        
+
         # Modular components
         self.account_factory = StellarAccountFactory(
             network_manager, self.hd_manager, self._master_wallet_id
@@ -83,23 +83,18 @@ class StellarTestAccountManager:
     # Main API methods
 
     async def create_test_account(
-        self, 
-        network: StellarNetwork, 
-        config: TestAccountConfig, 
-        account_name: Optional[str] = None
+        self, network: StellarNetwork, config: TestAccountConfig, account_name: Optional[str] = None
     ) -> TestAccount:
         """Create a new test account."""
-        account = await self.account_factory.create_test_account(
-            network, config, account_name
-        )
-        
+        account = await self.account_factory.create_test_account(network, config, account_name)
+
         # Store in local registry
         self._accounts[account.account_id] = account
         self._add_to_indices(account)
-        
+
         # Save to storage
         await self._save_accounts()
-        
+
         return account
 
     async def get_test_account(
@@ -112,7 +107,8 @@ class StellarTestAccountManager:
         """Get an available test account matching criteria."""
         # Filter available accounts
         available_accounts = [
-            account for account in self._accounts.values()
+            account
+            for account in self._accounts.values()
             if account.status in [AccountStatus.ACTIVE, AccountStatus.FUNDED]
             and not account.is_expired
             and account.xlm_balance >= min_balance
@@ -120,17 +116,14 @@ class StellarTestAccountManager:
 
         # Apply filters
         if account_type:
-            available_accounts = [
-                a for a in available_accounts if a.account_type == account_type
-            ]
+            available_accounts = [a for a in available_accounts if a.account_type == account_type]
 
         if network:
             available_accounts = [a for a in available_accounts if a.network == network]
 
         if tags:
             available_accounts = [
-                a for a in available_accounts 
-                if any(tag in a.tags for tag in tags)
+                a for a in available_accounts if any(tag in a.tags for tag in tags)
             ]
 
         if not available_accounts:
@@ -150,7 +143,7 @@ class StellarTestAccountManager:
 
         account = self._accounts[account_id]
         account.last_used = time.time()
-        
+
         # Try returning to pool first
         if self.pool_manager.return_pool_account(account_id):
             return True
@@ -174,14 +167,16 @@ class StellarTestAccountManager:
         success = await self.pool_manager.create_account_pool(
             pool_name, network, config, pool_size, auto_refill, min_available
         )
-        
+
         if success:
             # Add pool accounts to main registry
             pool_info = self.pool_manager.get_pool_accounts(pool_name)
-            for account_id in pool_info.get("available_accounts", []) + pool_info.get("in_use_accounts", []):
+            for account_id in pool_info.get("available_accounts", []) + pool_info.get(
+                "in_use_accounts", []
+            ):
                 if account_id in self._accounts:
                     continue
-                    
+
                 # Create minimal account entry (pool manages the details)
                 account = TestAccount(
                     account_id=account_id,
@@ -193,9 +188,9 @@ class StellarTestAccountManager:
                 account.tags.append(f"pool:{pool_name}")
                 self._accounts[account_id] = account
                 self._add_to_indices(account)
-            
+
             await self._save_accounts()
-        
+
         return success
 
     def get_pool_account(self, pool_name: str) -> Optional[TestAccount]:
@@ -215,11 +210,11 @@ class StellarTestAccountManager:
             return False
 
         account = self._accounts[account_id]
-        
+
         try:
             server = self.network_manager.get_server(account.network)
             account_data = server.load_account(account_id)
-            
+
             # Update XLM balance
             for balance in account_data.balances:
                 if balance["asset_type"] == "native":
@@ -315,9 +310,10 @@ class StellarTestAccountManager:
         """Load accounts from storage."""
         try:
             import aiofiles
-            async with aiofiles.open(self.storage_path, 'r') as f:
+
+            async with aiofiles.open(self.storage_path, "r") as f:
                 data = json.loads(await f.read())
-                
+
             for account_data in data.get("accounts", []):
                 try:
                     account = TestAccount.from_dict(account_data)
@@ -347,9 +343,10 @@ class StellarTestAccountManager:
                 "accounts": [account.to_dict() for account in self._accounts.values()],
                 "last_saved": time.time(),
             }
-            
+
             import aiofiles
-            async with aiofiles.open(self.storage_path, 'w') as f:
+
+            async with aiofiles.open(self.storage_path, "w") as f:
                 await f.write(json.dumps(data, indent=2))
 
         except Exception as e:
@@ -363,8 +360,7 @@ class StellarTestAccountManager:
         """Clean up expired accounts."""
         expired_count = 0
         expired_accounts = [
-            account_id for account_id, account in self._accounts.items()
-            if account.is_expired
+            account_id for account_id, account in self._accounts.items() if account.is_expired
         ]
 
         for account_id in expired_accounts:

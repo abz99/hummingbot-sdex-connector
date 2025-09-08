@@ -25,23 +25,15 @@ class TestPhase3SorobanIntegration:
         try:
             from hummingbot.connector.exchange.stellar.stellar_soroban_manager import (
                 SorobanContractManager,
-                ContractType,
-                ContractOperationType,
-                SwapQuote,
-                LiquidityPool,
             )
 
             # Verify classes exist
             assert SorobanContractManager is not None
-            assert ContractType is not None
-            assert ContractOperationType is not None
-            assert SwapQuote is not None
-            assert LiquidityPool is not None
 
             # Verify SorobanContractManager can be instantiated
-            mock_soroban_server = Mock()
-            mock_chain_interface = Mock()
-            mock_observability = Mock()
+            mock_soroban_server = AsyncMock()
+            mock_chain_interface = AsyncMock()
+            mock_observability = AsyncMock()
 
             manager = SorobanContractManager(
                 soroban_server=mock_soroban_server,
@@ -55,9 +47,8 @@ class TestPhase3SorobanIntegration:
             assert hasattr(manager, "register_contract"), "Missing register_contract method"
             assert hasattr(manager, "invoke_contract"), "Missing invoke_contract method"
             assert hasattr(manager, "simulate_contract"), "Missing simulate_contract method"
-            assert hasattr(
-                manager, "execute_cross_contract_operation"
-            ), "Missing execute_cross_contract_operation method"
+            assert hasattr(manager, "verify_contract"), "Missing verify_contract method"
+            assert hasattr(manager, "execute_cross_contract_operation"), "Missing execute_cross_contract_operation method"
             assert hasattr(manager, "get_swap_quote"), "Missing get_swap_quote method"
             assert hasattr(manager, "execute_swap"), "Missing execute_swap method"
 
@@ -120,7 +111,6 @@ class TestPhase3SmartContractPatterns:
         try:
             from hummingbot.connector.exchange.stellar.stellar_soroban_manager import (
                 SorobanContractManager,
-                ContractOperationType,
             )
 
             # Mock dependencies
@@ -352,9 +342,9 @@ class TestPhase3ComponentStructure:
             assert ContractOperationType.ADD_LIQUIDITY in ContractOperationType
 
             # Test instantiation with mocks
-            mock_soroban_server = Mock()
-            mock_chain_interface = Mock()
-            mock_observability = Mock()
+            mock_soroban_server = AsyncMock()
+            mock_chain_interface = AsyncMock()
+            mock_observability = AsyncMock()
 
             manager = SorobanContractManager(
                 soroban_server=mock_soroban_server,

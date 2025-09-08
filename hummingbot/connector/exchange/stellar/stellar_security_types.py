@@ -6,8 +6,8 @@ Core types, enums, and protocols for the Stellar security infrastructure.
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Dict, List, Optional, Any, Tuple, Protocol, runtime_checkable
+from enum import auto, Enum
+from typing import Any, Dict, List, Optional, Protocol, runtime_checkable, Tuple
 
 
 class SecurityLevel(Enum):

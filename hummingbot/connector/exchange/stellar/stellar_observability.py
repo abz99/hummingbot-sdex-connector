@@ -5,36 +5,46 @@ Phase 4: Production Hardening - Advanced monitoring and alerting system.
 """
 
 import asyncio
-import time
 import json
-import psutil
+import time
 import traceback
-from typing import Dict, Any, Optional, List, Callable, Union
-from dataclasses import dataclass, asdict
-from enum import Enum
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
+from dataclasses import asdict, dataclass
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Union
+
+import psutil
 import structlog
 from prometheus_client import (
-    Counter, Histogram, Gauge, Summary, Info,
-    CollectorRegistry, generate_latest, start_http_server,
-    push_to_gateway, delete_from_gateway
+    CollectorRegistry,
+    Counter,
+    delete_from_gateway,
+    Gauge,
+    generate_latest,
+    Histogram,
+    Info,
+    push_to_gateway,
+    start_http_server,
+    Summary,
 )
 
+from .stellar_logging import correlation_id, get_stellar_logger, LogCategory
 from .stellar_metrics import get_stellar_metrics, StellarMetrics
-from .stellar_logging import get_stellar_logger, LogCategory, correlation_id
 
 
 class AlertLevel(Enum):
     """Alert severity levels."""
+
     INFO = "info"
-    WARNING = "warning" 
+    WARNING = "warning"
     CRITICAL = "critical"
     EMERGENCY = "emergency"
 
 
 class ObservabilityEvent(Enum):
     """Types of observability events."""
+
     SYSTEM_START = "system_start"
     SYSTEM_STOP = "system_stop"
     HEALTH_CHECK = "health_check"
@@ -55,6 +65,7 @@ class ObservabilityEvent(Enum):
 @dataclass
 class AlertRule:
     """Definition of an alert rule."""
+
     name: str
     description: str
     metric_name: str
@@ -73,6 +84,7 @@ class AlertRule:
 @dataclass
 class Alert:
     """An active alert."""
+
     rule_name: str
     level: AlertLevel
     message: str
@@ -90,6 +102,7 @@ class Alert:
 
 class HealthCheckStatus(Enum):
     """Health check status values."""
+
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
@@ -99,6 +112,7 @@ class HealthCheckStatus(Enum):
 @dataclass
 class HealthCheckResult:
     """Result of a health check."""
+
     component: str
     status: HealthCheckStatus
     response_time: float
@@ -115,127 +129,129 @@ class HealthCheckResult:
 
 class StellarObservabilityFramework:
     """Production observability framework for Stellar connector."""
-    
-    def __init__(self, 
-                 metrics_port: int = 8000,
-                 pushgateway_url: Optional[str] = None,
-                 alert_webhook_url: Optional[str] = None):
+
+    def __init__(
+        self,
+        metrics_port: int = 8000,
+        pushgateway_url: Optional[str] = None,
+        alert_webhook_url: Optional[str] = None,
+    ):
         self.logger = get_stellar_logger()
         self.metrics = get_stellar_metrics()
         self.metrics_port = metrics_port
         self.pushgateway_url = pushgateway_url
         self.alert_webhook_url = alert_webhook_url
-        
+
         # Alert management
         self.alert_rules: Dict[str, AlertRule] = {}
         self.active_alerts: Dict[str, Alert] = {}
         self.alert_callbacks: List[Callable[[Alert], None]] = []
-        
+
         # Health checks
         self.health_checks: Dict[str, Callable[[], HealthCheckResult]] = {}
         self.health_status: Dict[str, HealthCheckResult] = {}
-        
+
         # Background tasks
         self._background_tasks: List[asyncio.Task] = []
         self._running = False
-        
+
         # Performance tracking
         self.performance_metrics = {
-            'startup_time': time.time(),
-            'request_count': 0,
-            'error_count': 0,
-            'last_error_time': None
+            "startup_time": time.time(),
+            "request_count": 0,
+            "error_count": 0,
+            "last_error_time": None,
         }
-        
+
         self._init_production_metrics()
         self._init_default_alert_rules()
         self._init_health_checks()
 
     def _init_production_metrics(self):
         """Initialize production-specific metrics."""
-        
+
         # Observability system metrics
         self.observability_events = Counter(
             "stellar_observability_events_total",
             "Total observability events",
             ["event_type", "status"],
-            registry=self.metrics.registry
+            registry=self.metrics.registry,
         )
-        
+
         self.alert_firings = Counter(
-            "stellar_alert_firings_total", 
+            "stellar_alert_firings_total",
             "Total alert firings",
             ["alert_rule", "level"],
-            registry=self.metrics.registry
+            registry=self.metrics.registry,
         )
-        
+
         self.health_check_results = Gauge(
             "stellar_health_check_status",
             "Health check results (0=unhealthy, 1=degraded, 2=healthy)",
             ["component"],
-            registry=self.metrics.registry
+            registry=self.metrics.registry,
         )
-        
+
         self.system_uptime = Gauge(
             "stellar_system_uptime_seconds",
             "System uptime in seconds",
-            registry=self.metrics.registry
+            registry=self.metrics.registry,
         )
-        
+
         # Advanced performance metrics
         self.request_processing_time = Histogram(
             "stellar_request_processing_seconds",
-            "Request processing time", 
+            "Request processing time",
             ["operation", "status"],
             buckets=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0],
-            registry=self.metrics.registry
+            registry=self.metrics.registry,
         )
-        
+
         self.concurrent_operations = Gauge(
             "stellar_concurrent_operations",
             "Number of concurrent operations",
             ["operation_type"],
-            registry=self.metrics.registry
+            registry=self.metrics.registry,
         )
-        
+
         # Resource utilization
         self.resource_utilization = Gauge(
             "stellar_resource_utilization_percent",
             "Resource utilization percentage",
             ["resource_type", "component"],
-            registry=self.metrics.registry
+            registry=self.metrics.registry,
         )
-        
+
         # Business logic metrics
         self.trading_session_duration = Histogram(
             "stellar_trading_session_duration_seconds",
             "Trading session duration",
             ["outcome"],
             buckets=[60, 300, 900, 1800, 3600, 7200, 14400],
-            registry=self.metrics.registry
+            registry=self.metrics.registry,
         )
 
     def _init_default_alert_rules(self):
         """Initialize default alert rules for production monitoring."""
-        
+
         default_rules = [
             AlertRule(
                 name="high_error_rate",
                 description="Error rate exceeds 5% over 5 minutes",
                 metric_name="stellar_errors_total",
                 threshold=0.05,
-                comparison="gt", 
+                comparison="gt",
                 duration=300,
-                level=AlertLevel.WARNING
+                level=AlertLevel.WARNING,
             ),
             AlertRule(
-                name="critical_error_rate", 
+                name="critical_error_rate",
                 description="Error rate exceeds 10% over 2 minutes",
                 metric_name="stellar_errors_total",
                 threshold=0.10,
                 comparison="gt",
                 duration=120,
-                level=AlertLevel.CRITICAL
+                level=AlertLevel.CRITICAL,
             ),
             AlertRule(
                 name="high_response_time",
@@ -244,16 +260,16 @@ class StellarObservabilityFramework:
                 threshold=5.0,
                 comparison="gt",
                 duration=60,
-                level=AlertLevel.WARNING
+                level=AlertLevel.WARNING,
             ),
             AlertRule(
                 name="circuit_breaker_open",
                 description="Circuit breaker is open",
-                metric_name="stellar_circuit_breaker_state", 
+                metric_name="stellar_circuit_breaker_state",
                 threshold=1,
                 comparison="gte",
                 duration=0,
-                level=AlertLevel.CRITICAL
+                level=AlertLevel.CRITICAL,
             ),
             AlertRule(
                 name="low_account_balance",
@@ -262,7 +278,7 @@ class StellarObservabilityFramework:
                 threshold=10.0,  # 10 XLM minimum
                 comparison="lt",
                 duration=0,
-                level=AlertLevel.WARNING
+                level=AlertLevel.WARNING,
             ),
             AlertRule(
                 name="memory_exhaustion",
@@ -271,7 +287,7 @@ class StellarObservabilityFramework:
                 threshold=0.90,
                 comparison="gt",
                 duration=300,
-                level=AlertLevel.CRITICAL
+                level=AlertLevel.CRITICAL,
             ),
             AlertRule(
                 name="health_check_failure",
@@ -280,16 +296,16 @@ class StellarObservabilityFramework:
                 threshold=1,
                 comparison="lt",
                 duration=60,
-                level=AlertLevel.CRITICAL
-            )
+                level=AlertLevel.CRITICAL,
+            ),
         ]
-        
+
         for rule in default_rules:
             self.add_alert_rule(rule)
 
     def _init_health_checks(self):
         """Initialize health check functions."""
-        
+
         self.add_health_check("system_resources", self._check_system_resources)
         self.add_health_check("stellar_network", self._check_stellar_network)
         self.add_health_check("database_connection", self._check_database_connection)
@@ -299,19 +315,14 @@ class StellarObservabilityFramework:
         """Add an alert rule."""
         self.alert_rules[rule.name] = rule
         self.logger.info(
-            f"Added alert rule: {rule.name}",
-            category=LogCategory.CONFIGURATION,
-            rule=asdict(rule)
+            f"Added alert rule: {rule.name}", category=LogCategory.CONFIGURATION, rule=asdict(rule)
         )
 
     def remove_alert_rule(self, rule_name: str):
         """Remove an alert rule."""
         if rule_name in self.alert_rules:
             del self.alert_rules[rule_name]
-            self.logger.info(
-                f"Removed alert rule: {rule_name}",
-                category=LogCategory.CONFIGURATION
-            )
+            self.logger.info(f"Removed alert rule: {rule_name}", category=LogCategory.CONFIGURATION)
 
     def add_alert_callback(self, callback: Callable[[Alert], None]):
         """Add a callback for alert notifications."""
@@ -320,46 +331,44 @@ class StellarObservabilityFramework:
     def add_health_check(self, name: str, check_func: Callable[[], HealthCheckResult]):
         """Add a health check function."""
         self.health_checks[name] = check_func
-        self.logger.info(
-            f"Added health check: {name}",
-            category=LogCategory.HEALTH_CHECK
-        )
+        self.logger.info(f"Added health check: {name}", category=LogCategory.HEALTH_CHECK)
 
     async def start_observability_system(self):
         """Start the production observability system."""
         if self._running:
             return
-            
+
         self._running = True
-        
+
         # Start metrics server
         self.metrics.start_metrics_server(self.metrics_port)
-        
+
         # Start background monitoring tasks
-        self._background_tasks.extend([
-            asyncio.create_task(self._monitor_alerts()),
-            asyncio.create_task(self._run_health_checks()),
-            asyncio.create_task(self._collect_performance_metrics()),
-            asyncio.create_task(self._update_system_metrics())
-        ])
-        
+        self._background_tasks.extend(
+            [
+                asyncio.create_task(self._monitor_alerts()),
+                asyncio.create_task(self._run_health_checks()),
+                asyncio.create_task(self._collect_performance_metrics()),
+                asyncio.create_task(self._update_system_metrics()),
+            ]
+        )
+
         # Start background metrics collection
         await self.metrics.start_background_metrics_collection()
-        
+
         # Register QA alert rules
         await self.register_qa_alerts()
-        
+
         self.observability_events.labels(
-            event_type=ObservabilityEvent.SYSTEM_START.value,
-            status="success"
+            event_type=ObservabilityEvent.SYSTEM_START.value, status="success"
         ).inc()
-        
+
         self.logger.info(
             "Observability system started",
             category=LogCategory.METRICS,
             metrics_port=self.metrics_port,
             alert_rules_count=len(self.alert_rules),
-            health_checks_count=len(self.health_checks)
+            health_checks_count=len(self.health_checks),
         )
 
     # Legacy compatibility methods
@@ -380,39 +389,35 @@ class StellarObservabilityFramework:
     ) -> None:
         """Log structured error."""
         self.logger.error(
-            error_name, 
+            error_name,
             category=LogCategory.ERROR_HANDLING,
-            error=str(error), 
-            error_type=type(error).__name__, 
-            **(context or {})
+            error=str(error),
+            error_type=type(error).__name__,
+            **(context or {}),
         )
 
     async def stop_observability_system(self):
         """Stop the observability system."""
         if not self._running:
             return
-            
+
         self._running = False
-        
+
         # Cancel background tasks
         for task in self._background_tasks:
             task.cancel()
-            
+
         await asyncio.gather(*self._background_tasks, return_exceptions=True)
         self._background_tasks.clear()
-        
+
         # Stop metrics collection
         await self.metrics.stop_background_metrics_collection()
-        
+
         self.observability_events.labels(
-            event_type=ObservabilityEvent.SYSTEM_STOP.value,
-            status="success"
+            event_type=ObservabilityEvent.SYSTEM_STOP.value, status="success"
         ).inc()
-        
-        self.logger.info(
-            "Observability system stopped", 
-            category=LogCategory.METRICS
-        )
+
+        self.logger.info("Observability system stopped", category=LogCategory.METRICS)
 
     async def _monitor_alerts(self):
         """Monitor metrics for alert conditions."""
@@ -422,27 +427,25 @@ class StellarObservabilityFramework:
                 await asyncio.sleep(30)  # Check every 30 seconds
             except Exception as e:
                 self.logger.error(
-                    "Error in alert monitoring",
-                    category=LogCategory.ERROR_HANDLING,
-                    exception=e
+                    "Error in alert monitoring", category=LogCategory.ERROR_HANDLING, exception=e
                 )
                 await asyncio.sleep(60)
 
     async def _check_alert_conditions(self):
         """Check all alert rule conditions."""
         current_time = time.time()
-        
+
         for rule_name, rule in self.alert_rules.items():
             if not rule.enabled:
                 continue
-                
+
             try:
                 # Get current metric value (simplified - in production would query Prometheus)
                 current_value = await self._get_metric_value(rule.metric_name, rule.labels)
-                
+
                 # Evaluate alert condition
                 should_fire = self._evaluate_alert_condition(rule, current_value)
-                
+
                 if should_fire and rule_name not in self.active_alerts:
                     # Fire new alert
                     alert = Alert(
@@ -454,20 +457,20 @@ class StellarObservabilityFramework:
                         threshold=rule.threshold,
                         timestamp=current_time,
                         labels=rule.labels.copy(),
-                        correlation_id=correlation_id.get()
+                        correlation_id=correlation_id.get(),
                     )
-                    
+
                     await self._fire_alert(alert)
-                    
+
                 elif not should_fire and rule_name in self.active_alerts:
                     # Resolve alert
                     await self._resolve_alert(rule_name)
-                    
+
             except Exception as e:
                 self.logger.error(
                     f"Error checking alert rule {rule_name}",
                     category=LogCategory.ERROR_HANDLING,
-                    exception=e
+                    exception=e,
                 )
 
     def _evaluate_alert_condition(self, rule: AlertRule, current_value: float) -> bool:
@@ -494,33 +497,32 @@ class StellarObservabilityFramework:
     async def _fire_alert(self, alert: Alert):
         """Fire an alert."""
         self.active_alerts[alert.rule_name] = alert
-        
+
         # Record metrics
-        self.alert_firings.labels(
-            alert_rule=alert.rule_name,
-            level=alert.level.value
-        ).inc()
-        
+        self.alert_firings.labels(alert_rule=alert.rule_name, level=alert.level.value).inc()
+
         # Log alert
         self.logger.error(
             f"ALERT FIRED: {alert.message}",
-            category=LogCategory.SECURITY if alert.level in [AlertLevel.CRITICAL, AlertLevel.EMERGENCY] else LogCategory.PERFORMANCE,
+            category=(
+                LogCategory.SECURITY
+                if alert.level in [AlertLevel.CRITICAL, AlertLevel.EMERGENCY]
+                else LogCategory.PERFORMANCE
+            ),
             alert_rule=alert.rule_name,
             alert_level=alert.level.value,
             current_value=alert.current_value,
             threshold=alert.threshold,
-            correlation_id=alert.correlation_id
+            correlation_id=alert.correlation_id,
         )
-        
+
         # Send notifications
         for callback in self.alert_callbacks:
             try:
                 callback(alert)
             except Exception as e:
                 self.logger.error(
-                    "Error in alert callback",
-                    category=LogCategory.ERROR_HANDLING,
-                    exception=e
+                    "Error in alert callback", category=LogCategory.ERROR_HANDLING, exception=e
                 )
 
     async def _resolve_alert(self, rule_name: str):
@@ -528,11 +530,11 @@ class StellarObservabilityFramework:
         if rule_name in self.active_alerts:
             alert = self.active_alerts[rule_name]
             del self.active_alerts[rule_name]
-            
+
             self.logger.info(
                 f"ALERT RESOLVED: {rule_name}",
                 category=LogCategory.PERFORMANCE,
-                alert_rule=rule_name
+                alert_rule=rule_name,
             )
 
     async def _run_health_checks(self):
@@ -543,9 +545,7 @@ class StellarObservabilityFramework:
                 await asyncio.sleep(60)  # Run every minute
             except Exception as e:
                 self.logger.error(
-                    "Error in health checks",
-                    category=LogCategory.ERROR_HANDLING,
-                    exception=e
+                    "Error in health checks", category=LogCategory.ERROR_HANDLING, exception=e
                 )
                 await asyncio.sleep(120)
 
@@ -555,16 +555,16 @@ class StellarObservabilityFramework:
             try:
                 result = check_func()
                 self.health_status[name] = result
-                
+
                 # Update metrics
                 status_value = 0
                 if result.status == HealthCheckStatus.DEGRADED:
                     status_value = 1
                 elif result.status == HealthCheckStatus.HEALTHY:
                     status_value = 2
-                    
+
                 self.health_check_results.labels(component=name).set(status_value)
-                
+
                 # Log if unhealthy
                 if result.status != HealthCheckStatus.HEALTHY:
                     self.logger.warning(
@@ -573,14 +573,12 @@ class StellarObservabilityFramework:
                         component=name,
                         status=result.status.value,
                         message=result.message,
-                        response_time=result.response_time
+                        response_time=result.response_time,
                     )
-                    
+
             except Exception as e:
                 self.logger.error(
-                    f"Health check error: {name}",
-                    category=LogCategory.ERROR_HANDLING,
-                    exception=e
+                    f"Health check error: {name}", category=LogCategory.ERROR_HANDLING, exception=e
                 )
 
     def _check_system_resources(self) -> HealthCheckResult:
@@ -588,26 +586,26 @@ class StellarObservabilityFramework:
         try:
             # CPU usage
             cpu_percent = psutil.cpu_percent(interval=1)
-            
+
             # Memory usage
             memory = psutil.virtual_memory()
             memory_percent = memory.percent
-            
+
             # Disk usage
-            disk = psutil.disk_usage('/')
+            disk = psutil.disk_usage("/")
             disk_percent = disk.percent
-            
+
             # Determine overall status
             if cpu_percent > 90 or memory_percent > 90 or disk_percent > 90:
                 status = HealthCheckStatus.UNHEALTHY
                 message = f"High resource usage: CPU {cpu_percent}%, Memory {memory_percent}%, Disk {disk_percent}%"
             elif cpu_percent > 80 or memory_percent > 80 or disk_percent > 80:
-                status = HealthCheckStatus.DEGRADED  
+                status = HealthCheckStatus.DEGRADED
                 message = f"Moderate resource usage: CPU {cpu_percent}%, Memory {memory_percent}%, Disk {disk_percent}%"
             else:
                 status = HealthCheckStatus.HEALTHY
                 message = f"Resource usage normal: CPU {cpu_percent}%, Memory {memory_percent}%, Disk {disk_percent}%"
-            
+
             return HealthCheckResult(
                 component="system_resources",
                 status=status,
@@ -616,16 +614,16 @@ class StellarObservabilityFramework:
                 details={
                     "cpu_percent": cpu_percent,
                     "memory_percent": memory_percent,
-                    "disk_percent": disk_percent
-                }
+                    "disk_percent": disk_percent,
+                },
             )
-            
+
         except Exception as e:
             return HealthCheckResult(
                 component="system_resources",
                 status=HealthCheckStatus.UNKNOWN,
                 response_time=0.0,
-                message=f"Error checking system resources: {e}"
+                message=f"Error checking system resources: {e}",
             )
 
     def _check_stellar_network(self) -> HealthCheckResult:
@@ -635,17 +633,17 @@ class StellarObservabilityFramework:
             component="stellar_network",
             status=HealthCheckStatus.HEALTHY,
             response_time=0.5,
-            message="Network connectivity OK"
+            message="Network connectivity OK",
         )
 
     def _check_database_connection(self) -> HealthCheckResult:
         """Check database connection."""
         # This would implement actual database connectivity check
         return HealthCheckResult(
-            component="database_connection", 
+            component="database_connection",
             status=HealthCheckStatus.HEALTHY,
             response_time=0.1,
-            message="Database connection OK"
+            message="Database connection OK",
         )
 
     def _check_metrics_system(self) -> HealthCheckResult:
@@ -658,21 +656,21 @@ class StellarObservabilityFramework:
                     component="metrics_system",
                     status=HealthCheckStatus.HEALTHY,
                     response_time=0.05,
-                    message="Metrics system operational"
+                    message="Metrics system operational",
                 )
             else:
                 return HealthCheckResult(
                     component="metrics_system",
                     status=HealthCheckStatus.DEGRADED,
                     response_time=0.05,
-                    message="Metrics system returning limited data"
+                    message="Metrics system returning limited data",
                 )
         except Exception as e:
             return HealthCheckResult(
                 component="metrics_system",
                 status=HealthCheckStatus.UNHEALTHY,
                 response_time=0.0,
-                message=f"Metrics system error: {e}"
+                message=f"Metrics system error: {e}",
             )
 
     async def _collect_performance_metrics(self):
@@ -680,60 +678,57 @@ class StellarObservabilityFramework:
         while self._running:
             try:
                 # Update system uptime
-                uptime = time.time() - self.performance_metrics['startup_time']
+                uptime = time.time() - self.performance_metrics["startup_time"]
                 self.system_uptime.set(uptime)
-                
+
                 # Collect resource utilization
                 process = psutil.Process()
-                
+
                 # CPU usage
                 cpu_percent = process.cpu_percent()
-                self.resource_utilization.labels(
-                    resource_type="cpu",
-                    component="connector"
-                ).set(cpu_percent)
-                
+                self.resource_utilization.labels(resource_type="cpu", component="connector").set(
+                    cpu_percent
+                )
+
                 # Memory usage
                 memory_info = process.memory_info()
                 memory_percent = process.memory_percent()
-                self.resource_utilization.labels(
-                    resource_type="memory",
-                    component="connector"  
-                ).set(memory_percent)
-                
+                self.resource_utilization.labels(resource_type="memory", component="connector").set(
+                    memory_percent
+                )
+
                 # Network connections
                 connections = len(process.connections())
-                self.concurrent_operations.labels(
-                    operation_type="network_connections"
-                ).set(connections)
-                
+                self.concurrent_operations.labels(operation_type="network_connections").set(
+                    connections
+                )
+
                 await asyncio.sleep(30)  # Collect every 30 seconds
-                
+
             except Exception as e:
                 self.logger.error(
                     "Error collecting performance metrics",
                     category=LogCategory.ERROR_HANDLING,
-                    exception=e
+                    exception=e,
                 )
                 await asyncio.sleep(60)
 
     async def _update_system_metrics(self):
-        """Update system-level metrics.""" 
+        """Update system-level metrics."""
         while self._running:
             try:
                 # Record observability system health
                 self.observability_events.labels(
-                    event_type=ObservabilityEvent.HEALTH_CHECK.value,
-                    status="running"
+                    event_type=ObservabilityEvent.HEALTH_CHECK.value, status="running"
                 ).inc()
-                
+
                 await asyncio.sleep(300)  # Update every 5 minutes
-                
+
             except Exception as e:
                 self.logger.error(
                     "Error updating system metrics",
-                    category=LogCategory.ERROR_HANDLING, 
-                    exception=e
+                    category=LogCategory.ERROR_HANDLING,
+                    exception=e,
                 )
                 await asyncio.sleep(300)
 
@@ -742,36 +737,34 @@ class StellarObservabilityFramework:
         """Context manager to observe operation performance."""
         start_time = time.time()
         operation_id = f"{operation_name}_{int(start_time)}"
-        
+
         # Increment concurrent operations
         self.concurrent_operations.labels(operation_type=operation_name).inc()
-        
+
         try:
             yield operation_id
             # Record successful operation
             duration = time.time() - start_time
-            self.request_processing_time.labels(
-                operation=operation_name,
-                status="success"
-            ).observe(duration)
-            
+            self.request_processing_time.labels(operation=operation_name, status="success").observe(
+                duration
+            )
+
         except Exception as e:
             # Record failed operation
             duration = time.time() - start_time
-            self.request_processing_time.labels(
-                operation=operation_name,
-                status="error"
-            ).observe(duration)
-            
+            self.request_processing_time.labels(operation=operation_name, status="error").observe(
+                duration
+            )
+
             self.logger.error(
                 f"Operation failed: {operation_name}",
                 category=LogCategory.ERROR_HANDLING,
                 operation=operation_name,
                 duration=duration,
-                exception=e
+                exception=e,
             )
             raise
-            
+
         finally:
             # Decrement concurrent operations
             self.concurrent_operations.labels(operation_type=operation_name).dec()
@@ -779,19 +772,22 @@ class StellarObservabilityFramework:
     def get_health_status(self) -> Dict[str, Any]:
         """Get current health status."""
         overall_status = HealthCheckStatus.HEALTHY
-        
+
         for result in self.health_status.values():
             if result.status == HealthCheckStatus.UNHEALTHY:
                 overall_status = HealthCheckStatus.UNHEALTHY
                 break
-            elif result.status == HealthCheckStatus.DEGRADED and overall_status == HealthCheckStatus.HEALTHY:
+            elif (
+                result.status == HealthCheckStatus.DEGRADED
+                and overall_status == HealthCheckStatus.HEALTHY
+            ):
                 overall_status = HealthCheckStatus.DEGRADED
-                
+
         return {
             "overall_status": overall_status.value,
             "components": {name: asdict(result) for name, result in self.health_status.items()},
             "active_alerts": {name: asdict(alert) for name, alert in self.active_alerts.items()},
-            "system_uptime": time.time() - self.performance_metrics['startup_time']
+            "system_uptime": time.time() - self.performance_metrics["startup_time"],
         }
 
     async def register_qa_alerts(self):
@@ -803,15 +799,15 @@ class StellarObservabilityFramework:
                 severity=AlertLevel.WARNING,
                 description="Overall test coverage below 80%",
                 labels={"category": "qa", "component": "testing"},
-                for_duration="5m"
+                for_duration="5m",
             ),
             "qa_critical_coverage_fail": AlertRule(
-                name="qa_critical_coverage_fail", 
+                name="qa_critical_coverage_fail",
                 condition="stellar_qa_test_coverage_percentage{coverage_type='critical'} < 90",
                 severity=AlertLevel.CRITICAL,
                 description="Critical module coverage below required threshold",
                 labels={"category": "qa", "component": "testing"},
-                for_duration="2m"
+                for_duration="2m",
             ),
             "qa_test_failures": AlertRule(
                 name="qa_test_failures",
@@ -819,7 +815,7 @@ class StellarObservabilityFramework:
                 severity=AlertLevel.WARNING,
                 description="Test success rate below 95%",
                 labels={"category": "qa", "component": "testing"},
-                for_duration="3m"
+                for_duration="3m",
             ),
             "qa_code_quality_low": AlertRule(
                 name="qa_code_quality_low",
@@ -827,7 +823,7 @@ class StellarObservabilityFramework:
                 severity=AlertLevel.WARNING,
                 description="Code quality score below acceptable threshold",
                 labels={"category": "qa", "component": "quality"},
-                for_duration="10m"
+                for_duration="10m",
             ),
             "qa_compliance_fail": AlertRule(
                 name="qa_compliance_fail",
@@ -835,32 +831,29 @@ class StellarObservabilityFramework:
                 severity=AlertLevel.WARNING,
                 description="Non-compliant QA requirements detected",
                 labels={"category": "qa", "component": "compliance"},
-                for_duration="5m"
-            )
+                for_duration="5m",
+            ),
         }
-        
+
         for rule_name, rule in qa_alert_rules.items():
             await self.register_alert_rule(rule)
             self.logger.info(f"Registered QA alert rule: {rule_name}")
-    
+
     async def handle_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]):
         """Handle QA-specific observability events."""
         try:
-            self.observability_events.labels(
-                event_type=event_type.value,
-                status="triggered"
-            ).inc()
-            
+            self.observability_events.labels(event_type=event_type.value, status="triggered").inc()
+
             # Log QA event with context
             self.logger.warning(
                 f"QA event triggered: {event_type.value}",
                 extra={
                     "event_type": event_type.value,
                     "context": context,
-                    "timestamp": time.time()
-                }
+                    "timestamp": time.time(),
+                },
             )
-            
+
             # Handle specific QA events
             if event_type == ObservabilityEvent.QA_COVERAGE_LOW:
                 await self._handle_coverage_alert(context)
@@ -874,149 +867,142 @@ class StellarObservabilityFramework:
                 await self._handle_defect_alert(context)
             elif event_type == ObservabilityEvent.QA_METRICS_STALE:
                 await self._handle_stale_metrics_alert(context)
-            
+
         except Exception as e:
             self.logger.error(f"Error handling QA event {event_type.value}: {str(e)}")
-            self.observability_events.labels(
-                event_type=event_type.value,
-                status="error"
-            ).inc()
-    
+            self.observability_events.labels(event_type=event_type.value, status="error").inc()
+
     async def _handle_coverage_alert(self, context: Dict[str, Any]):
         """Handle low coverage alerts."""
         coverage_percentage = context.get("coverage_percentage", 0)
         module = context.get("module", "unknown")
-        
+
         alert = Alert(
             name="low_test_coverage",
             level=AlertLevel.WARNING,
             message=f"Test coverage for {module} is {coverage_percentage}% (below 80%)",
             context=context,
-            timestamp=time.time()
+            timestamp=time.time(),
         )
-        
+
         await self.fire_alert(alert)
-    
+
     async def _handle_test_failure_alert(self, context: Dict[str, Any]):
         """Handle test failure alerts."""
         success_rate = context.get("success_rate", 0)
         test_suite = context.get("test_suite", "unknown")
-        
+
         alert = Alert(
             name="test_failures",
             level=AlertLevel.CRITICAL if success_rate < 0.90 else AlertLevel.WARNING,
             message=f"Test suite {test_suite} has {success_rate*100:.1f}% success rate",
             context=context,
-            timestamp=time.time()
+            timestamp=time.time(),
         )
-        
+
         await self.fire_alert(alert)
-    
+
     async def _handle_quality_alert(self, context: Dict[str, Any]):
         """Handle code quality alerts."""
         quality_score = context.get("quality_score", 0)
-        
+
         alert = Alert(
             name="low_code_quality",
             level=AlertLevel.CRITICAL if quality_score < 5.0 else AlertLevel.WARNING,
             message=f"Code quality score is {quality_score}/10",
             context=context,
-            timestamp=time.time()
+            timestamp=time.time(),
         )
-        
+
         await self.fire_alert(alert)
-    
+
     async def _handle_compliance_alert(self, context: Dict[str, Any]):
         """Handle compliance alerts."""
         requirement_id = context.get("requirement_id", "unknown")
         category = context.get("category", "unknown")
-        
+
         alert = Alert(
             name="compliance_failure",
             level=AlertLevel.CRITICAL if category == "security" else AlertLevel.WARNING,
             message=f"Requirement {requirement_id} in category {category} is non-compliant",
             context=context,
-            timestamp=time.time()
+            timestamp=time.time(),
         )
-        
+
         await self.fire_alert(alert)
-    
+
     async def _handle_defect_alert(self, context: Dict[str, Any]):
         """Handle defect rate alerts."""
         defect_rate = context.get("defect_rate", 0)
         severity = context.get("severity", "unknown")
-        
+
         alert = Alert(
             name="high_defect_rate",
             level=AlertLevel.CRITICAL if severity == "critical" else AlertLevel.WARNING,
             message=f"High {severity} defect rate: {defect_rate} defects/hour",
             context=context,
-            timestamp=time.time()
+            timestamp=time.time(),
         )
-        
+
         await self.fire_alert(alert)
-    
+
     async def _handle_stale_metrics_alert(self, context: Dict[str, Any]):
         """Handle stale metrics alerts."""
         last_update = context.get("last_update", "unknown")
-        
+
         alert = Alert(
             name="stale_qa_metrics",
             level=AlertLevel.WARNING,
             message=f"QA metrics haven't been updated since {last_update}",
             context=context,
-            timestamp=time.time()
+            timestamp=time.time(),
         )
-        
+
         await self.fire_alert(alert)
-    
+
     def get_qa_health_status(self) -> Dict[str, Any]:
         """Get QA-specific health status."""
         try:
             # This would integrate with actual QA metrics collection
             qa_status = {
                 "coverage_health": "healthy",  # Based on coverage metrics
-                "test_health": "healthy",      # Based on test success rates
-                "quality_health": "healthy",   # Based on quality scores
-                "compliance_health": "healthy", # Based on compliance status
-                "integration_health": "healthy" # Based on QA integration status
+                "test_health": "healthy",  # Based on test success rates
+                "quality_health": "healthy",  # Based on quality scores
+                "compliance_health": "healthy",  # Based on compliance status
+                "integration_health": "healthy",  # Based on QA integration status
             }
-            
+
             # Determine overall QA health
             unhealthy_components = [k for k, v in qa_status.items() if v != "healthy"]
-            
+
             if len(unhealthy_components) == 0:
                 overall_status = "healthy"
             elif len(unhealthy_components) <= 1:
                 overall_status = "degraded"
             else:
                 overall_status = "unhealthy"
-            
+
             return {
                 "overall_status": overall_status,
                 "component_status": qa_status,
                 "unhealthy_components": unhealthy_components,
-                "last_check": time.time()
+                "last_check": time.time(),
             }
-            
+
         except Exception as e:
             self.logger.error(f"Error getting QA health status: {str(e)}")
-            return {
-                "overall_status": "unknown",
-                "error": str(e),
-                "last_check": time.time()
-            }
+            return {"overall_status": "unknown", "error": str(e), "last_check": time.time()}
 
     def generate_observability_report(self) -> Dict[str, Any]:
         """Generate comprehensive observability report."""
         return {
             "timestamp": time.time(),
             "system_info": {
-                "uptime": time.time() - self.performance_metrics['startup_time'],
+                "uptime": time.time() - self.performance_metrics["startup_time"],
                 "metrics_port": self.metrics_port,
                 "alert_rules": len(self.alert_rules),
                 "active_alerts": len(self.active_alerts),
-                "health_checks": len(self.health_checks)
+                "health_checks": len(self.health_checks),
             },
             "health_status": self.get_health_status(),
             "qa_health_status": self.get_qa_health_status(),
@@ -1024,8 +1010,8 @@ class StellarObservabilityFramework:
             "metrics_summary": {
                 "total_metrics": len(self.metrics._metrics) + len(self.metrics._custom_metrics),
                 "metrics_server_running": True,  # Would check actual server status
-                "last_collection": time.time()
-            }
+                "last_collection": time.time(),
+            },
         }
 
 
@@ -1044,16 +1030,16 @@ def get_stellar_observability() -> StellarObservabilityFramework:
 async def start_production_observability(
     metrics_port: int = 8000,
     pushgateway_url: Optional[str] = None,
-    alert_webhook_url: Optional[str] = None
+    alert_webhook_url: Optional[str] = None,
 ) -> StellarObservabilityFramework:
     """Start production observability system."""
     global _observability_instance
     _observability_instance = StellarObservabilityFramework(
         metrics_port=metrics_port,
         pushgateway_url=pushgateway_url,
-        alert_webhook_url=alert_webhook_url
+        alert_webhook_url=alert_webhook_url,
     )
-    
+
     await _observability_instance.start_observability_system()
     return _observability_instance
 

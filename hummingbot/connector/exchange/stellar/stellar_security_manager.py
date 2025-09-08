@@ -5,27 +5,27 @@ Enterprise-grade security infrastructure for Stellar connector (REFACTORED).
 
 import os
 import time
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from stellar_sdk import Keypair
 
+from .stellar_keystores import FileSystemKeyStore, HSMKeyStore, MemoryKeyStore
 from .stellar_logging import get_stellar_logger, LogCategory
 from .stellar_security_types import (
-    SecurityLevel,
-    SecurityConfig,
-    KeyStoreType,
     KeyMetadata,
     KeyStoreBackend,
+    KeyStoreType,
+    SecurityConfig,
+    SecurityLevel,
 )
-from .stellar_keystores import MemoryKeyStore, FileSystemKeyStore, HSMKeyStore
 from .stellar_security_validation import (
-    SecurityValidator,
-    RateLimiter,
-    ValidationLevel,
-    RateLimitScope,
-    RateLimitConfig,
     create_default_rate_limits,
+    RateLimitConfig,
+    RateLimiter,
+    RateLimitScope,
     sanitize_log_data,
+    SecurityValidator,
+    ValidationLevel,
 )
 
 
@@ -38,7 +38,7 @@ class StellarSecurityManager:
         self._stores: Dict[KeyStoreType, KeyStoreBackend] = {}
         self._session_data: Dict[str, Any] = {}
         self._failed_attempts: Dict[str, int] = {}
-        
+
         # Initialize security validation and rate limiting
         validation_level = self._map_security_to_validation_level(config.security_level)
         self._validator = SecurityValidator(validation_level)
@@ -93,31 +93,31 @@ class StellarSecurityManager:
         """Configure rate limits for security operations."""
         # Get default rate limit configurations
         default_limits = create_default_rate_limits()
-        
+
         # Configure each operation with rate limiting
         for operation, config in default_limits.items():
             self._rate_limiter.configure_operation(operation, config)
-            
+
         # Add custom rate limits based on security level
         if self.config.security_level == SecurityLevel.PRODUCTION:
             # More restrictive limits for production
             self._rate_limiter.configure_operation(
-                'generate_keypair',
+                "generate_keypair",
                 RateLimitConfig(
                     max_requests=5,
                     time_window_seconds=60,
                     scope=RateLimitScope.PER_USER,
-                    burst_allowance=1
-                )
+                    burst_allowance=1,
+                ),
             )
             self._rate_limiter.configure_operation(
-                'sign_transaction',
+                "sign_transaction",
                 RateLimitConfig(
                     max_requests=50,
                     time_window_seconds=60,
                     scope=RateLimitScope.PER_USER,
-                    burst_allowance=5
-                )
+                    burst_allowance=5,
+                ),
             )
 
     async def generate_keypair(
@@ -126,16 +126,14 @@ class StellarSecurityManager:
         """Generate a new Stellar keypair with secure storage."""
         try:
             # Check rate limit
-            allowed = await self._rate_limiter.check_rate_limit('generate_keypair')
+            allowed = await self._rate_limiter.check_rate_limit("generate_keypair")
             if not allowed:
                 error_msg = "Rate limit exceeded for keypair generation"
                 sanitized_error = self._validator.sanitize_error_message(
-                    Exception(error_msg), 'generate_keypair'
+                    Exception(error_msg), "generate_keypair"
                 )
                 self.logger.warning(
-                    sanitized_error,
-                    category=LogCategory.SECURITY,
-                    operation='generate_keypair'
+                    sanitized_error, category=LogCategory.SECURITY, operation="generate_keypair"
                 )
                 raise Exception(sanitized_error)
 
@@ -143,12 +141,10 @@ class StellarSecurityManager:
             if account_id and not self._validator.validate_stellar_public_key(account_id):
                 error_msg = f"Invalid account ID format: {account_id}"
                 sanitized_error = self._validator.sanitize_error_message(
-                    ValueError(error_msg), 'generate_keypair'
+                    ValueError(error_msg), "generate_keypair"
                 )
                 self.logger.error(
-                    sanitized_error,
-                    category=LogCategory.SECURITY,
-                    operation='generate_keypair'
+                    sanitized_error, category=LogCategory.SECURITY, operation="generate_keypair"
                 )
                 raise ValueError(sanitized_error)
 
@@ -184,27 +180,29 @@ class StellarSecurityManager:
                 raise RuntimeError(f"Failed to store keypair in {store_type.name}")
 
             # Log with sanitized data
-            log_data = sanitize_log_data({
-                "account_id": account_id,
-                "key_id": key_id,
-                "store_type": store_type.name,
-                "operation": "generate_keypair"
-            })
+            log_data = sanitize_log_data(
+                {
+                    "account_id": account_id,
+                    "key_id": key_id,
+                    "store_type": store_type.name,
+                    "operation": "generate_keypair",
+                }
+            )
             self.logger.info(
                 f"Generated and stored new keypair: {account_id}",
                 category=LogCategory.SECURITY,
-                **log_data
+                **log_data,
             )
 
             return keypair, key_id
-            
+
         except Exception as e:
             # Sanitize and log error
-            sanitized_error = self._validator.sanitize_error_message(e, 'generate_keypair')
+            sanitized_error = self._validator.sanitize_error_message(e, "generate_keypair")
             self.logger.error(
                 f"Failed to generate keypair: {sanitized_error}",
                 category=LogCategory.SECURITY,
-                operation='generate_keypair'
+                operation="generate_keypair",
             )
             raise
 
@@ -213,32 +211,28 @@ class StellarSecurityManager:
     ) -> str:
         """Store an existing Stellar keypair with secure storage."""
         try:
-            # Check rate limit  
-            allowed = await self._rate_limiter.check_rate_limit('generate_keypair')
+            # Check rate limit
+            allowed = await self._rate_limiter.check_rate_limit("generate_keypair")
             if not allowed:
                 error_msg = "Rate limit exceeded for keypair storage"
                 sanitized_error = self._validator.sanitize_error_message(
-                    Exception(error_msg), 'store_keypair'
+                    Exception(error_msg), "store_keypair"
                 )
                 self.logger.warning(
-                    sanitized_error,
-                    category=LogCategory.SECURITY,
-                    operation='store_keypair'
+                    sanitized_error, category=LogCategory.SECURITY, operation="store_keypair"
                 )
                 raise Exception(sanitized_error)
 
             account_id = keypair.public_key
-            
+
             # Validate public key format
             if not self._validator.validate_stellar_public_key(account_id):
                 error_msg = f"Invalid public key format: {account_id}"
                 sanitized_error = self._validator.sanitize_error_message(
-                    ValueError(error_msg), 'store_keypair'
+                    ValueError(error_msg), "store_keypair"
                 )
                 self.logger.error(
-                    sanitized_error,
-                    category=LogCategory.SECURITY,
-                    operation='store_keypair'
+                    sanitized_error, category=LogCategory.SECURITY, operation="store_keypair"
                 )
                 raise ValueError(sanitized_error)
 
@@ -266,27 +260,27 @@ class StellarSecurityManager:
             await self._stores[store_type].store_key(key_id, key_data, metadata)
 
             # Log with sanitized data
-            log_data = sanitize_log_data({
-                "account_id": account_id,
-                "key_id": key_id,
-                "store_type": store_type.name,
-                "operation": "store_keypair"
-            })
+            log_data = sanitize_log_data(
+                {
+                    "account_id": account_id,
+                    "key_id": key_id,
+                    "store_type": store_type.name,
+                    "operation": "store_keypair",
+                }
+            )
             self.logger.info(
-                f"Stored existing keypair: {account_id}",
-                category=LogCategory.SECURITY,
-                **log_data
+                f"Stored existing keypair: {account_id}", category=LogCategory.SECURITY, **log_data
             )
 
             return key_id
-            
+
         except Exception as e:
             # Sanitize and log error
-            sanitized_error = self._validator.sanitize_error_message(e, 'store_keypair')
+            sanitized_error = self._validator.sanitize_error_message(e, "store_keypair")
             self.logger.error(
                 f"Failed to store keypair: {sanitized_error}",
                 category=LogCategory.SECURITY,
-                operation='store_keypair'
+                operation="store_keypair",
             )
             raise
 
@@ -297,12 +291,10 @@ class StellarSecurityManager:
             if not self._validator.validate_key_id(key_id):
                 error_msg = f"Invalid key ID format: {key_id}"
                 sanitized_error = self._validator.sanitize_error_message(
-                    ValueError(error_msg), 'get_keypair'
+                    ValueError(error_msg), "get_keypair"
                 )
                 self.logger.error(
-                    sanitized_error,
-                    category=LogCategory.SECURITY,
-                    operation='get_keypair'
+                    sanitized_error, category=LogCategory.SECURITY, operation="get_keypair"
                 )
                 raise ValueError(sanitized_error)
 
@@ -316,22 +308,24 @@ class StellarSecurityManager:
                         keypair = Keypair.from_secret(secret_key)
 
                         # Log with sanitized data
-                        log_data = sanitize_log_data({
-                            "key_id": key_id,
-                            "account_id": metadata.account_id,
-                            "store_type": store_type.name,
-                            "operation": "get_keypair"
-                        })
+                        log_data = sanitize_log_data(
+                            {
+                                "key_id": key_id,
+                                "account_id": metadata.account_id,
+                                "store_type": store_type.name,
+                                "operation": "get_keypair",
+                            }
+                        )
                         self.logger.info(
                             f"Retrieved keypair: {key_id}",
                             category=LogCategory.SECURITY,
-                            **log_data
+                            **log_data,
                         )
 
                         return keypair
                 except Exception as e:
                     # Sanitize error messages
-                    sanitized_error = self._validator.sanitize_error_message(e, 'get_keypair')
+                    sanitized_error = self._validator.sanitize_error_message(e, "get_keypair")
                     self.logger.warning(
                         f"Failed to retrieve key from {store_type.name}: {sanitized_error}",
                         category=LogCategory.SECURITY,
@@ -341,14 +335,14 @@ class StellarSecurityManager:
                     continue
 
             return None
-            
+
         except Exception as e:
             # Sanitize and log error
-            sanitized_error = self._validator.sanitize_error_message(e, 'get_keypair')
+            sanitized_error = self._validator.sanitize_error_message(e, "get_keypair")
             self.logger.error(
                 f"Failed to get keypair: {sanitized_error}",
                 category=LogCategory.SECURITY,
-                operation='get_keypair'
+                operation="get_keypair",
             )
             raise
 
@@ -359,12 +353,10 @@ class StellarSecurityManager:
             if not self._validator.validate_key_id(key_id):
                 error_msg = f"Invalid key ID format: {key_id}"
                 sanitized_error = self._validator.sanitize_error_message(
-                    ValueError(error_msg), 'delete_keypair'
+                    ValueError(error_msg), "delete_keypair"
                 )
                 self.logger.error(
-                    sanitized_error,
-                    category=LogCategory.SECURITY,
-                    operation='delete_keypair'
+                    sanitized_error, category=LogCategory.SECURITY, operation="delete_keypair"
                 )
                 raise ValueError(sanitized_error)
 
@@ -374,19 +366,21 @@ class StellarSecurityManager:
                     if await store.delete_key(key_id):
                         deleted = True
                         # Log with sanitized data
-                        log_data = sanitize_log_data({
-                            "key_id": key_id,
-                            "store_type": store_type.name,
-                            "operation": "delete_keypair"
-                        })
+                        log_data = sanitize_log_data(
+                            {
+                                "key_id": key_id,
+                                "store_type": store_type.name,
+                                "operation": "delete_keypair",
+                            }
+                        )
                         self.logger.info(
                             f"Deleted key from {store_type.name}: {key_id}",
                             category=LogCategory.SECURITY,
-                            **log_data
+                            **log_data,
                         )
                 except Exception as e:
                     # Sanitize error messages
-                    sanitized_error = self._validator.sanitize_error_message(e, 'delete_keypair')
+                    sanitized_error = self._validator.sanitize_error_message(e, "delete_keypair")
                     self.logger.error(
                         f"Failed to delete key from {store_type.name}: {sanitized_error}",
                         category=LogCategory.SECURITY,
@@ -395,14 +389,14 @@ class StellarSecurityManager:
                     )
 
             return deleted
-            
+
         except Exception as e:
             # Sanitize and log error
-            sanitized_error = self._validator.sanitize_error_message(e, 'delete_keypair')
+            sanitized_error = self._validator.sanitize_error_message(e, "delete_keypair")
             self.logger.error(
                 f"Failed to delete keypair: {sanitized_error}",
                 category=LogCategory.SECURITY,
-                operation='delete_keypair'
+                operation="delete_keypair",
             )
             raise
 
@@ -419,7 +413,7 @@ class StellarSecurityManager:
                         all_keys.append(key)
                         seen_key_ids.add(key.key_id)
             except Exception as e:
-                sanitized_error = self._validator.sanitize_error_message(e, 'list_managed_keys')
+                sanitized_error = self._validator.sanitize_error_message(e, "list_managed_keys")
                 self.logger.warning(
                     f"Failed to list keys from {store_type.name}: {sanitized_error}",
                     category=LogCategory.SECURITY,
@@ -430,59 +424,59 @@ class StellarSecurityManager:
 
     # Additional security manager methods would go here...
     # (Session management, backup/restore, etc.)
-    
+
     def create_secure_session(self, user_id: str) -> str:
         """Create a secure session ID for user authentication.
-        
+
         Args:
             user_id: User identifier
-            
+
         Returns:
             Secure session ID string
-            
+
         Raises:
             ValueError: If user_id is invalid
         """
         import secrets
         import time
-        
+
         if not user_id or not isinstance(user_id, str):
             raise ValueError("Invalid user_id provided")
-            
+
         # Create secure session ID with timestamp and random data
         timestamp = str(int(time.time()))
         random_part = secrets.token_urlsafe(32)
         session_id = f"sess_{timestamp}_{random_part}_{secrets.token_hex(16)}"
-        
+
         # Store active session
         self._session_data[session_id] = {
             "user_id": user_id,
             "created_at": time.time(),
-            "active": True
+            "active": True,
         }
-        
+
         self.logger.info(
             "Created secure session",
             category=LogCategory.SECURITY,
-            operation='create_secure_session',
-            user_id=self._validator.sanitize_string(user_id)
+            operation="create_secure_session",
+            user_id=self._validator.sanitize_string(user_id),
         )
-        
+
         return session_id
-    
+
     def validate_secure_session(self, session_id: str) -> bool:
         """Validate a secure session ID."""
         if not session_id or not session_id.startswith("sess_"):
             return False
-            
+
         # Check if session exists and is active
         session_info = self._session_data.get(session_id)
         return session_info is not None and session_info.get("active", False)
-    
+
     def validate_session(self, session_id: str) -> bool:
         """Alias for validate_secure_session for test compatibility."""
         return self.validate_secure_session(session_id)
-    
+
     def invalidate_session(self, session_id: str) -> bool:
         """Invalidate a session ID."""
         if session_id and session_id in self._session_data:
@@ -490,76 +484,79 @@ class StellarSecurityManager:
             self.logger.info(
                 "Session invalidated",
                 category=LogCategory.SECURITY,
-                operation='invalidate_session',
-                session_id=session_id[:20] + "..."  # Truncate for logging
+                operation="invalidate_session",
+                session_id=session_id[:20] + "...",  # Truncate for logging
             )
             return True
         return False
-    
+
     def derive_key_from_path(self, path: str, master_key: bytes = None) -> str:
         """Derive key from hierarchical path - stub implementation."""
         import secrets
+
         return f"derived_key_{secrets.token_hex(32)}"
-    
+
     def derive_key(self, master_key: bytes, purpose: str, index: int) -> bytes:
         """Derive key for specific purpose - stub implementation."""
-        import secrets
         import hashlib
+        import secrets
+
         # Create deterministic but unique key based on inputs
         data = f"{master_key.hex()}_{purpose}_{index}".encode()
         derived = hashlib.sha256(data).digest()
         return derived
-    
+
     def create_backup(self, backup_name: str) -> dict:
         """Create backup of keys - stub implementation."""
         import secrets
+
         return {
             "backup_id": f"backup_{backup_name}_{secrets.token_hex(16)}",
             "created_at": time.time(),
-            "key_count": 0
+            "key_count": 0,
         }
-    
+
     async def backup_keys(self, backup_path: str, encryption_key: bytes) -> bool:
         """Backup keys to encrypted file - stub implementation."""
         import json
         import os
-        
+
         try:
             # Create a simple backup structure (stub implementation)
             backup_data = {
                 "created_at": time.time(),
                 "security_level": self.config.security_level.name,
                 "key_count": len(self._session_data),  # Using session data as proxy
-                "encrypted": True
+                "encrypted": True,
             }
-            
+
             # Write backup file
-            with open(backup_path, 'w') as f:
+            with open(backup_path, "w") as f:
                 json.dump(backup_data, f)
-                
+
             self.logger.info(
                 "Keys backup completed",
                 category=LogCategory.SECURITY,
-                operation='backup_keys',
+                operation="backup_keys",
                 backup_path=os.path.basename(backup_path),
-                key_count=backup_data["key_count"]
+                key_count=backup_data["key_count"],
             )
-            
+
             return True
-            
+
         except Exception as e:
             self.logger.error(
                 f"Backup creation failed: {str(e)}",
                 category=LogCategory.SECURITY,
-                operation='backup_keys'
+                operation="backup_keys",
             )
             return False
-    
+
     def get_security_status(self) -> dict:
         """Get current security status."""
         return {
             "security_level": self.config.security_level.name,
             "active_stores": [store.name for store in self._stores.keys()],
             "key_count": 0,
-            "health_status": "healthy"
+            "health_status": "healthy",
         }

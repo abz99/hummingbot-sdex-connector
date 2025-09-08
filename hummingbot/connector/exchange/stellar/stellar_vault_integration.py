@@ -8,13 +8,14 @@ import base64
 import json
 import time
 from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Dict, List, Optional, Any, Union
+from enum import auto, Enum
+from typing import Any, Dict, List, Optional, Union
+
 import aiohttp
 from stellar_sdk import Keypair
 
 from .stellar_logging import get_stellar_logger, LogCategory
-from .stellar_security_manager import KeyMetadata, SecurityLevel, KeyStoreBackend, KeyStoreType
+from .stellar_security_manager import KeyMetadata, KeyStoreBackend, KeyStoreType, SecurityLevel
 
 
 class VaultAuthMethod(Enum):

@@ -6,29 +6,28 @@ Main interface for hierarchical deterministic wallets and key derivation.
 import asyncio
 import secrets
 import time
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from stellar_sdk import Keypair
 
-from .stellar_logging import get_stellar_logger, LogCategory
-from .stellar_security_types import SecurityLevel
-from .stellar_key_derivation_types import (
-    DerivationType,
-    KeyDerivationAlgorithm,
-    DerivationPath,
-    MasterSeed,
-    ExtendedKey,
-    DerivationConfig,
-    KeyDerivationResult,
-)
 from .stellar_key_derivation_core import SecureKeyDerivation
 from .stellar_key_derivation_manager import HierarchicalKeyManager
-
+from .stellar_key_derivation_types import (
+    DerivationConfig,
+    DerivationPath,
+    DerivationType,
+    ExtendedKey,
+    KeyDerivationAlgorithm,
+    KeyDerivationResult,
+    MasterSeed,
+)
+from .stellar_logging import get_stellar_logger, LogCategory
+from .stellar_security_types import SecurityLevel
 
 # Main API - expose the key classes
 __all__ = [
     "DerivationType",
-    "KeyDerivationAlgorithm", 
+    "KeyDerivationAlgorithm",
     "DerivationPath",
     "MasterSeed",
     "ExtendedKey",
@@ -44,23 +43,24 @@ __all__ = [
 
 # Utility functions for key derivation
 
+
 def generate_bip39_mnemonic(word_count: int = 24) -> str:
     """Generate BIP-39 compatible mnemonic phrase."""
     if word_count not in [12, 15, 18, 21, 24]:
         raise ValueError("Word count must be 12, 15, 18, 21, or 24")
-    
+
     # This is a simplified implementation
     # In production, use a proper BIP-39 word list
     entropy_bits = (word_count * 11) - (word_count // 3)
     entropy = secrets.token_bytes(entropy_bits // 8)
-    
+
     # Convert entropy to mnemonic (simplified)
     words = []
     for i in range(word_count):
         # Use entropy to generate word indices
-        word_index = int.from_bytes(entropy[i:i+2], 'big') % 2048
+        word_index = int.from_bytes(entropy[i : i + 2], "big") % 2048
         words.append(f"word{word_index:04d}")  # Placeholder words
-    
+
     return " ".join(words)
 
 
@@ -77,7 +77,7 @@ async def benchmark_key_derivation(iterations: int = 1000) -> Dict[str, Any]:
     """Benchmark key derivation performance."""
     logger = get_stellar_logger()
     derivation = SecureKeyDerivation(SecurityLevel.DEVELOPMENT)
-    
+
     logger.info(
         f"Starting key derivation benchmark with {iterations} iterations",
         category=LogCategory.PERFORMANCE,
@@ -125,56 +125,61 @@ async def benchmark_key_derivation(iterations: int = 1000) -> Dict[str, Any]:
 
 # Convenience factory functions
 
-def create_hd_wallet_manager(security_level: SecurityLevel = SecurityLevel.PRODUCTION) -> HierarchicalKeyManager:
+
+def create_hd_wallet_manager(
+    security_level: SecurityLevel = SecurityLevel.PRODUCTION,
+) -> HierarchicalKeyManager:
     """Create a new hierarchical deterministic wallet manager."""
     return HierarchicalKeyManager(security_level)
 
 
-def create_key_derivation_engine(security_level: SecurityLevel = SecurityLevel.PRODUCTION) -> SecureKeyDerivation:
-    """Create a new secure key derivation engine.""" 
+def create_key_derivation_engine(
+    security_level: SecurityLevel = SecurityLevel.PRODUCTION,
+) -> SecureKeyDerivation:
+    """Create a new secure key derivation engine."""
     return SecureKeyDerivation(security_level)
 
 
 def derive_stellar_account(
-    mnemonic: str, 
+    mnemonic: str,
     account_index: int = 0,
     passphrase: str = "",
-    security_level: SecurityLevel = SecurityLevel.PRODUCTION
+    security_level: SecurityLevel = SecurityLevel.PRODUCTION,
 ) -> Keypair:
     """Derive a Stellar account keypair from mnemonic phrase."""
     derivation = SecureKeyDerivation(security_level)
     master_seed = derivation.seed_from_mnemonic(mnemonic, passphrase)
     master_key = derivation.derive_master_key(master_seed)
-    
+
     path = DerivationPath(account=account_index)
     derived_key = derivation.derive_path(master_key, path)
-    
+
     stellar_keypair = derivation.derive_stellar_keypair(derived_key)
     if not stellar_keypair:
         raise RuntimeError("Failed to derive Stellar keypair")
-    
+
     return stellar_keypair
 
 
 def create_deterministic_accounts(
     entropy_bits: int = 256,
     account_count: int = 10,
-    security_level: SecurityLevel = SecurityLevel.PRODUCTION
+    security_level: SecurityLevel = SecurityLevel.PRODUCTION,
 ) -> List[Tuple[int, Keypair, DerivationPath]]:
     """Create multiple deterministic accounts from random entropy."""
     derivation = SecureKeyDerivation(security_level)
     master_seed = derivation.generate_master_seed(entropy_bits)
     master_key = derivation.derive_master_key(master_seed)
-    
+
     accounts = []
     for account_index in range(account_count):
         path = DerivationPath(account=account_index)
         derived_key = derivation.derive_path(master_key, path)
         stellar_keypair = derivation.derive_stellar_keypair(derived_key)
-        
+
         if not stellar_keypair:
             raise RuntimeError(f"Failed to derive keypair for account {account_index}")
-            
+
         accounts.append((account_index, stellar_keypair, path))
-    
+
     return accounts

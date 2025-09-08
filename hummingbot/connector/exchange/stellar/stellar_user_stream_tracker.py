@@ -4,11 +4,12 @@ Real-time user data tracking and WebSocket management.
 """
 
 import asyncio
-import aiohttp
-from typing import Dict, List, Optional, Callable, Any, Set, TYPE_CHECKING
-from enum import Enum
-from decimal import Decimal
 import time
+from decimal import Decimal
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Set, TYPE_CHECKING
+
+import aiohttp
 
 if TYPE_CHECKING:
     from .stellar_chain_interface import ModernStellarChainInterface

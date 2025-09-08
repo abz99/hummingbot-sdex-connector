@@ -4,11 +4,12 @@ Market data tracking and order book management.
 """
 
 import asyncio
-import aiohttp
-from typing import Dict, List, Optional, Callable, Any, Tuple
-from decimal import Decimal
-from dataclasses import dataclass
 import time
+from dataclasses import dataclass
+from decimal import Decimal
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+import aiohttp
 from stellar_sdk import Asset
 
 

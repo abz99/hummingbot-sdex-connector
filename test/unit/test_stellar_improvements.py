@@ -468,9 +468,31 @@ class TestHealthMonitoring:
             HorizonHealthChecker,
         )
 
-        # Skip this test for now due to mock complexity
-        # In a real implementation, we'd use aioresponses or similar
-        pytest.skip("Skipping complex async context manager mock test")
+        # Create health checker (no constructor arguments needed)
+        health_checker = HorizonHealthChecker()
+
+        # Create mock session
+        mock_session = AsyncMock()
+
+        # Mock successful response
+        mock_response = AsyncMock()
+        mock_response.status = 200
+        mock_response.json.return_value = {
+            "network_passphrase": "Public Global Stellar Network ; September 2015"
+        }
+
+        # Configure the session mock properly
+        mock_session.get.return_value.__aenter__.return_value = mock_response
+
+        # Test health check using the correct method signature
+        result = await health_checker.check_health("https://horizon.stellar.org", mock_session)
+
+        # Verify result
+        assert result.healthy is True
+        assert result.status_code == 200
+        assert result.response_time_ms > 0
+
+        print("✅ Horizon health check test completed")
 
     @pytest.mark.asyncio
     async def test_health_check_failure(self):

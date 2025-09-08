@@ -3,16 +3,17 @@ Stellar Structured Logging
 Enhanced logging with correlation IDs and structured output.
 """
 
-import uuid
+import asyncio
 import json
 import time
-import asyncio
-from typing import Dict, Any, Optional, Union
+import uuid
 from contextvars import ContextVar
 from enum import Enum
+from typing import Any, Dict, Optional, Union
+
 import structlog
-from structlog.typing import EventDict, Processor, WrappedLogger
 from structlog import BoundLogger
+from structlog.typing import EventDict, Processor, WrappedLogger
 
 
 class LogLevel(str, Enum):
