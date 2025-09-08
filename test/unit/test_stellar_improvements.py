@@ -464,33 +464,40 @@ class TestHealthMonitoring:
     @pytest.mark.asyncio
     async def test_health_check_horizon(self):
         """Test Horizon health check."""
+        import unittest.mock
         from hummingbot.connector.exchange.stellar.stellar_health_monitor import (
             HorizonHealthChecker,
+            HealthStatus,
         )
 
         # Create health checker (no constructor arguments needed)
         health_checker = HorizonHealthChecker()
 
-        # Create mock session
-        mock_session = AsyncMock()
+        # Mock aiohttp session with proper context manager
+        with unittest.mock.patch('aiohttp.ClientSession') as mock_session_class:
+            mock_session = AsyncMock()
+            mock_session_class.return_value = mock_session
+            
+            # Create mock response
+            mock_response = AsyncMock()
+            mock_response.status = 200
+            mock_response.json = AsyncMock(return_value={
+                "horizon_version": "2.0.0",
+                "core_version": "19.0.0", 
+                "current_protocol_version": 19,
+                "network_passphrase": "Public Global Stellar Network ; September 2015"
+            })
+            
+            # Configure async context manager
+            mock_session.get.return_value.__aenter__.return_value = mock_response
+            mock_session.get.return_value.__aexit__.return_value = None
 
-        # Mock successful response
-        mock_response = AsyncMock()
-        mock_response.status = 200
-        mock_response.json.return_value = {
-            "network_passphrase": "Public Global Stellar Network ; September 2015"
-        }
+            # Test health check using the correct method signature
+            result = await health_checker.check_health("https://horizon.stellar.org", mock_session)
 
-        # Configure the session mock properly
-        mock_session.get.return_value.__aenter__.return_value = mock_response
-
-        # Test health check using the correct method signature
-        result = await health_checker.check_health("https://horizon.stellar.org", mock_session)
-
-        # Verify result
-        assert result.healthy is True
-        assert result.status_code == 200
-        assert result.response_time_ms > 0
+            # Verify result
+            assert result.status == HealthStatus.HEALTHY
+            assert result.response_time > 0
 
         print("✅ Horizon health check test completed")
 
@@ -499,6 +506,7 @@ class TestHealthMonitoring:
         """Test health check failure handling."""
         from hummingbot.connector.exchange.stellar.stellar_health_monitor import (
             HorizonHealthChecker,
+            HealthStatus,
         )
 
         checker = HorizonHealthChecker()

@@ -153,7 +153,7 @@ class QAConfigManager:
                 config = QAMetricsConfig(**config_data)
                 self.logger.info(
                     f"Loaded QA metrics configuration from {self.config_path}",
-                    category=LogCategory.CONFIGURATIONURATION,
+                    category=LogCategory.CONFIGURATION,
                 )
                 return config
             else:
@@ -161,7 +161,7 @@ class QAConfigManager:
                 self.save_config(config)
                 self.logger.info(
                     f"Created default QA metrics configuration at {self.config_path}",
-                    category=LogCategory.CONFIGURATIONURATION,
+                    category=LogCategory.CONFIGURATION,
                 )
                 return config
 
@@ -238,7 +238,7 @@ class QAConfigManager:
             if len(stellar_files) > rules.get("file_count_threshold", 50):
                 self.logger.debug(
                     f"Auto-selecting optimized collector due to file count ({len(stellar_files)})",
-                    category=LogCategory.CONFIGURATIONURATION,
+                    category=LogCategory.CONFIGURATION,
                 )
                 return QACollectorMode.OPTIMIZED
 
@@ -249,7 +249,7 @@ class QAConfigManager:
             if memory_usage_mb > rules.get("memory_limit_mb", 512):
                 self.logger.debug(
                     f"Auto-selecting optimized collector due to memory usage ({memory_usage_mb:.1f}MB)",
-                    category=LogCategory.CONFIGURATIONURATION,
+                    category=LogCategory.CONFIGURATION,
                 )
                 return QACollectorMode.OPTIMIZED
 
@@ -257,7 +257,7 @@ class QAConfigManager:
             if os.getenv("QA_DEVELOPMENT_MODE", "false").lower() == "true":
                 self.logger.debug(
                     "Auto-selecting optimized collector for development mode",
-                    category=LogCategory.CONFIGURATIONURATION,
+                    category=LogCategory.CONFIGURATION,
                 )
                 return QACollectorMode.OPTIMIZED
 
@@ -295,7 +295,7 @@ class QAConfigManager:
 
                 self.logger.info(
                     f"Created optimized QA metrics collector (workers: {self.config.max_workers})",
-                    category=LogCategory.CONFIGURATIONURATION,
+                    category=LogCategory.CONFIGURATION,
                 )
 
             # Apply common configuration
@@ -342,7 +342,7 @@ class QAConfigManager:
 
         self.save_config()
         self.logger.info(
-            f"Updated performance profile to {profile.value}", category=LogCategory.CONFIG
+            f"Updated performance profile to {profile.value}", category=LogCategory.CONFIGURATION
         )
 
     def get_runtime_stats(self) -> Dict[str, int]:
