@@ -8,9 +8,14 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, TYPE_CHECKING
 
 from stellar_sdk import Asset, Keypair
+
+if TYPE_CHECKING:
+    from .stellar_chain_interface import ModernStellarChainInterface
+    from .stellar_asset_manager import ModernAssetManager
+    from .stellar_observability import StellarObservabilityFramework
 
 
 class OrderStatus(Enum):

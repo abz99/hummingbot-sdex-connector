@@ -10,9 +10,13 @@ import time
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 
 import aiohttp
+
+if TYPE_CHECKING:
+    from .stellar_chain_interface import ModernStellarChainInterface
+    from .stellar_observability import StellarObservabilityFramework
 from stellar_sdk import Account, Keypair, Network, StrKey, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import BaseRequestError
@@ -295,9 +299,9 @@ class SorobanContractManager:
                 simulated_tx = await self.soroban_server.simulate_transaction(transaction)
 
                 # Prepare and submit transaction
-                prepared_tx = await self.soroban_server.prepare_transaction(
-                    transaction, simulated_tx
-                )
+                # prepared_tx = await self.soroban_server.prepare_transaction(
+                #     transaction, simulated_tx
+                # )  # Unused
 
                 # This would require signing in a real implementation
                 # For now, return simulation result with transaction hash
@@ -473,12 +477,12 @@ class SorobanContractManager:
             else:
                 # Execute operations individually
                 for operation in operations:
-                    result = await self.invoke_contract(
-                        operation.contract_address,
-                        operation.function_name,
-                        operation.parameters,
-                        source_account,
-                    )
+                    # result = await self.invoke_contract(
+                    #     operation.contract_address,
+                    #     operation.function_name,
+                    #     operation.parameters,
+                    #     source_account,
+                    # )  # Unused
                     transaction_ids.append(f"individual_{time.time()}")
 
             return transaction_ids

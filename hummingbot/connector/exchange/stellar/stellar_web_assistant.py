@@ -168,7 +168,7 @@ class StellarRESTAssistant:
             # Log successful request
             duration = time.time() - start_time
             self.logger.debug(
-                f"Request completed successfully",
+                "Request completed successfully",
                 category=LogCategory.NETWORK,
                 method=request.method,
                 url=request.url,

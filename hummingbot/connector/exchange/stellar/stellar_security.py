@@ -6,9 +6,13 @@ Multi-layered security with HSM, MPC, and Hardware wallet support.
 import asyncio
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from stellar_sdk import Keypair
+
+if TYPE_CHECKING:
+    from .stellar_config_models import StellarNetworkConfig
+    from .stellar_observability import StellarObservabilityFramework
 
 
 class SecurityProvider(Enum):
@@ -125,7 +129,7 @@ class EnterpriseSecurityFramework:
             Signed transaction XDR
         """
         try:
-            keypair = await self.get_signing_keypair(account_id)
+            # keypair = await self.get_signing_keypair(account_id)  # Unused
 
             # Actual signing implementation would depend on security provider
             # This is a simplified stub

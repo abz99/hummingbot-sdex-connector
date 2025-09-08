@@ -401,7 +401,7 @@ class EnhancedStellarNetworkManager:
                 for network_type, health in self.health_status.items():
                     if self.health_monitor:
                         # Get health summary for this network's endpoints
-                        summary = self.health_monitor.get_health_summary()
+                        # summary = self.health_monitor.get_health_summary()  # Unused
 
                         self.metrics.set_endpoint_health(
                             network=network_type.value,

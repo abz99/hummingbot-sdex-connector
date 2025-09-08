@@ -428,7 +428,7 @@ def create_default_rate_limits() -> Dict[str, RateLimitConfig]:
 
 def sanitize_log_data(data: Dict[str, Any]) -> Dict[str, Any]:
     """Sanitize data for logging to prevent information leakage."""
-    validator = SecurityValidator()
+    # validator = SecurityValidator()  # Unused
     sanitized = {}
 
     for key, value in data.items():

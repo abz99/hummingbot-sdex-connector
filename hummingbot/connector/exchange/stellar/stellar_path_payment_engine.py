@@ -9,9 +9,14 @@ import time
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, TYPE_CHECKING
 
 from stellar_sdk import Asset
+
+if TYPE_CHECKING:
+    from .stellar_chain_interface import ModernStellarChainInterface
+    from .stellar_soroban_manager import SorobanContractManager
+    from .stellar_observability import StellarObservabilityFramework
 
 
 class PathType(Enum):
@@ -319,7 +324,7 @@ class EnhancedPathPaymentEngine:
                     "opportunities_found": len(filtered_opportunities),
                     "min_profit_threshold": str(min_profit),
                     "execution_time_ms": execution_time * 1000,
-                    "algorithm_efficiency": f"O(n log n) vs O(n²)",
+                    "algorithm_efficiency": "O(n log n) vs O(n²)",
                     "performance_improvement": f"{((len(assets)**2 - len(filtered_assets) * math.log2(max(2, len(filtered_assets)))) / max(1, len(assets)**2) * 100):.1f}%",
                 },
             )
@@ -404,7 +409,7 @@ class EnhancedPathPaymentEngine:
         """Build price matrix for a specific DEX."""
         try:
             matrix = {}
-            n_assets = len(assets)
+            # n_assets = len(assets)  # Unused
 
             # Initialize matrix
             for asset in assets:
@@ -624,7 +629,7 @@ class EnhancedPathPaymentEngine:
                                 unified_matrix[source_key][target_key] = price
 
             # Apply Floyd-Warshall for path finding
-            n = len(assets)
+            # n = len(assets)  # Unused
             asset_keys = [str(asset) for asset in assets]
 
             # Use logarithms to convert to shortest path problem

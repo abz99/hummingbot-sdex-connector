@@ -7,10 +7,14 @@ import asyncio
 import time
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import aiohttp
 from stellar_sdk import Asset
+
+if TYPE_CHECKING:
+    from .stellar_chain_interface import ModernStellarChainInterface
+    from .stellar_observability import StellarObservabilityFramework
 
 
 @dataclass

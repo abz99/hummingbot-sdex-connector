@@ -334,7 +334,7 @@ class OptimizedStellarQAMetricsCollector:
 
             try:
                 # Use existing coverage file if recent
-                coverage_file = self.project_root / "coverage.xml"
+                # coverage_file = self.project_root / "coverage.xml"  # Unused
                 coverage_json = self.project_root / "coverage.json"
 
                 coverage_data = None
@@ -366,9 +366,9 @@ class OptimizedStellarQAMetricsCollector:
         """Generate coverage data using optimized subprocess execution."""
         try:
             # Use faster coverage collection with selective module testing
-            stellar_modules = list(
-                self.project_root.glob("hummingbot/connector/exchange/stellar/*.py")
-            )
+            # stellar_modules = list(
+            #     self.project_root.glob("hummingbot/connector/exchange/stellar/*.py")
+            # )  # Unused
 
             # Run coverage on smaller batches
             cmd = [

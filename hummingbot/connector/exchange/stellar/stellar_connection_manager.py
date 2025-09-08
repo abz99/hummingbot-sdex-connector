@@ -283,7 +283,7 @@ class StellarConnectionManager:
         # Get session
         session = await self.get_session(service_name)
 
-        with with_correlation_id() as logger:
+        with with_correlation_id():
             # Log request start
             request_id = await self.request_logger.log_request(method, url, kwargs.get("headers"))
 
@@ -566,7 +566,7 @@ class StellarConnectionManager:
     async def _on_request_end(self, session, trace_config_ctx, params):
         """Called when request ends."""
         if hasattr(trace_config_ctx, "start_time"):
-            duration = time.time() - trace_config_ctx.start_time
+            # duration = time.time() - trace_config_ctx.start_time
 
             # Update metrics would be handled in the main request method
             pass

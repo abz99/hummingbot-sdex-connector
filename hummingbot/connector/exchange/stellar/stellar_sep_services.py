@@ -7,11 +7,16 @@ import asyncio
 import base64
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 import aiohttp
 import jwt
 from stellar_sdk import Keypair, Network, TransactionBuilder
+
+if TYPE_CHECKING:
+    from .stellar_chain_interface import ModernStellarChainInterface
+    from .stellar_security import EnterpriseSecurityFramework
+    from .stellar_observability import StellarObservabilityFramework
 
 
 @dataclass
@@ -151,7 +156,7 @@ class StellarSEPServices:
             if response.status != 200:
                 raise Exception(f"Failed to get stellar.toml: {response.status}")
 
-            toml_content = await response.text()
+            # toml_content = await response.text()  # Unused
             # Parse TOML to get WEB_AUTH_ENDPOINT (simplified)
             web_auth_endpoint = "https://example.com/auth"  # Stub
 
@@ -176,7 +181,7 @@ class StellarSEPServices:
     async def _sign_sep10_challenge(self, challenge: SEP10Challenge, account_id: str) -> str:
         """Sign SEP-10 challenge transaction."""
         # Get signing keypair from security framework
-        keypair = await self.security_framework.get_signing_keypair(account_id)
+        # keypair = await self.security_framework.get_signing_keypair(account_id)  # Unused
 
         # Sign transaction (simplified implementation)
         # In real implementation, this would properly sign the XDR transaction

@@ -121,7 +121,8 @@ class StellarAccountFactory:
     async def _fund_test_account(self, account: TestAccount, config: TestAccountConfig) -> bool:
         """Fund test account using friendbot."""
         try:
-            server = self.network_manager.get_server(account.network)
+            # Get server for potential future use
+            # server = self.network_manager.get_server(account.network)
 
             # Use friendbot to fund the account
             friendbot_url = self._get_friendbot_url(account.network)
@@ -136,7 +137,7 @@ class StellarAccountFactory:
                 ) as response:
                     if response.status == 200:
                         self.logger.info(
-                            f"Successfully funded test account via friendbot",
+                            "Successfully funded test account via friendbot",
                             category=LogCategory.SECURITY,
                             account_id=account.account_id[:8] + "...",
                             amount=config.initial_xlm_balance,

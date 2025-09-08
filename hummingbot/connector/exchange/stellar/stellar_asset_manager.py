@@ -6,7 +6,11 @@ Enhanced asset operations and validation.
 import asyncio
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .stellar_chain_interface import ModernStellarChainInterface
+    from .stellar_observability import StellarObservabilityFramework
 
 from stellar_sdk import Asset
 

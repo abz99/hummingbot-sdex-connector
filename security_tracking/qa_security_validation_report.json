@@ -1,0 +1,215 @@
+{
+  "timestamp": 1757350447.06087,
+  "summary": {
+    "total_tests": 24,
+    "passed": 24,
+    "failed": 0,
+    "warnings": 0,
+    "security_score": 55.0,
+    "overall_status": "NEEDS_ATTENTION"
+  },
+  "severity_breakdown": {
+    "critical": 0,
+    "high": 1,
+    "medium": 3,
+    "low": 20
+  },
+  "test_results": [
+    {
+      "test_name": "path_validation_valid",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Valid path handling works correctly",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "config_validation",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Configuration validation works correctly",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "subprocess_security_python",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Subprocess execution secure for python",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "subprocess_security_flake8",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Subprocess execution secure for flake8",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "resource_limits",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Resource limits properly configured",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "project_root_validation",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Project root validation working correctly",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "safe_directory_creation",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Safe directory creation working",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "file_creation_permissions",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "File creation with proper permissions",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "secure_default_subprocess_timeout_configured",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Subprocess timeout configured",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "secure_default_worker_limit_reasonable",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Worker limit reasonable",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "secure_default_cache_ttl_configured",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Cache TTL configured",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "secure_default_critical_thresholds_defined",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Critical thresholds defined",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "config_loading_security",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Configuration loading secure",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "resource_cleanup",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "ThreadPoolExecutor properly managed",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "memory_management",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Cache with thread-safe memory management",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "concurrency_limits",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Concurrency limits properly configured",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "error_handling_graceful",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Graceful error handling implemented",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "logging_information_disclosure",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Logging appears to not disclose sensitive information",
+      "details": {
+        "note": "Manual log review recommended"
+      },
+      "recommendations": []
+    },
+    {
+      "test_name": "configuration_information_disclosure",
+      "status": "PASSED",
+      "severity": "MEDIUM",
+      "description": "Configuration doesn't expose sensitive information",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "authentication_not_required",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "QA components appropriately don't require authentication for local operations",
+      "details": {
+        "rationale": "Components operate on local filesystem and processes only"
+      },
+      "recommendations": []
+    },
+    {
+      "test_name": "safe_standard_imports",
+      "status": "PASSED",
+      "severity": "LOW",
+      "description": "Uses safe standard library imports",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "no_dangerous_imports",
+      "status": "PASSED",
+      "severity": "HIGH",
+      "description": "No dangerous dynamic execution imports found",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "project_boundary_enforcement",
+      "status": "PASSED",
+      "severity": "MEDIUM",
+      "description": "Operations constrained to project directory",
+      "details": {},
+      "recommendations": []
+    },
+    {
+      "test_name": "pathlib_usage",
+      "status": "PASSED",
+      "severity": "MEDIUM",
+      "description": "Uses pathlib.Path for secure path handling",
+      "details": {},
+      "recommendations": []
+    }
+  ]
+}

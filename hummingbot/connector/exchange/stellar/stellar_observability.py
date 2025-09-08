@@ -528,7 +528,7 @@ class StellarObservabilityFramework:
     async def _resolve_alert(self, rule_name: str):
         """Resolve an active alert."""
         if rule_name in self.active_alerts:
-            alert = self.active_alerts[rule_name]
+            # alert = self.active_alerts[rule_name]  # Unused
             del self.active_alerts[rule_name]
 
             self.logger.info(
@@ -691,7 +691,7 @@ class StellarObservabilityFramework:
                 )
 
                 # Memory usage
-                memory_info = process.memory_info()
+                # memory_info = process.memory_info()  # Unused
                 memory_percent = process.memory_percent()
                 self.resource_utilization.labels(resource_type="memory", component="connector").set(
                     memory_percent
