@@ -185,8 +185,8 @@ class SecureKeyDerivation:
 
         return current_key
 
-    # Duplicate method - commented out to fix F811 error
-    # def derive_path(self, master_key: ExtendedKey, path: DerivationPath) -> ExtendedKey:
+        # Duplicate method - commented out to fix F811 error
+        # def derive_path(self, master_key: ExtendedKey, path: DerivationPath) -> ExtendedKey:
         """Derive extended key following a derivation path."""
         current_key = master_key
 

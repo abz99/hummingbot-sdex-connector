@@ -16,6 +16,7 @@ mypy==1.17.1
 # Monitoring and observability  
 prometheus_client==0.22.1
 structlog==25.4.0
+psutil==6.1.2  # System monitoring
 
 # Security
 hvac  # HashiCorp Vault client
