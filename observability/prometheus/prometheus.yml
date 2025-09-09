@@ -19,6 +19,7 @@ alerting:
 rule_files:
   - "stellar_alerts.yml"
   - "stellar_recording_rules.yml"
+  - "qa_alerting_rules.yml"
 
 # Scrape configurations
 scrape_configs:

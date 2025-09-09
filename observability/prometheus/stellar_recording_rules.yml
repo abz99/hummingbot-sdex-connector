@@ -1,0 +1,396 @@
+# Stellar Hummingbot Connector Recording Rules
+# Production metrics aggregation and derived metrics
+
+groups:
+  - name: stellar_business_kpis
+    interval: 30s
+    rules:
+      # Daily trading volume aggregation
+      - record: stellar_trading_volume_daily_xlm
+        expr: increase(stellar_trading_volume_xlm_total[24h])
+        labels:
+          metric_type: "business_kpi"
+          aggregation: "daily"
+
+      # Hourly revenue rate
+      - record: stellar_revenue_rate_xlm_per_hour
+        expr: rate(stellar_trading_revenue_xlm_total[1h])
+        labels:
+          metric_type: "business_kpi"
+          time_window: "1h"
+
+      # Order fill rate percentage
+      - record: stellar_order_fill_rate_percentage
+        expr: |
+          (
+            rate(stellar_orders_filled_total[5m]) / 
+            rate(stellar_orders_placed_total[5m])
+          ) * 100
+        labels:
+          metric_type: "business_kpi"
+          time_window: "5m"
+
+      # Arbitrage success rate
+      - record: stellar_arbitrage_success_rate_percentage
+        expr: |
+          (
+            rate(stellar_arbitrage_opportunities_total{executed="true"}[1h]) / 
+            rate(stellar_arbitrage_opportunities_total[1h])
+          ) * 100
+        labels:
+          metric_type: "business_kpi"
+          time_window: "1h"
+
+      # Average profit per trade
+      - record: stellar_avg_profit_per_trade_xlm
+        expr: |
+          rate(stellar_trading_revenue_xlm_total[1h]) / 
+          rate(stellar_orders_filled_total[1h])
+        labels:
+          metric_type: "business_kpi"
+          calculation: "average"
+
+  - name: stellar_technical_slas
+    interval: 30s
+    rules:
+      # API availability percentage (24h)
+      - record: stellar_api_availability_24h_percentage
+        expr: |
+          (
+            1 - (
+              increase(stellar_network_errors_total[24h]) / 
+              increase(stellar_network_requests_total[24h])
+            )
+          ) * 100
+        labels:
+          metric_type: "technical_sla"
+          time_window: "24h"
+
+      # P95 order execution latency
+      - record: stellar_order_execution_p95_seconds
+        expr: histogram_quantile(0.95, rate(stellar_order_execution_seconds_bucket[5m]))
+        labels:
+          metric_type: "technical_sla"
+          percentile: "95"
+
+      # P99 API response time
+      - record: stellar_api_response_p99_seconds
+        expr: histogram_quantile(0.99, rate(stellar_network_request_duration_seconds_bucket[5m]))
+        labels:
+          metric_type: "technical_sla"
+          percentile: "99"
+
+      # Data freshness score (0-100)
+      - record: stellar_data_freshness_score
+        expr: |
+          100 - min(
+            stellar_data_freshness_seconds / 60, 
+            100
+          )
+        labels:
+          metric_type: "technical_sla"
+          unit: "score"
+
+      # System health composite score
+      - record: stellar_system_health_score
+        expr: |
+          (
+            avg(stellar_health_check_status) * 50 +
+            (100 - stellar_resource_saturation_percentage) * 0.3 +
+            stellar_api_availability_24h_percentage * 0.2
+          )
+        labels:
+          metric_type: "technical_sla"
+          calculation: "composite"
+
+  - name: stellar_performance_metrics
+    interval: 30s
+    rules:
+      # Request rate per second
+      - record: stellar_request_rate_per_second
+        expr: rate(stellar_network_requests_total[1m])
+        labels:
+          metric_type: "performance"
+          time_window: "1m"
+
+      # Error rate percentage
+      - record: stellar_error_rate_percentage
+        expr: |
+          (
+            rate(stellar_errors_total[5m]) / 
+            rate(stellar_network_requests_total[5m])
+          ) * 100
+        labels:
+          metric_type: "performance"
+          time_window: "5m"
+
+      # Cache hit rate percentage
+      - record: stellar_cache_hit_rate_percentage
+        expr: |
+          (
+            rate(stellar_cache_hits_total[5m]) / 
+            (rate(stellar_cache_hits_total[5m]) + rate(stellar_cache_misses_total[5m]))
+          ) * 100
+        labels:
+          metric_type: "performance"
+          time_window: "5m"
+
+      # Memory utilization trend (1h slope)
+      - record: stellar_memory_utilization_trend_1h
+        expr: |
+          (
+            avg_over_time(stellar_resource_utilization_percent{resource_type="memory"}[1h]) - 
+            avg_over_time(stellar_resource_utilization_percent{resource_type="memory"}[1h] offset 1h)
+          )
+        labels:
+          metric_type: "performance"
+          calculation: "trend"
+          time_window: "1h"
+
+      # Concurrent operations utilization
+      - record: stellar_concurrent_operations_utilization_percentage
+        expr: |
+          (
+            stellar_concurrent_operations / 
+            stellar_throughput_peak_capacity_ops_per_second
+          ) * 100
+        labels:
+          metric_type: "performance"
+          calculation: "utilization"
+
+  - name: stellar_capacity_planning
+    interval: 60s
+    rules:
+      # Resource utilization average (1h)
+      - record: stellar_resource_utilization_avg_1h
+        expr: avg_over_time(stellar_resource_utilization_percent[1h])
+        labels:
+          metric_type: "capacity"
+          time_window: "1h"
+          aggregation: "average"
+
+      # Peak concurrent operations (24h)
+      - record: stellar_concurrent_operations_peak_24h
+        expr: max_over_time(stellar_concurrent_operations[24h])
+        labels:
+          metric_type: "capacity"
+          time_window: "24h"
+          aggregation: "peak"
+
+      # Capacity headroom percentage
+      - record: stellar_capacity_headroom_percentage
+        expr: |
+          100 - max(
+            stellar_resource_utilization_percentage
+          )
+        labels:
+          metric_type: "capacity"
+          calculation: "headroom"
+
+      # Growth rate of requests (week over week)
+      - record: stellar_request_growth_rate_wow_percentage
+        expr: |
+          (
+            (rate(stellar_network_requests_total[7d]) - 
+             rate(stellar_network_requests_total[7d] offset 7d)) /
+            rate(stellar_network_requests_total[7d] offset 7d)
+          ) * 100
+        labels:
+          metric_type: "capacity"
+          calculation: "growth_rate"
+          time_window: "7d"
+
+      # Projected capacity exhaustion days
+      - record: stellar_capacity_exhaustion_days
+        expr: |
+          (100 - stellar_resource_utilization_avg_1h) / 
+          max(stellar_memory_utilization_trend_1h, 0.1) * 24
+        labels:
+          metric_type: "capacity"
+          calculation: "projection"
+          unit: "days"
+
+  - name: stellar_cost_optimization
+    interval: 300s  # 5 minutes
+    rules:
+      # Cost per transaction
+      - record: stellar_cost_per_transaction_usd
+        expr: |
+          rate(stellar_infrastructure_cost_usd_total[1h]) / 
+          rate(stellar_orders_filled_total[1h])
+        labels:
+          metric_type: "cost"
+          calculation: "per_transaction"
+
+      # Cost efficiency trend (24h)
+      - record: stellar_cost_efficiency_trend_24h
+        expr: |
+          (
+            stellar_cost_per_transaction_usd - 
+            avg_over_time(stellar_cost_per_transaction_usd[24h] offset 24h)
+          ) / avg_over_time(stellar_cost_per_transaction_usd[24h] offset 24h) * 100
+        labels:
+          metric_type: "cost"
+          calculation: "efficiency_trend"
+          time_window: "24h"
+
+      # Revenue to cost ratio
+      - record: stellar_revenue_cost_ratio
+        expr: |
+          rate(stellar_trading_revenue_xlm_total[1h]) / 
+          rate(stellar_infrastructure_cost_usd_total[1h])
+        labels:
+          metric_type: "cost"
+          calculation: "ratio"
+
+      # Fee optimization savings percentage
+      - record: stellar_fee_optimization_savings_percentage
+        expr: |
+          (1 - stellar_transaction_fee_efficiency_percentage / 100) * 
+          rate(stellar_trading_revenue_xlm_total[1h]) * 0.1
+        labels:
+          metric_type: "cost"
+          calculation: "savings"
+
+  - name: stellar_security_metrics
+    interval: 60s
+    rules:
+      # Security incident rate (per hour)
+      - record: stellar_security_incident_rate_per_hour
+        expr: rate(stellar_security_events_total{severity="critical"}[1h])
+        labels:
+          metric_type: "security"
+          time_window: "1h"
+
+      # Key rotation compliance percentage
+      - record: stellar_key_rotation_compliance_percentage
+        expr: |
+          (
+            count(stellar_security_key_age_seconds < 2592000) / 
+            count(stellar_security_key_age_seconds)
+          ) * 100
+        labels:
+          metric_type: "security"
+          calculation: "compliance"
+          threshold: "30d"
+
+      # Security alert resolution time P50/P95
+      - record: stellar_security_resolution_time_p50_minutes
+        expr: |
+          histogram_quantile(0.50, 
+            rate(stellar_security_resolution_duration_seconds_bucket[1h])
+          ) / 60
+        labels:
+          metric_type: "security"
+          percentile: "50"
+          unit: "minutes"
+
+      - record: stellar_security_resolution_time_p95_minutes
+        expr: |
+          histogram_quantile(0.95, 
+            rate(stellar_security_resolution_duration_seconds_bucket[1h])
+          ) / 60
+        labels:
+          metric_type: "security"
+          percentile: "95"
+          unit: "minutes"
+
+      # Overall security posture score
+      - record: stellar_security_posture_score
+        expr: |
+          (
+            stellar_key_rotation_compliance_percentage * 0.3 +
+            (100 - stellar_security_incident_rate_per_hour * 100) * 0.4 +
+            stellar_compliance_checks_pass_rate_percentage * 0.3
+          )
+        labels:
+          metric_type: "security"
+          calculation: "composite_score"
+
+  - name: stellar_anomaly_detection
+    interval: 180s  # 3 minutes
+    rules:
+      # Volume anomaly score (Z-score based)
+      - record: stellar_volume_anomaly_zscore
+        expr: |
+          (
+            stellar_trading_volume_24h_xlm - 
+            avg_over_time(stellar_trading_volume_24h_xlm[7d])
+          ) / stddev_over_time(stellar_trading_volume_24h_xlm[7d])
+        labels:
+          metric_type: "anomaly"
+          detector: "volume_zscore"
+
+      # Latency anomaly score
+      - record: stellar_latency_anomaly_score
+        expr: |
+          clamp_max(
+            (stellar_api_response_p99_seconds - 
+             avg_over_time(stellar_api_response_p99_seconds[1h])) / 
+            stddev_over_time(stellar_api_response_p99_seconds[1h]),
+            5
+          ) / 5
+        labels:
+          metric_type: "anomaly"
+          detector: "latency_statistical"
+
+      # Error rate anomaly (sudden spikes)
+      - record: stellar_error_rate_anomaly_score
+        expr: |
+          clamp_max(
+            rate(stellar_errors_total[5m]) / 
+            avg_over_time(rate(stellar_errors_total[5m])[30m]),
+            10
+          ) / 10
+        labels:
+          metric_type: "anomaly"
+          detector: "error_rate_spike"
+
+      # Composite anomaly score
+      - record: stellar_composite_anomaly_score
+        expr: |
+          max(
+            abs(stellar_volume_anomaly_zscore) / 3,
+            stellar_latency_anomaly_score,
+            stellar_error_rate_anomaly_score
+          )
+        labels:
+          metric_type: "anomaly"
+          detector: "composite"
+
+  - name: stellar_predictive_metrics
+    interval: 900s  # 15 minutes
+    rules:
+      # Trading volume forecast (linear trend)
+      - record: stellar_volume_forecast_1h_xlm
+        expr: |
+          stellar_trading_volume_24h_xlm + 
+          (
+            (stellar_trading_volume_24h_xlm - 
+             avg_over_time(stellar_trading_volume_24h_xlm[24h] offset 24h)) * 
+            0.04166  # 1/24 for 1 hour prediction
+          )
+        labels:
+          metric_type: "predictive"
+          model: "linear_trend"
+          horizon: "1h"
+
+      # Resource utilization forecast (6h ahead)
+      - record: stellar_resource_utilization_forecast_6h
+        expr: |
+          stellar_resource_utilization_avg_1h + 
+          stellar_memory_utilization_trend_1h * 6
+        labels:
+          metric_type: "predictive"
+          model: "trend_extrapolation"
+          horizon: "6h"
+
+      # Cost forecast (24h)
+      - record: stellar_cost_forecast_24h_usd
+        expr: |
+          stellar_infrastructure_cost_usd_per_hour * 24 * 
+          (1 + stellar_request_growth_rate_wow_percentage / 100 / 7)
+        labels:
+          metric_type: "predictive"
+          model: "growth_adjusted"
+          horizon: "24h"

@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stellar-config
+  labels:
+    app: stellar-hummingbot-connector
+data:
+  # Environment configuration
+  environment: "production"
+  log_level: "INFO"
+  stellar_network: "MAINNET"
+  
+  # Application configuration
+  trading_enabled: "true"
+  arbitrage_enabled: "true"
+  path_payments_enabled: "true"
+  soroban_contracts_enabled: "true"
+  
+  # Performance settings
+  max_concurrent_operations: "100"
+  request_timeout: "30"
+  retry_attempts: "3"
+  circuit_breaker_threshold: "5"
+  
+  # Metrics and monitoring
+  metrics_enabled: "true"
+  metrics_port: "8000"
+  prometheus_scrape_interval: "30"
+  health_check_interval: "60"
+  
+  # Security settings
+  encryption_enabled: "true"
+  audit_logging_enabled: "true"
+  security_monitoring_enabled: "true"
+  
+  # Rate limiting (per minute)
+  rate_limit_horizon_submit: "10"
+  rate_limit_horizon_account: "3600"
+  rate_limit_horizon_ledger: "7200"
+  rate_limit_horizon_transaction: "3600"
+  rate_limit_horizon_operation: "3600"
+  rate_limit_horizon_payment: "3600"
+  rate_limit_horizon_trade: "3600"
+  rate_limit_horizon_order_book: "7200"
+  rate_limit_horizon_path: "1800"
+  rate_limit_horizon_asset: "3600"
+  rate_limit_horizon_effect: "3600"
+  rate_limit_horizon_fee_stats: "3600"
+  rate_limit_horizon_claimable_balance: "3600"
+  rate_limit_horizon_liquidity_pool: "3600"
+  rate_limit_soroban_rpc: "600"
+  rate_limit_external_price_api: "300"
+  rate_limit_internal_metrics: "600"
+  
+  # Database configuration
+  database_pool_size: "20"
+  database_max_connections: "50"
+  database_connection_timeout: "30"
+  
+  # Cache configuration
+  redis_pool_size: "10"
+  redis_connection_timeout: "5"
+  cache_ttl_default: "300"
+  cache_ttl_price_data: "60"
+  cache_ttl_account_data: "30"
+  
+  # Feature flags
+  feature_advanced_routing: "true"
+  feature_mev_protection: "true"
+  feature_cross_chain_arbitrage: "false"
+  feature_yield_farming: "true"
+  feature_liquidity_mining: "false"
+  
+  # Business KPIs thresholds
+  kpi_daily_volume_target: "10000"
+  kpi_order_fill_rate_target: "0.98"
+  kpi_api_uptime_target: "0.9995"
+  kpi_cost_per_transaction_target: "0.0008"
+  kpi_arbitrage_success_rate_target: "0.80"
+  
+  # Alert thresholds
+  alert_error_rate_warning: "0.05"
+  alert_error_rate_critical: "0.10"
+  alert_latency_warning: "5.0"
+  alert_latency_critical: "10.0"
+  alert_memory_warning: "0.80"
+  alert_memory_critical: "0.90"
+  alert_cpu_warning: "0.80"
+  alert_cpu_critical: "0.90"
+  
+  # QA and compliance settings
+  qa_coverage_threshold: "0.80"
+  qa_critical_coverage_threshold: "0.90"
+  qa_test_success_rate_threshold: "0.95"
+  qa_code_quality_threshold: "7.0"
+  compliance_audit_enabled: "true"
+  
+  # External service endpoints
+  horizon_mainnet_url: "https://horizon.stellar.org"
+  horizon_testnet_url: "https://horizon-testnet.stellar.org"
+  soroban_rpc_mainnet_url: "https://soroban-rpc.mainnet.stellar.gateway.fm"
+  soroban_rpc_testnet_url: "https://soroban-rpc.testnet.stellar.gateway.fm"
+  
+  # Observability configuration
+  observability_collection_interval: "30"
+  observability_data_retention: "30d"
+  observability_enable_tracing: "true"
+  observability_enable_profiling: "false"
+  observability_log_structured: "true"
+  observability_log_format: "json"

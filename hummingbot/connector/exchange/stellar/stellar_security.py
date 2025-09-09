@@ -6,7 +6,7 @@ Multi-layered security with HSM, MPC, and Hardware wallet support.
 import asyncio
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
 
 from stellar_sdk import Keypair
 

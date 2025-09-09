@@ -1,0 +1,381 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Stellar Hummingbot Connector - Executive Production Dashboard",
+    "description": "Executive-level production metrics and business KPIs",
+    "tags": ["stellar", "production", "business-kpis", "executive"],
+    "timezone": "browser",
+    "editable": true,
+    "refresh": "30s",
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Business KPIs Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "stellar_trading_volume_24h_xlm",
+            "legendFormat": "24h Volume (XLM)"
+          },
+          {
+            "expr": "stellar_trading_revenue_xlm_total",
+            "legendFormat": "Total Revenue (XLM)"
+          },
+          {
+            "expr": "stellar_arbitrage_profit_xlm_total",
+            "legendFormat": "Arbitrage Profit (XLM)"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "XLM",
+            "color": {
+              "mode": "palette-classic"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 1000},
+                {"color": "green", "value": 5000}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "API Availability SLA",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "stellar_api_availability_percentage",
+            "legendFormat": "{{api_endpoint}} ({{time_window}})"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 95,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 95},
+                {"color": "yellow", "value": 98},
+                {"color": "green", "value": 99.5}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8}
+      },
+      {
+        "id": 3,
+        "title": "Order Execution SLA",
+        "type": "histogram",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(stellar_order_execution_seconds_bucket[5m]))",
+            "legendFormat": "50th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(stellar_order_execution_seconds_bucket[5m]))",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(stellar_order_execution_seconds_bucket[5m]))",
+            "legendFormat": "99th percentile"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 10}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Infrastructure Cost per Hour",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "stellar_infrastructure_cost_usd_per_hour",
+            "legendFormat": "{{cost_center}} - {{resource_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "min": 0,
+            "max": 20,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 10},
+                {"color": "red", "value": 15}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Active Trading Strategies",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "stellar_active_strategies_count",
+            "legendFormat": "{{strategy_type}} ({{status}})"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "Resource Saturation",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "stellar_resource_saturation_percentage",
+            "legendFormat": "{{resource_type}} - {{instance}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 70},
+                {"color": "red", "value": 90}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16}
+      },
+      {
+        "id": 7,
+        "title": "Transaction Fee Efficiency",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "stellar_transaction_fee_efficiency_percentage",
+            "legendFormat": "{{fee_strategy}} ({{network_condition}})"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 70},
+                {"color": "green", "value": 85}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 16}
+      },
+      {
+        "id": 8,
+        "title": "Anomaly Detection Scores",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "stellar_anomaly_scores",
+            "legendFormat": "{{detector_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.7},
+                {"color": "red", "value": 0.9}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 9,
+        "title": "Model Prediction Accuracy",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "stellar_model_prediction_accuracy_percentage",
+            "legendFormat": "{{model_name}} - {{prediction_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 70},
+                {"color": "green", "value": 85}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 10,
+        "title": "Concurrent User Sessions",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "stellar_concurrent_user_sessions",
+            "legendFormat": "{{session_type}} - {{user_tier}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "continuous-GrYlRd"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 32}
+      },
+      {
+        "id": 11,
+        "title": "Peak Throughput Capacity",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "stellar_throughput_peak_capacity_ops_per_second",
+            "legendFormat": "{{operation_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 100}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 32}
+      },
+      {
+        "id": 12,
+        "title": "Compliance Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(stellar_compliance_checks_total{result=\"pass\"}[1h]) / rate(stellar_compliance_checks_total[1h]) * 100",
+            "legendFormat": "Compliance Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 99}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 32}
+      }
+    ],
+    "annotations": {
+      "list": [
+        {
+          "name": "Deployments",
+          "datasource": "prometheus",
+          "enable": true,
+          "iconColor": "green",
+          "query": "stellar_deployment_events"
+        },
+        {
+          "name": "Incidents",
+          "datasource": "prometheus",
+          "enable": true,
+          "iconColor": "red",
+          "query": "stellar_incident_events"
+        }
+      ]
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "environment",
+          "type": "query",
+          "query": "label_values(stellar_system_uptime_seconds, environment)",
+          "current": {
+            "value": "production",
+            "text": "production"
+          }
+        },
+        {
+          "name": "time_range",
+          "type": "interval",
+          "options": [
+            {"text": "1h", "value": "1h"},
+            {"text": "24h", "value": "24h"},
+            {"text": "7d", "value": "7d"},
+            {"text": "30d", "value": "30d"}
+          ],
+          "current": {
+            "value": "24h",
+            "text": "24h"
+          }
+        }
+      ]
+    }
+  },
+  "overwrite": true
+}

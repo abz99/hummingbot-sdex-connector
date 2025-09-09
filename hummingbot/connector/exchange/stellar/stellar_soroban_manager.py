@@ -10,13 +10,14 @@ import time
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
 
 import aiohttp
 
 if TYPE_CHECKING:
     from .stellar_chain_interface import ModernStellarChainInterface
     from .stellar_observability import StellarObservabilityFramework
+
 from stellar_sdk import Account, Keypair, Network, StrKey, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import BaseRequestError

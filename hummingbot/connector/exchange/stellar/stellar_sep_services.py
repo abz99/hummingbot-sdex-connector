@@ -15,8 +15,8 @@ from stellar_sdk import Keypair, Network, TransactionBuilder
 
 if TYPE_CHECKING:
     from .stellar_chain_interface import ModernStellarChainInterface
-    from .stellar_security import EnterpriseSecurityFramework
     from .stellar_observability import StellarObservabilityFramework
+    from .stellar_security import EnterpriseSecurityFramework
 
 
 @dataclass

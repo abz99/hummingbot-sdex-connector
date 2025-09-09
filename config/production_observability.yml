@@ -1,0 +1,343 @@
+# Production Observability Configuration
+# Stellar Hummingbot Connector v3 - Production Monitoring Stack
+
+# Core observability settings
+observability:
+  metrics_port: 8000
+  pushgateway_url: null  # Set if using remote Prometheus pushgateway
+  alert_webhook_url: null  # Set for external alert integrations
+  collection_interval: 30  # seconds
+  enable_tracing: true
+  enable_profiling: false
+  log_level: "INFO"
+  
+  # Advanced metrics configuration
+  advanced_metrics:
+    business_kpis: true
+    technical_slas: true
+    capacity_planning: true
+    cost_optimization: true
+    anomaly_detection: true
+    predictive_analytics: false  # Requires ML models
+  
+  # Data retention policies
+  data_retention:
+    raw_metrics: "30d"
+    aggregated_metrics: "1y"
+    alert_history: "90d"
+    trace_data: "7d"
+    log_data: "30d"
+
+# Docker infrastructure configuration
+docker:
+  compose_file: "observability/docker-compose.observability.yml"
+  project_name: "stellar-observability"
+  pull_images: true
+  wait_timeout: 300
+  restart_policy: "unless-stopped"
+  
+  # Resource constraints
+  resource_limits:
+    prometheus:
+      memory: "2g"
+      cpu: "1.0"
+    grafana:
+      memory: "512m" 
+      cpu: "0.5"
+    alertmanager:
+      memory: "256m"
+      cpu: "0.25"
+
+# Service configurations
+services:
+  prometheus:
+    port: 9090
+    health_endpoint: "/-/healthy"
+    required: true
+    config_reload: true
+    scrape_configs:
+      - job_name: "stellar-connector"
+        static_configs:
+          - targets: ["${STELLAR_HOST:-stellar-horizon}:${STELLAR_PORT:-8000}"]
+        scrape_interval: "5s"
+        metrics_path: "/metrics"
+    
+  grafana:
+    port: 3000
+    health_endpoint: "/api/health"
+    required: true
+    admin_user: "admin"
+    admin_password: "${GRAFANA_ADMIN_PASSWORD:-stellar-admin-2024}"
+    auto_assign_org: true
+    auto_assign_org_role: "Viewer"
+    datasources:
+      - name: "Prometheus"
+        type: "prometheus"
+        url: "http://prometheus:9090"
+        access: "proxy"
+        is_default: true
+    
+  alertmanager:
+    port: 9093
+    health_endpoint: "/-/healthy"
+    required: false
+    smtp_smarthost: "${SMTP_HOST:-smtp.example.com}:${SMTP_PORT:-587}"
+    smtp_from: "alerts@stellar-hummingbot.com"
+    slack_api_url: null  # Set for Slack notifications
+    pagerduty_key: null  # Set for PagerDuty integration
+    
+  jaeger:
+    port: 16686
+    health_endpoint: "/"
+    required: false
+    collector_otlp_enabled: true
+    storage_type: "memory"
+    
+  loki:
+    port: 3100
+    health_endpoint: "/ready"
+    required: false
+    retention_period: "168h"  # 7 days
+    
+  redis:
+    port: 6379
+    health_endpoint: "/ping"
+    required: false
+    password: "${REDIS_PASSWORD:-stellar-redis-2024}"
+    persist_data: true
+
+# Monitoring and alerting configuration
+monitoring:
+  startup_checks: true
+  health_check_interval: 60
+  auto_restart_failed: true
+  notification_webhooks: []
+  
+  # Critical thresholds
+  critical_thresholds:
+    api_availability: 99.0  # percentage
+    error_rate: 5.0  # percentage
+    response_time_p95: 5.0  # seconds
+    memory_usage: 90.0  # percentage
+    disk_usage: 85.0  # percentage
+  
+  # Alert routing
+  alert_routing:
+    critical_alerts:
+      - email: "ops-team@stellar-hummingbot.com"
+      - slack: "#ops-critical"
+      - pagerduty: true
+    warning_alerts:
+      - email: "ops-team@stellar-hummingbot.com"
+      - slack: "#ops-warnings"
+    info_alerts:
+      - email: "team@stellar-hummingbot.com"
+
+# Security configuration
+security:
+  enable_tls: false  # Set to true for production with TLS certificates
+  tls_cert_path: "/certs/server.crt"
+  tls_key_path: "/certs/server.key"
+  
+  basic_auth: false  # Enable basic authentication
+  auth_users:
+    admin: "$2y$10$..."  # bcrypt hashed password
+    viewer: "$2y$10$..."
+  
+  api_keys:
+    prometheus: null
+    grafana: null
+    alertmanager: null
+  
+  network_isolation: true
+  allowed_origins: ["${ALLOWED_ORIGIN_1:-stellar-ui.example.com}", "${ALLOWED_ORIGIN_2:-api.example.com}"]
+  
+  # Security monitoring
+  security_monitoring:
+    enable_audit_logs: true
+    log_failed_auth: true
+    rate_limiting: true
+    max_requests_per_minute: 1000
+
+# Performance configuration
+performance:
+  resource_limits:
+    cpu_cores: 2
+    memory_gb: 4
+    disk_gb: 50
+    network_mbps: 100
+  
+  scaling:
+    auto_scale: false
+    min_instances: 1
+    max_instances: 3
+    cpu_threshold: 80
+    memory_threshold: 80
+  
+  optimization:
+    enable_compression: true
+    cache_ttl: 300  # seconds
+    batch_size: 1000
+    query_timeout: 30  # seconds
+    
+  # Storage optimization
+  storage:
+    prometheus_retention: "30d"
+    prometheus_retention_size: "10GB"
+    grafana_data_retention: "90d"
+    log_rotation_size: "100MB"
+    log_rotation_count: 10
+
+# Business intelligence configuration
+business_intelligence:
+  enable_business_kpis: true
+  kpi_collection_interval: 300  # 5 minutes
+  
+  # KPI definitions
+  kpis:
+    daily_trading_volume:
+      target: 10000.0  # XLM
+      critical_threshold: 1000.0
+      warning_threshold: 5000.0
+    
+    order_fill_rate:
+      target: 0.98  # 98%
+      critical_threshold: 0.85
+      warning_threshold: 0.90
+    
+    api_uptime:
+      target: 0.9995  # 99.95%
+      critical_threshold: 0.995
+      warning_threshold: 0.998
+    
+    cost_per_transaction:
+      target: 0.0008  # USD
+      critical_threshold: 0.002
+      warning_threshold: 0.0015
+  
+  # Reporting
+  reporting:
+    enable_executive_dashboard: true
+    generate_daily_reports: true
+    generate_weekly_reports: true
+    report_recipients:
+      - "executives@stellar-hummingbot.com"
+      - "ops-team@stellar-hummingbot.com"
+
+# Machine learning and analytics
+analytics:
+  enable_anomaly_detection: true
+  anomaly_sensitivity: 0.95  # threshold for anomaly alerts
+  
+  models:
+    volume_prediction:
+      enabled: true
+      horizon: "1h"
+      retrain_interval: "24h"
+    
+    cost_optimization:
+      enabled: true
+      horizon: "24h"
+      retrain_interval: "7d"
+    
+    capacity_planning:
+      enabled: false  # Requires historical data
+      horizon: "7d"
+      retrain_interval: "30d"
+  
+  # Feature engineering
+  features:
+    enable_seasonality: true
+    enable_trend_analysis: true
+    enable_correlation_analysis: false
+
+# Integration configuration
+integrations:
+  # External monitoring systems
+  external_monitoring:
+    datadog:
+      enabled: false
+      api_key: null
+      app_key: null
+    
+    newrelic:
+      enabled: false
+      license_key: null
+    
+    splunk:
+      enabled: false
+      token: null
+      index: "stellar-hummingbot"
+  
+  # Business systems
+  business_systems:
+    accounting_system:
+      enabled: false
+      api_endpoint: null
+      api_key: null
+    
+    risk_management:
+      enabled: false
+      api_endpoint: null
+      api_key: null
+  
+  # Cloud providers
+  cloud_providers:
+    aws:
+      enabled: false
+      region: "us-east-1"
+      cloudwatch_namespace: "StellarHummingbot"
+    
+    gcp:
+      enabled: false
+      project_id: null
+      metrics_prefix: "stellar.hummingbot"
+
+# Development and testing
+development:
+  enable_debug_mode: false
+  mock_external_services: false
+  synthetic_data_generation: false
+  performance_testing: false
+  
+  # Test data
+  test_scenarios:
+    high_volume_trading: false
+    network_latency_simulation: false
+    error_injection: false
+    resource_exhaustion: false
+  
+  # Debugging
+  debug_settings:
+    verbose_logging: false
+    metric_debugging: false
+    trace_sampling_rate: 0.1
+    profile_cpu: false
+    profile_memory: false
+
+# Environment-specific overrides
+environment_overrides:
+  production:
+    observability:
+      log_level: "WARN"
+      enable_profiling: false
+    security:
+      enable_tls: true
+      basic_auth: true
+    performance:
+      auto_scale: true
+  
+  staging:
+    observability:
+      log_level: "INFO"
+      collection_interval: 60
+    analytics:
+      enable_anomaly_detection: false
+  
+  development:
+    observability:
+      log_level: "DEBUG"
+      collection_interval: 10
+    development:
+      enable_debug_mode: true
+      mock_external_services: true

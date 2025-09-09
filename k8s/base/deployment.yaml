@@ -1,0 +1,224 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stellar-hummingbot-connector
+  labels:
+    app: stellar-hummingbot-connector
+    component: trading-engine
+    version: v3.0
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: stellar-hummingbot-connector
+  template:
+    metadata:
+      labels:
+        app: stellar-hummingbot-connector
+        component: trading-engine
+        version: v3.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: stellar-connector-service-account
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+      containers:
+      - name: stellar-connector
+        image: stellar-hummingbot-connector:v3.0
+        imagePullPolicy: Always
+        ports:
+        - name: metrics
+          containerPort: 8000
+          protocol: TCP
+        - name: health
+          containerPort: 8080
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: stellar-config
+              key: environment
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: stellar-config
+              key: log_level
+        - name: STELLAR_NETWORK
+          valueFrom:
+            configMapKeyRef:
+              name: stellar-config
+              key: stellar_network
+        - name: METRICS_PORT
+          value: "8000"
+        - name: HEALTH_CHECK_PORT
+          value: "8080"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stellar-secrets
+              key: secret-key
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: stellar-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: stellar-secrets
+              key: redis-url
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: health
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: health
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: health
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 30
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        - name: secrets-volume
+          mountPath: /app/secrets
+          readOnly: true
+        - name: logs-volume
+          mountPath: /app/logs
+        - name: temp-volume
+          mountPath: /tmp
+      volumes:
+      - name: config-volume
+        configMap:
+          name: stellar-config
+      - name: secrets-volume
+        secret:
+          secretName: stellar-secrets
+          defaultMode: 0400
+      - name: logs-volume
+        emptyDir:
+          sizeLimit: 1Gi
+      - name: temp-volume
+        emptyDir:
+          sizeLimit: 500Mi
+      tolerations:
+      - key: "stellar/trading-workload"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: stellar/workload-type
+                operator: In
+                values: ["trading", "compute"]
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["stellar-hummingbot-connector"]
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 60
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stellar-hummingbot-connector-service
+  labels:
+    app: stellar-hummingbot-connector
+    component: trading-engine
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+  - name: metrics
+    port: 8000
+    targetPort: metrics
+    protocol: TCP
+  - name: health
+    port: 8080
+    targetPort: health
+    protocol: TCP
+  selector:
+    app: stellar-hummingbot-connector
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: stellar-connector-service-account
+  labels:
+    app: stellar-hummingbot-connector
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: stellar-connector-role
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: stellar-connector-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: stellar-connector-service-account
+  namespace: default
+roleRef:
+  kind: Role
+  name: stellar-connector-role
+  apiGroup: rbac.authorization.k8s.io

@@ -15,8 +15,8 @@ from stellar_sdk import Asset
 
 if TYPE_CHECKING:
     from .stellar_chain_interface import ModernStellarChainInterface
-    from .stellar_soroban_manager import SorobanContractManager
     from .stellar_observability import StellarObservabilityFramework
+    from .stellar_soroban_manager import SorobanContractManager
 
 
 class PathType(Enum):
