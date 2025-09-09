@@ -601,6 +601,84 @@ class EnhancedPathPaymentEngine:
             self.logger().warning(f"Triangular arbitrage detection failed: {e}")
             return []
 
+    def _build_unified_price_matrix(self, assets: List[Asset]) -> Dict[str, Dict[str, Decimal]]:
+        """Initialize unified price matrix for all assets."""
+        unified_matrix = {}
+        for asset in assets:
+            unified_matrix[str(asset)] = {}
+            for target_asset in assets:
+                unified_matrix[str(asset)][str(target_asset)] = Decimal("0")
+        return unified_matrix
+
+    def _update_best_prices(
+        self,
+        unified_matrix: Dict[str, Dict[str, Decimal]],
+        price_matrices: Dict[str, Dict[str, Dict[str, Decimal]]],
+    ) -> None:
+        """Update unified matrix with best prices across all DEXes."""
+        for dex_matrix in price_matrices.values():
+            for source_key, targets in dex_matrix.items():
+                for target_key, price in targets.items():
+                    if price > 0:
+                        current_best = unified_matrix[source_key][target_key]
+                        if current_best == 0 or price > current_best:
+                            unified_matrix[source_key][target_key] = price
+
+    def _build_log_matrix(
+        self, unified_matrix: Dict[str, Dict[str, Decimal]], asset_keys: List[str]
+    ) -> Dict[str, Dict[str, float]]:
+        """Convert price matrix to log matrix for Floyd-Warshall."""
+        log_matrix = {}
+        for key_i in asset_keys:
+            log_matrix[key_i] = {}
+            for key_j in asset_keys:
+                if unified_matrix[key_i][key_j] > 0:
+                    log_matrix[key_i][key_j] = -float(unified_matrix[key_i][key_j].ln())
+                else:
+                    log_matrix[key_i][key_j] = float("inf")
+        return log_matrix
+
+    def _apply_floyd_warshall(
+        self, log_matrix: Dict[str, Dict[str, float]], asset_keys: List[str]
+    ) -> None:
+        """Apply Floyd-Warshall algorithm to find shortest paths."""
+        for key_k in asset_keys:
+            for key_i in asset_keys:
+                for key_j in asset_keys:
+                    if (
+                        log_matrix[key_i][key_k] + log_matrix[key_k][key_j]
+                        < log_matrix[key_i][key_j]
+                    ):
+                        log_matrix[key_i][key_j] = (
+                            log_matrix[key_i][key_k] + log_matrix[key_k][key_j]
+                        )
+
+    async def _extract_arbitrage_opportunities(
+        self,
+        log_matrix: Dict[str, Dict[str, float]],
+        unified_matrix: Dict[str, Dict[str, Decimal]],
+        asset_keys: List[str],
+        assets: List[Asset],
+        min_profit: Decimal,
+        max_hops: int,
+    ) -> List[ArbitrageOpportunity]:
+        """Extract arbitrage opportunities from negative cycles."""
+        opportunities = []
+        for key_i in asset_keys:
+            if log_matrix[key_i][key_i] < 0:  # Negative cycle found
+                profit = abs(log_matrix[key_i][key_i]) * 100  # Convert to percentage
+                if profit >= float(min_profit):
+                    path = await self._reconstruct_arbitrage_path(
+                        key_i, log_matrix, unified_matrix
+                    )
+                    if path and len(path) <= max_hops + 1:
+                        opportunity = await self._create_multi_hop_opportunity(
+                            assets[asset_keys.index(key_i)], path, Decimal(str(profit))
+                        )
+                        if opportunity:
+                            opportunities.append(opportunity)
+        return opportunities
+
     async def _find_multi_hop_arbitrage(
         self,
         assets: List[Asset],
@@ -609,69 +687,22 @@ class EnhancedPathPaymentEngine:
         max_hops: int = 4,
     ) -> List[ArbitrageOpportunity]:
         """Find multi-hop arbitrage using Floyd-Warshall algorithm."""
-        opportunities = []
-
         try:
-            # Combine all price matrices into a unified graph
-            unified_matrix = {}
-            for asset in assets:
-                unified_matrix[str(asset)] = {}
-                for target_asset in assets:
-                    unified_matrix[str(asset)][str(target_asset)] = Decimal("0")
+            # Build unified price matrix
+            unified_matrix = self._build_unified_price_matrix(assets)
+            self._update_best_prices(unified_matrix, price_matrices)
 
-            # Find best price for each pair across all DEXes
-            for dex_matrix in price_matrices.values():
-                for source_key, targets in dex_matrix.items():
-                    for target_key, price in targets.items():
-                        if price > 0:
-                            current_best = unified_matrix[source_key][target_key]
-                            if current_best == 0 or price > current_best:
-                                unified_matrix[source_key][target_key] = price
-
-            # Apply Floyd-Warshall for path finding
-            # n = len(assets)  # Unused
+            # Prepare for Floyd-Warshall
             asset_keys = [str(asset) for asset in assets]
+            log_matrix = self._build_log_matrix(unified_matrix, asset_keys)
 
-            # Use logarithms to convert to shortest path problem
-            log_matrix = {}
-            for i, key_i in enumerate(asset_keys):
-                log_matrix[key_i] = {}
-                for j, key_j in enumerate(asset_keys):
-                    if unified_matrix[key_i][key_j] > 0:
-                        # Use negative log to find maximum product paths
-                        log_matrix[key_i][key_j] = -float(unified_matrix[key_i][key_j].ln())
-                    else:
-                        log_matrix[key_i][key_j] = float("inf")
+            # Apply Floyd-Warshall algorithm
+            self._apply_floyd_warshall(log_matrix, asset_keys)
 
-            # Floyd-Warshall algorithm
-            for k, key_k in enumerate(asset_keys):
-                for i, key_i in enumerate(asset_keys):
-                    for j, key_j in enumerate(asset_keys):
-                        if (
-                            log_matrix[key_i][key_k] + log_matrix[key_k][key_j]
-                            < log_matrix[key_i][key_j]
-                        ):
-                            log_matrix[key_i][key_j] = (
-                                log_matrix[key_i][key_k] + log_matrix[key_k][key_j]
-                            )
-
-            # Look for negative cycles (arbitrage opportunities)
-            for i, key_i in enumerate(asset_keys):
-                if log_matrix[key_i][key_i] < 0:  # Negative cycle found
-                    profit = abs(log_matrix[key_i][key_i]) * 100  # Convert to percentage
-                    if profit >= float(min_profit):
-                        # Reconstruct the arbitrage path
-                        path = await self._reconstruct_arbitrage_path(
-                            key_i, log_matrix, unified_matrix
-                        )
-                        if path and len(path) <= max_hops + 1:
-                            opportunity = await self._create_multi_hop_opportunity(
-                                assets[asset_keys.index(key_i)], path, Decimal(str(profit))
-                            )
-                            if opportunity:
-                                opportunities.append(opportunity)
-
-            return opportunities
+            # Extract arbitrage opportunities
+            return await self._extract_arbitrage_opportunities(
+                log_matrix, unified_matrix, asset_keys, assets, min_profit, max_hops
+            )
 
         except Exception as e:
             self.logger().warning(f"Multi-hop arbitrage detection failed: {e}")

@@ -310,6 +310,42 @@ class RateLimiter:
         }
 
 
+def _validate_specific_fields(
+    validator: SecurityValidator,
+    kwargs: Dict[str, Any],
+    public_key: Optional[str],
+    key_id: Optional[str],
+    session_id: Optional[str],
+    network: Optional[str],
+) -> None:
+    """Validate specific field parameters."""
+    if public_key and public_key in kwargs:
+        if not validator.validate_stellar_public_key(kwargs[public_key]):
+            raise ValueError(f"Invalid public key format: {public_key}")
+
+    if key_id and key_id in kwargs:
+        if not validator.validate_key_id(kwargs[key_id]):
+            raise ValueError(f"Invalid key ID format: {key_id}")
+
+    if session_id and session_id in kwargs:
+        if not validator.validate_session_id(kwargs[session_id]):
+            raise ValueError(f"Invalid session ID format: {session_id}")
+
+    if network and network in kwargs:
+        if not validator.validate_network_name(kwargs[network]):
+            raise ValueError(f"Invalid network name: {network}")
+
+
+def _validate_string_lengths(
+    validator: SecurityValidator, kwargs: Dict[str, Any], max_length: int
+) -> None:
+    """Validate string parameter lengths."""
+    for key, value in kwargs.items():
+        if isinstance(value, str):
+            if not validator.validate_input_length(value, max_len=max_length):
+                raise ValueError(f"Input too long: {key}")
+
+
 def require_validation(
     public_key: Optional[str] = None,
     key_id: Optional[str] = None,
@@ -324,31 +360,8 @@ def require_validation(
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
             validator = SecurityValidator()
 
-            # Validate public key if provided
-            if public_key and public_key in kwargs:
-                if not validator.validate_stellar_public_key(kwargs[public_key]):
-                    raise ValueError(f"Invalid public key format: {public_key}")
-
-            # Validate key ID if provided
-            if key_id and key_id in kwargs:
-                if not validator.validate_key_id(kwargs[key_id]):
-                    raise ValueError(f"Invalid key ID format: {key_id}")
-
-            # Validate session ID if provided
-            if session_id and session_id in kwargs:
-                if not validator.validate_session_id(kwargs[session_id]):
-                    raise ValueError(f"Invalid session ID format: {session_id}")
-
-            # Validate network if provided
-            if network and network in kwargs:
-                if not validator.validate_network_name(kwargs[network]):
-                    raise ValueError(f"Invalid network name: {network}")
-
-            # Length validation for string parameters
-            for key, value in kwargs.items():
-                if isinstance(value, str):
-                    if not validator.validate_input_length(value, max_len=max_length):
-                        raise ValueError(f"Input too long: {key}")
+            _validate_specific_fields(validator, kwargs, public_key, key_id, session_id, network)
+            _validate_string_lengths(validator, kwargs, max_length)
 
             return await func(*args, **kwargs)
 
