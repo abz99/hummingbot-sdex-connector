@@ -119,7 +119,7 @@ class TestPhase2ComponentValidation:
 
             # Verify order manager can be instantiated
             order_manager = ModernStellarOrderManager(
-                chain_interface=Mock(), asset_manager=Mock(), observability=Mock()
+                chain_interface=Mock(), asset_manager=Mock(), observability=Mock(), account_id="test_account"
             )
             assert order_manager is not None
 
