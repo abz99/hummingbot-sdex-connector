@@ -148,18 +148,22 @@ jobs:
         # Create basic SDK compatibility check if script doesn't exist
         if [ ! -f "scripts/check_sdk_compatibility.py" ]; then
           mkdir -p scripts
-          cat > scripts/check_sdk_compatibility.py << 'EOF'
-#!/usr/bin/env python3
+          python -c "
+import os
+os.makedirs('scripts', exist_ok=True)
+with open('scripts/check_sdk_compatibility.py', 'w') as f:
+    f.write('''#!/usr/bin/env python3
 import sys
 import argparse
 import stellar_sdk
-print(f"Using Stellar SDK version: {stellar_sdk.__version__}")
+print(f\"Using Stellar SDK version: {stellar_sdk.__version__}\")
 parser = argparse.ArgumentParser()
 parser.add_argument('--sdk-version', required=True)
 args = parser.parse_args()
-print(f"Expected SDK version: {args.sdk_version}")
-print("SDK compatibility check passed")
-EOF
+print(f\"Expected SDK version: {args.sdk_version}\")
+print(\"SDK compatibility check passed\")
+''')
+          "
         fi
         python scripts/check_sdk_compatibility.py --sdk-version=${{ matrix.stellar-sdk-version }}
     
@@ -173,16 +177,20 @@ EOF
         else
           echo "No unit test directory found, creating basic test..."
           mkdir -p tests/unit
-          cat > tests/unit/test_basic.py << 'EOF'
-def test_imports():
-    """Basic import test to verify setup"""
+          python -c "
+import os
+os.makedirs('tests/unit', exist_ok=True)
+with open('tests/unit/test_basic.py', 'w') as f:
+    f.write('''def test_imports():
+    \"\"\"Basic import test to verify setup\"\"\"
     try:
         import hummingbot.connector.exchange.stellar
         assert True
     except ImportError:
         # If module doesn't exist yet, just pass
         assert True
-EOF
+''')
+          "
           TEST_DIR="tests/unit"
         fi
         
@@ -200,18 +208,22 @@ EOF
         # Create basic coverage check if script doesn't exist
         if [ ! -f "scripts/check_critical_coverage.py" ]; then
           mkdir -p scripts
-          cat > scripts/check_critical_coverage.py << 'EOF'
-#!/usr/bin/env python3
+          python -c "
+import os
+os.makedirs('scripts', exist_ok=True)
+with open('scripts/check_critical_coverage.py', 'w') as f:
+    f.write('''#!/usr/bin/env python3
 import argparse
-print("Critical coverage check - placeholder implementation")
+print(\"Critical coverage check - placeholder implementation\")
 parser = argparse.ArgumentParser()
 parser.add_argument('--threshold', type=int, required=True)
 parser.add_argument('--coverage-file', required=True)
 args = parser.parse_args()
-print(f"Coverage threshold: {args.threshold}%")
-print(f"Coverage file: {args.coverage_file}")
-print("Coverage check passed (placeholder)")
-EOF
+print(f\"Coverage threshold: {args.threshold}%\")
+print(f\"Coverage file: {args.coverage_file}\")
+print(\"Coverage check passed (placeholder)\")
+''')
+          "
         fi
         python scripts/check_critical_coverage.py \
           --threshold=${{ env.CRITICAL_COVERAGE_THRESHOLD }} \
