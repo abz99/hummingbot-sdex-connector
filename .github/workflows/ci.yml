@@ -552,6 +552,7 @@ jobs:
     
     - name: Create GitHub Release
       id: create_release
+      continue-on-error: true
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -562,16 +563,24 @@ jobs:
         prerelease: false
         files: dist/*
         generate_release_notes: true
+    
+    - name: Handle release failure
+      if: steps.create_release.outcome == 'failure'
+      run: |
+        echo "⚠️ Release creation failed - likely due to repository permissions"
+        echo "This is not a CI failure. Check repository settings or run manually:"
+        echo "gh release create v${{ github.run_number }} dist/* --generate-notes"
+        echo "Release artifacts are available in the package-dist artifact"
 
   notify:
     name: Notification
     runs-on: ubuntu-latest
-    needs: [security-scan, code-quality, unit-tests, integration-tests]
+    needs: [security-scan, code-quality, unit-tests, integration-tests, testnet-validation, performance-tests, build-and-package]
     if: always()
     
     steps:
     - name: Notify on failure
-      if: needs.security-scan.result == 'failure' || needs.code-quality.result == 'failure' || needs.unit-tests.result == 'failure' || needs.integration-tests.result == 'failure'
+      if: needs.security-scan.result == 'failure' || needs.code-quality.result == 'failure' || needs.unit-tests.result == 'failure' || needs.integration-tests.result == 'failure' || needs.testnet-validation.result == 'failure' || needs.performance-tests.result == 'failure' || needs.build-and-package.result == 'failure'
       run: |
         if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
           echo "Sending Slack notification for CI failure..."
@@ -583,7 +592,7 @@ jobs:
         fi
     
     - name: Notify on success
-      if: needs.security-scan.result == 'success' && needs.code-quality.result == 'success' && needs.unit-tests.result == 'success' && needs.integration-tests.result == 'success'
+      if: needs.security-scan.result == 'success' && needs.code-quality.result == 'success' && needs.unit-tests.result == 'success' && needs.integration-tests.result == 'success' && needs.testnet-validation.result == 'success' && needs.performance-tests.result == 'success' && needs.build-and-package.result == 'success'
       run: |
         if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
           echo "Sending Slack notification for CI success..."
