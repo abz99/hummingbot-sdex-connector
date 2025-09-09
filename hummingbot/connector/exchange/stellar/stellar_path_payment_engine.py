@@ -668,9 +668,7 @@ class EnhancedPathPaymentEngine:
             if log_matrix[key_i][key_i] < 0:  # Negative cycle found
                 profit = abs(log_matrix[key_i][key_i]) * 100  # Convert to percentage
                 if profit >= float(min_profit):
-                    path = await self._reconstruct_arbitrage_path(
-                        key_i, log_matrix, unified_matrix
-                    )
+                    path = await self._reconstruct_arbitrage_path(key_i, log_matrix, unified_matrix)
                     if path and len(path) <= max_hops + 1:
                         opportunity = await self._create_multi_hop_opportunity(
                             assets[asset_keys.index(key_i)], path, Decimal(str(profit))
