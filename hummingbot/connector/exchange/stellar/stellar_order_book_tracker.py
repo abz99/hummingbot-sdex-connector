@@ -70,7 +70,7 @@ class StellarOrderBookTracker:
         self,
         chain_interface: "ModernStellarChainInterface",
         observability: "StellarObservabilityFramework",
-    ):
+    ) -> None:
         self.chain_interface = chain_interface
         self.observability = observability
 
@@ -186,7 +186,7 @@ class StellarOrderBookTracker:
         """Get all tracked order books."""
         return self._order_books.copy()
 
-    def add_update_handler(self, handler: Callable[[str, StellarOrderBook], None]):
+    def add_update_handler(self, handler: Callable[[str, StellarOrderBook], None]) -> None:
         """Add order book update handler."""
         self._update_handlers.append(handler)
 

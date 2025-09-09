@@ -12,8 +12,12 @@ from typing import Dict, Any, Optional
 import time
 import uuid
 
-from hummingbot.core.data_type.common import OrderType, TradeType
-from hummingbot.core.data_type.order_candidate import OrderCandidate
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../src'))
+
+from hummingbot_stubs.core.data_type.common import OrderType, TradeType
+from hummingbot_stubs.core.data_type.order_candidate import OrderCandidate
 
 
 class MockStellarOrder:

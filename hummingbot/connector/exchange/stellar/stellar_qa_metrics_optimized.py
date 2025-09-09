@@ -71,7 +71,7 @@ class CacheEntry:
 class OptimizedQAMetricsCache:
     """Thread-safe cache for QA metrics with TTL and file-based invalidation."""
 
-    def __init__(self, default_ttl: float = 300.0):
+    def __init__(self, default_ttl: float = 300.0) -> None:
         self.cache: Dict[str, CacheEntry] = {}
         self.default_ttl = default_ttl
         self._lock = threading.RLock()
@@ -108,7 +108,7 @@ class OptimizedQAMetricsCache:
 
     def set(
         self, key: str, data: Any, file_path: Optional[Path] = None, ttl: Optional[float] = None
-    ):
+    ) -> None:
         """Set cached data with optional file tracking."""
         with self._lock:
             file_hash = self._file_hash(file_path) if file_path else None
@@ -128,7 +128,7 @@ class OptimizedQAMetricsCache:
             else:
                 self.cache.clear()
 
-    def cleanup_expired(self):
+    def cleanup_expired(self) -> None:
         """Remove expired entries from cache."""
         with self._lock:
             expired_keys = [k for k, v in self.cache.items() if not v.is_valid()]
@@ -139,7 +139,7 @@ class OptimizedQAMetricsCache:
 class OptimizedStellarQAMetricsCollector:
     """Performance-optimized QA metrics collector."""
 
-    def __init__(self, metrics: Optional[StellarMetrics] = None, max_workers: int = 4):
+    def __init__(self, metrics: Optional[StellarMetrics] = None, max_workers: int = 4) -> None:
         """Initialize optimized QA metrics collector."""
         self.logger = get_stellar_logger()
         self.metrics = metrics or get_stellar_metrics()

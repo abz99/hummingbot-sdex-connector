@@ -86,7 +86,7 @@ class SecurityRequirement:
     update_count: int = 0
     blocked_reason: Optional[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.created_date == 0.0:
             self.created_date = time.time()
         if self.last_updated == 0.0:
@@ -98,7 +98,7 @@ class SecurityRequirement:
         if self.acceptance_criteria is None:
             self.acceptance_criteria = []
 
-    def update_status(self, status: RequirementStatus, notes: str = "", user: str = "system"):
+    def update_status(self, status: RequirementStatus, notes: str = "", user: str = "system") -> None:
         """Update requirement status with audit trail."""
         self.status = status
         self.last_updated = time.time()
@@ -178,14 +178,14 @@ class SecurityMetrics:
     # Calculated at runtime
     calculation_timestamp: float = 0.0
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.calculation_timestamp = time.time()
 
 
 class SecurityRequirementsTracker:
     """Main security requirements tracking and metrics system."""
 
-    def __init__(self, data_dir: Optional[str] = None):
+    def __init__(self, data_dir: Optional[str] = None) -> None:
         self.logger = get_stellar_logger()
         self.data_dir = Path(data_dir or "security_tracking")
         self.data_dir.mkdir(exist_ok=True)
@@ -420,7 +420,7 @@ class SecurityRequirementsTracker:
         completion_percentage: Optional[int] = None,
         notes: str = "",
         user: str = "system",
-    ):
+    ) -> None:
         """Update requirement status with full audit trail."""
         if req_id not in self.requirements:
             raise ValueError(f"Requirement not found: {req_id}")

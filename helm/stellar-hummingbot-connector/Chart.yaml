@@ -1,0 +1,58 @@
+apiVersion: v2
+name: stellar-hummingbot-connector
+description: A Helm chart for Stellar Hummingbot Connector v3 with production observability
+type: application
+version: 3.0.0
+appVersion: "v3.0.0"
+kubeVersion: ">=1.21.0"
+
+keywords:
+  - stellar
+  - hummingbot
+  - trading
+  - blockchain
+  - cryptocurrency
+  - defi
+  - arbitrage
+
+home: https://github.com/stellar/hummingbot-connector-v3
+sources:
+  - https://github.com/stellar/hummingbot-connector-v3
+
+maintainers:
+  - name: Stellar Trading Team
+    email: trading@stellar.org
+  - name: Operations Team
+    email: ops@stellar.org
+
+icon: https://stellar.org/favicon.ico
+
+annotations:
+  category: Trading
+  licenses: Apache-2.0
+  
+dependencies:
+  - name: prometheus
+    version: "15.x.x"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: monitoring.prometheus.enabled
+    tags:
+      - monitoring
+  - name: grafana
+    version: "6.x.x"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: monitoring.grafana.enabled
+    tags:
+      - monitoring
+  - name: redis
+    version: "17.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled
+    tags:
+      - cache
+  - name: postgresql
+    version: "11.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+    tags:
+      - database

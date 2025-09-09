@@ -118,7 +118,7 @@ class SorobanContractManager:
         soroban_server: Any,  # SorobanServer when available
         chain_interface: "ModernStellarChainInterface",
         observability: "StellarObservabilityFramework",
-    ):
+    ) -> None:
         self.soroban_server = soroban_server
         self.chain_interface = chain_interface
         self.observability = observability

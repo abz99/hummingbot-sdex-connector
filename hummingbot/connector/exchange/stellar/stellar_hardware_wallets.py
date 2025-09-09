@@ -95,7 +95,7 @@ class HardwareWalletInterface(ABC):
 class LedgerWallet(HardwareWalletInterface):
     """Ledger hardware wallet implementation."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_stellar_logger()
         self.device_info: Optional[HardwareWalletInfo] = None
         self._connection = None
@@ -221,7 +221,7 @@ class LedgerWallet(HardwareWalletInterface):
 class TrezorWallet(HardwareWalletInterface):
     """Trezor hardware wallet implementation."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_stellar_logger()
         self.device_info: Optional[HardwareWalletInfo] = None
         self._client = None
@@ -351,7 +351,7 @@ class TrezorWallet(HardwareWalletInterface):
 class HardwareWalletManager:
     """Manager for hardware wallet operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_stellar_logger()
         self._wallets: Dict[str, HardwareWalletInterface] = {}
         self._signing_requests: Dict[str, SigningRequest] = {}

@@ -81,7 +81,7 @@ class EnhancedPathPaymentEngine:
         chain_interface: "ModernStellarChainInterface",
         soroban_manager: "SorobanContractManager",
         observability: "StellarObservabilityFramework",
-    ):
+    ) -> None:
         self.chain_interface = chain_interface
         self.soroban_manager = soroban_manager
         self.observability = observability

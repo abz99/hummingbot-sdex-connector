@@ -103,7 +103,7 @@ class QAMetricsConfig:
 class QAConfigManager:
     """Manages QA metrics configuration and collector instantiation."""
 
-    def __init__(self, config_path: Optional[Path] = None):
+    def __init__(self, config_path: Optional[Path] = None) -> None:
         self.logger = get_stellar_logger()
         self.config_path = config_path or self._get_default_config_path()
         self._config: Optional[QAMetricsConfig] = None
@@ -311,7 +311,7 @@ class QAConfigManager:
             )
             raise
 
-    def update_performance_profile(self, profile: QAPerformanceProfile):
+    def update_performance_profile(self, profile: QAPerformanceProfile) -> None:
         """Update performance profile and adjust settings accordingly."""
         self.config.performance_profile = profile
 

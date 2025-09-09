@@ -80,7 +80,7 @@ class StellarEndpointConfig:
 class StellarAuthenticator:
     """Handle authentication for Stellar API requests."""
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None) -> None:
         self.api_key = api_key
         self.logger = get_stellar_logger()
 
@@ -117,7 +117,7 @@ class StellarRESTAssistant:
         endpoint_config: StellarEndpointConfig,
         authenticator: Optional[StellarAuthenticator] = None,
         session: Optional[ClientSession] = None,
-    ):
+    ) -> None:
         self.throttler = throttler
         self.endpoint_config = endpoint_config
         self.authenticator = authenticator
@@ -389,7 +389,7 @@ class StellarWebAssistantsFactory:
         shared_session: Optional[ClientSession] = None,
         # Compatibility parameters for tests
         auth: Optional[Any] = None,
-    ):
+    ) -> None:
         self.logger = get_stellar_logger()
 
         # Default configuration for Stellar Mainnet

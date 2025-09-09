@@ -21,7 +21,7 @@ from .stellar_test_account_types import (
 class StellarAccountPoolManager:
     """Manages pools of test accounts for efficient allocation."""
 
-    def __init__(self, account_factory: StellarAccountFactory):
+    def __init__(self, account_factory: StellarAccountFactory) -> None:
         self.account_factory = account_factory
         self.logger = get_stellar_logger()
 

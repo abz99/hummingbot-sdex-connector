@@ -62,7 +62,7 @@ class EnhancedStellarNetworkManager:
         enable_health_monitoring: bool = True,
         enable_asset_verification: bool = True,
         enable_metrics: bool = True,
-    ):
+    ) -> None:
         # Configuration
         self.config_path = config_path
         self.enable_health_monitoring = enable_health_monitoring

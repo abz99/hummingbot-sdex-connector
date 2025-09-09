@@ -60,7 +60,7 @@ class ValidationRule:
 class SecurityValidator:
     """Input validation and sanitization for security-critical operations."""
 
-    def __init__(self, validation_level: ValidationLevel = ValidationLevel.STRICT):
+    def __init__(self, validation_level: ValidationLevel = ValidationLevel.STRICT) -> None:
         self.validation_level = validation_level
         self.logger = get_stellar_logger()
 

@@ -94,7 +94,7 @@ class StellarConnectionManager:
         pool_config: Optional[ConnectionPool] = None,
         load_balance_strategy: LoadBalanceStrategy = LoadBalanceStrategy.RESPONSE_TIME,
         enable_http2: bool = True,
-    ):
+    ) -> None:
         self.logger = get_stellar_logger()
         self.request_logger = get_request_logger()
         self.metrics = get_stellar_metrics()
@@ -163,7 +163,7 @@ class StellarConnectionManager:
 
         self.logger.info("Connection manager stopped", category=LogCategory.NETWORK)
 
-    def add_endpoint_group(self, service_name: str, endpoints: List[EndpointConfig]):
+    def add_endpoint_group(self, service_name: str, endpoints: List[EndpointConfig]) -> None:
         """Add a group of endpoints for a service."""
         self.endpoints[service_name] = sorted(endpoints, key=lambda x: x.priority)
 

@@ -46,7 +46,7 @@ class StellarErrorClassification:
         recoverable: bool,
         retry_after: Optional[int] = None,
         action: Optional[str] = None,
-    ):
+    ) -> None:
         self.category = category
         self.severity = severity
         self.recoverable = recoverable
@@ -57,7 +57,7 @@ class StellarErrorClassification:
 class ModernStellarErrorHandler:
     """Advanced error handling and classification."""
 
-    def __init__(self, observability: Optional["StellarObservabilityFramework"] = None):
+    def __init__(self, observability: Optional["StellarObservabilityFramework"] = None) -> None:
         self.observability = observability
         self._error_patterns = self._initialize_error_patterns()
         self._error_counts: Dict[str, int] = {}

@@ -32,7 +32,7 @@ from .stellar_security_validation import (
 class StellarSecurityManager:
     """Main security manager for Stellar connector."""
 
-    def __init__(self, config: SecurityConfig, key_store_path: Optional[str] = None):
+    def __init__(self, config: SecurityConfig, key_store_path: Optional[str] = None) -> None:
         self.config = config
         self.logger = get_stellar_logger()
         self._stores: Dict[KeyStoreType, KeyStoreBackend] = {}

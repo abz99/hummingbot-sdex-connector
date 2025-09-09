@@ -75,7 +75,7 @@ class ErrorContext:
     max_retries: int = 3
     metadata: Dict[str, Any] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.metadata is None:
             self.metadata = {}
 
@@ -96,7 +96,7 @@ class ErrorClassification:
 class StellarErrorClassifier:
     """Classifies Stellar-specific errors and determines recovery strategies."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_stellar_logger()
         self._error_patterns = self._build_error_patterns()
 
@@ -355,7 +355,7 @@ class RetryWithJitterHandler(ErrorRecoveryHandler):
 class SwitchEndpointHandler(ErrorRecoveryHandler):
     """Handler for switching to fallback endpoints."""
 
-    def __init__(self, endpoint_switcher: Callable[[str], Awaitable[bool]]):
+    def __init__(self, endpoint_switcher: Callable[[str], Awaitable[bool]]) -> None:
         self.endpoint_switcher = endpoint_switcher
 
     async def can_handle(self, classification: ErrorClassification, context: ErrorContext) -> bool:
@@ -372,7 +372,7 @@ class SwitchEndpointHandler(ErrorRecoveryHandler):
 class CircuitBreakerHandler(ErrorRecoveryHandler):
     """Handler for circuit breaker pattern."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.failure_counts: Dict[str, int] = {}
         self.circuit_open_until: Dict[str, float] = {}
         self.failure_threshold = 5
@@ -409,7 +409,7 @@ class CircuitBreakerHandler(ErrorRecoveryHandler):
 class StellarErrorManager:
     """Main error management system for Stellar connector."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_stellar_logger()
         self.classifier = StellarErrorClassifier()
         self.handlers: Dict[RecoveryStrategy, ErrorRecoveryHandler] = {}
@@ -424,11 +424,11 @@ class StellarErrorManager:
         self.handlers[RecoveryStrategy.RETRY_WITH_JITTER] = RetryWithJitterHandler()
         self.handlers[RecoveryStrategy.CIRCUIT_BREAKER] = CircuitBreakerHandler()
 
-    def register_handler(self, strategy: RecoveryStrategy, handler: ErrorRecoveryHandler):
+    def register_handler(self, strategy: RecoveryStrategy, handler: ErrorRecoveryHandler) -> None:
         """Register a custom error recovery handler."""
         self.handlers[strategy] = handler
 
-    def register_endpoint_switcher(self, switcher: Callable[[str], Awaitable[bool]]):
+    def register_endpoint_switcher(self, switcher: Callable[[str], Awaitable[bool]]) -> None:
         """Register endpoint switcher for fallback handling."""
         self.handlers[RecoveryStrategy.SWITCH_ENDPOINT] = SwitchEndpointHandler(switcher)
 

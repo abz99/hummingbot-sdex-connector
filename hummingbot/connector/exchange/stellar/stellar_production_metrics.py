@@ -63,7 +63,7 @@ class ProductionMetric:
     business_impact: str = ""
     remediation_steps: List[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.remediation_steps is None:
             self.remediation_steps = []
 
@@ -88,7 +88,7 @@ class BusinessKPI:
 class StellarProductionMetricsFramework:
     """Production-grade metrics framework for Stellar connector."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_stellar_logger()
         self.base_metrics = get_stellar_metrics()
         self.observability = get_stellar_observability()
@@ -111,7 +111,7 @@ class StellarProductionMetricsFramework:
         self._init_business_kpis()
         self._init_anomaly_detectors()
 
-    def _init_production_metrics(self):
+    def _init_production_metrics(self) -> None:
         """Initialize production-specific Prometheus metrics."""
 
         # Business KPI metrics
@@ -249,7 +249,7 @@ class StellarProductionMetricsFramework:
             registry=self.base_metrics.registry,
         )
 
-    def _init_business_kpis(self):
+    def _init_business_kpis(self) -> None:
         """Initialize business KPI definitions."""
 
         self.business_kpis = {
@@ -320,7 +320,7 @@ class StellarProductionMetricsFramework:
             ),
         }
 
-    def _init_anomaly_detectors(self):
+    def _init_anomaly_detectors(self) -> None:
         """Initialize anomaly detection algorithms."""
 
         self.anomaly_detectors = {

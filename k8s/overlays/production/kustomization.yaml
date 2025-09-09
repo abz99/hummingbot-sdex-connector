@@ -1,0 +1,80 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: stellar-production
+
+# Base resources
+resources:
+- ../../base
+- ingress.yaml
+- storage-class.yaml
+- monitoring-alerts.yaml
+
+# Images with specific tags for production
+images:
+- name: stellar-hummingbot-connector
+  newTag: v3.0.0-production
+- name: prom/prometheus
+  newTag: v2.40.0
+- name: grafana/grafana
+  newTag: v9.2.0
+- name: prom/alertmanager
+  newTag: v0.25.0
+
+# Resource patches for production scaling
+patchesStrategicMerge:
+- deployment-patch.yaml
+- hpa-patch.yaml
+- monitoring-patch.yaml
+
+# ConfigMap and Secret patches
+configMapGenerator:
+- name: stellar-config
+  behavior: merge
+  envs:
+  - production.env
+- name: prometheus-config
+  behavior: merge
+  files:
+  - prometheus.yml=prometheus-production.yml
+- name: grafana-datasources
+  behavior: merge
+  files:
+  - datasource.yml=grafana-datasources.yml
+- name: grafana-dashboards
+  behavior: merge
+  files:
+  - dashboards.yml=grafana-dashboards.yml
+
+secretGenerator:
+- name: stellar-secrets
+  behavior: merge
+  envs:
+  - secrets.env
+- name: grafana-secrets
+  behavior: merge
+  envs:
+  - grafana-secrets.env
+
+# Labels for production environment
+commonLabels:
+  environment: production
+  version: v3.0.0
+  managed-by: kustomize
+
+# Annotations for production tracking
+commonAnnotations:
+  deployment.kubernetes.io/revision: "1"
+  app.kubernetes.io/version: "v3.0.0"
+  app.kubernetes.io/managed-by: "kustomize"
+
+# Resource transformers
+replicas:
+- name: stellar-hummingbot-connector
+  count: 3
+
+# Name prefix for production resources
+namePrefix: prod-
+
+# Namespace creation
+namespace: stellar-production

@@ -44,7 +44,7 @@ class QAMetricResult:
 class StellarQAMetricsCollector:
     """Collects and reports QA metrics to the monitoring system."""
 
-    def __init__(self, metrics: Optional[StellarMetrics] = None):
+    def __init__(self, metrics: Optional[StellarMetrics] = None) -> None:
         """Initialize QA metrics collector."""
         self.logger = get_stellar_logger()
         self.metrics = metrics or get_stellar_metrics()

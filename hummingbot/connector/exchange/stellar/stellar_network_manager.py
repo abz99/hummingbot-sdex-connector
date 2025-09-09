@@ -83,7 +83,7 @@ class StellarNetworkConfig:
 class StellarNetworkManager:
     """Multi-network Stellar connection and configuration manager."""
 
-    def __init__(self, config_path: str = "config/networks.yml"):
+    def __init__(self, config_path: str = "config/networks.yml") -> None:
         self.config_path = config_path
         self.config: Dict[str, Any] = {}
         self.network_configs: Dict[StellarNetwork, StellarNetworkConfig] = {}

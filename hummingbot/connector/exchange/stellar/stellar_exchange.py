@@ -53,7 +53,7 @@ class StellarExchange(ExchangeBase):
         trading_pairs: List[str],
         trading_required: bool = True,
         **kwargs,
-    ):
+    ) -> None:
         super().__init__()
 
         # Core configuration

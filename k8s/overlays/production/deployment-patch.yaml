@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stellar-hummingbot-connector
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+        config.checksum: "production-config-v1"
+    spec:
+      containers:
+      - name: stellar-connector
+        image: stellar-hummingbot-connector:v3.0.0-production
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: LOG_LEVEL
+          value: "WARN"
+        - name: STELLAR_NETWORK
+          value: "MAINNET"
+        - name: ENABLE_PROFILING
+          value: "false"
+        - name: ENABLE_DEBUG_LOGGING
+          value: "false"
+        - name: MAX_CONCURRENT_OPERATIONS
+          value: "200"
+        - name: MEMORY_LIMIT_MB
+          value: "1536"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1500m"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 60
+      nodeSelector:
+        stellar.io/workload-type: "trading"
+        kubernetes.io/arch: "amd64"
+      tolerations:
+      - key: "stellar.io/trading-workload"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      - key: "stellar.io/high-memory"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: stellar.io/workload-type
+                operator: In
+                values: ["trading", "compute"]
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values: ["c5.xlarge", "c5.2xlarge", "m5.xlarge", "m5.2xlarge"]
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: ["stellar-hummingbot-connector"]
+            topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["stellar-hummingbot-connector"]
+              topologyKey: topology.kubernetes.io/zone
+      terminationGracePeriodSeconds: 120

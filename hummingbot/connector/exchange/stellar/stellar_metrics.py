@@ -53,7 +53,7 @@ class MetricDefinition:
 class StellarMetrics:
     """Comprehensive metrics collection for Stellar connector."""
 
-    def __init__(self, registry: Optional[CollectorRegistry] = None):
+    def __init__(self, registry: Optional[CollectorRegistry] = None) -> None:
         self.logger = get_stellar_logger()
         self.registry = registry or CollectorRegistry()
         self._metrics: Dict[str, Any] = {}
@@ -406,70 +406,70 @@ class StellarMetrics:
     # Account metrics methods
     def set_account_balance(
         self, network: str, account_id: str, asset_code: str, balance_xlm: float
-    ):
+    ) -> None:
         """Set account balance."""
         self.account_balances.labels(
             network=network, account_id=account_id, asset_code=asset_code
         ).set(balance_xlm)
 
-    def set_trustline_count(self, network: str, account_id: str, count: int):
+    def set_trustline_count(self, network: str, account_id: str, count: int) -> None:
         """Set trustline count."""
         self.trustline_count.labels(network=network, account_id=account_id).set(count)
 
     # Health metrics methods
-    def record_health_check(self, network: str, check_type: str, duration: float):
+    def record_health_check(self, network: str, check_type: str, duration: float) -> None:
         """Record a health check."""
         self.health_check_duration.labels(network=network, check_type=check_type).observe(duration)
 
-    def set_endpoint_health(self, network: str, endpoint_type: str, url: str, is_healthy: bool):
+    def set_endpoint_health(self, network: str, endpoint_type: str, url: str, is_healthy: bool) -> None:
         """Set endpoint health status."""
         self.endpoint_health_status.labels(
             network=network, endpoint_type=endpoint_type, url=url
         ).set(1 if is_healthy else 0)
 
-    def set_circuit_breaker_state(self, network: str, endpoint: str, state: int):
+    def set_circuit_breaker_state(self, network: str, endpoint: str, state: int) -> None:
         """Set circuit breaker state (0=closed, 1=open, 2=half-open)."""
         self.circuit_breaker_state.labels(network=network, endpoint=endpoint).set(state)
 
     # Cache metrics methods
-    def record_cache_hit(self, cache_type: str):
+    def record_cache_hit(self, cache_type: str) -> None:
         """Record a cache hit."""
         self.cache_hits_total.labels(cache_type=cache_type).inc()
 
-    def record_cache_miss(self, cache_type: str):
+    def record_cache_miss(self, cache_type: str) -> None:
         """Record a cache miss."""
         self.cache_misses_total.labels(cache_type=cache_type).inc()
 
-    def set_cache_size(self, cache_type: str, size: int):
+    def set_cache_size(self, cache_type: str, size: int) -> None:
         """Set cache size."""
         self.cache_size.labels(cache_type=cache_type).set(size)
 
     # Error metrics methods
-    def record_error(self, category: str, severity: str, operation: str):
+    def record_error(self, category: str, severity: str, operation: str) -> None:
         """Record an error."""
         self.errors_total.labels(category=category, severity=severity, operation=operation).inc()
 
-    def record_error_recovery(self, strategy: str, success: bool):
+    def record_error_recovery(self, strategy: str, success: bool) -> None:
         """Record an error recovery attempt."""
         self.error_recovery_attempts.labels(strategy=strategy, success=str(success).lower()).inc()
 
     # System metrics methods
-    def set_memory_usage(self, component: str, bytes_used: int):
+    def set_memory_usage(self, component: str, bytes_used: int) -> None:
         """Set memory usage."""
         self.memory_usage_bytes.labels(component=component).set(bytes_used)
 
-    def set_cpu_usage(self, component: str, percent: float):
+    def set_cpu_usage(self, component: str, percent: float) -> None:
         """Set CPU usage."""
         self.cpu_usage_percent.labels(component=component).set(percent)
 
     # Business metrics methods
-    def set_profit_loss(self, network: str, trading_pair: str, strategy: str, pnl_xlm: float):
+    def set_profit_loss(self, network: str, trading_pair: str, strategy: str, pnl_xlm: float) -> None:
         """Set profit/loss."""
         self.profit_loss_xlm.labels(
             network=network, trading_pair=trading_pair, strategy=strategy
         ).set(pnl_xlm)
 
-    def record_arbitrage_opportunity(self, network: str, asset_pair: str, executed: bool):
+    def record_arbitrage_opportunity(self, network: str, asset_pair: str, executed: bool) -> None:
         """Record an arbitrage opportunity."""
         self.arbitrage_opportunities.labels(
             network=network, asset_pair=asset_pair, executed=str(executed).lower()
@@ -478,7 +478,7 @@ class StellarMetrics:
     # QA and Testing metrics methods
     def update_test_coverage(
         self, module: str, coverage_percentage: float, coverage_type: str = "line"
-    ):
+    ) -> None:
         """Update test coverage percentage for a module."""
         self.qa_test_coverage.labels(module=module, coverage_type=coverage_type).set(
             coverage_percentage
@@ -494,7 +494,7 @@ class StellarMetrics:
 
     def update_test_success_rate(
         self, test_suite: str, success_rate: float, test_type: str = "unit"
-    ):
+    ) -> None:
         """Update test success rate for a test suite."""
         self.qa_test_success_rate.labels(test_suite=test_suite, test_type=test_type).set(
             success_rate
@@ -502,7 +502,7 @@ class StellarMetrics:
 
     def update_critical_module_coverage(
         self, module: str, coverage_percentage: float, threshold_type: str = "critical"
-    ):
+    ) -> None:
         """Update critical module coverage percentage."""
         self.qa_critical_module_coverage.labels(module=module, threshold_type=threshold_type).set(
             coverage_percentage
@@ -510,25 +510,25 @@ class StellarMetrics:
 
     def record_test_execution(
         self, test_suite: str, duration_seconds: float, test_category: str = "unit"
-    ):
+    ) -> None:
         """Record test execution duration."""
         self.qa_test_execution_duration.labels(
             test_suite=test_suite, test_category=test_category
         ).observe(duration_seconds)
 
-    def record_test_failure(self, test_suite: str, failure_type: str, module: str = "unknown"):
+    def record_test_failure(self, test_suite: str, failure_type: str, module: str = "unknown") -> None:
         """Record a test failure."""
         self.qa_test_failures_total.labels(
             test_suite=test_suite, failure_type=failure_type, module=module
         ).inc()
 
-    def update_code_quality_score(self, module: str, score: float, metric_type: str = "complexity"):
+    def update_code_quality_score(self, module: str, score: float, metric_type: str = "complexity") -> None:
         """Update code quality score for a module."""
         self.qa_code_quality_score.labels(module=module, metric_type=metric_type).set(score)
 
     def update_requirements_compliance(
         self, requirement_category: str, compliance_percentage: float, priority: str = "high"
-    ):
+    ) -> None:
         """Update requirements compliance percentage."""
         self.qa_requirements_compliance.labels(
             requirement_category=requirement_category, priority=priority
@@ -536,7 +536,7 @@ class StellarMetrics:
 
     def update_security_compliance(
         self, security_category: str, score: float, requirement_level: str = "mandatory"
-    ):
+    ) -> None:
         """Update security compliance score."""
         self.qa_security_compliance_score.labels(
             security_category=security_category, requirement_level=requirement_level

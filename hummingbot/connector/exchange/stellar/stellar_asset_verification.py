@@ -97,7 +97,7 @@ class AssetDirectory:
 class StellarAssetVerifier:
     """Verifies Stellar assets against their stellar.toml files."""
 
-    def __init__(self, session: Optional[aiohttp.ClientSession] = None):
+    def __init__(self, session: Optional[aiohttp.ClientSession] = None) -> None:
         self.logger = get_stellar_logger()
         self.metrics = get_stellar_metrics()
         self.session = session
@@ -127,7 +127,7 @@ class StellarAssetVerifier:
         if self._session_owned and self.session:
             await self.session.close()
 
-    def add_asset_directory(self, directory: AssetDirectory):
+    def add_asset_directory(self, directory: AssetDirectory) -> None:
         """Add an asset directory for verification."""
         self.asset_directories.append(directory)
         self.asset_directories.sort(key=lambda x: x.priority)

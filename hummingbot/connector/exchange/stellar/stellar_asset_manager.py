@@ -43,7 +43,7 @@ class ModernAssetManager:
         self,
         chain_interface: "ModernStellarChainInterface",
         observability: "StellarObservabilityFramework",
-    ):
+    ) -> None:
         self.chain_interface = chain_interface
         self.observability = observability
 

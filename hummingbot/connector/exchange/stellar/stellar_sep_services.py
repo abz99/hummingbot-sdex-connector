@@ -79,7 +79,7 @@ class StellarSEPServices:
         chain_interface: "ModernStellarChainInterface",
         security_framework: "EnterpriseSecurityFramework",
         observability: "StellarObservabilityFramework",
-    ):
+    ) -> None:
         self.chain_interface = chain_interface
         self.security_framework = security_framework
         self.observability = observability

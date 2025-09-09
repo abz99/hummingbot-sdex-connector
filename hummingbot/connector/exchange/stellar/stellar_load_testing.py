@@ -106,7 +106,7 @@ class LoadTestEngine(ABC):
 class StellarTradingLoadTest(LoadTestEngine):
     """Load testing for Stellar trading operations"""
 
-    def __init__(self, connector_instance=None):
+    def __init__(self, connector_instance=None) -> None:
         self.connector = connector_instance
         self.logger = logging.getLogger(self.__class__.__name__)
         self.results: List[PerformanceResult] = []
@@ -314,7 +314,7 @@ class StellarTradingLoadTest(LoadTestEngine):
 class StellarMarketDataLoadTest(LoadTestEngine):
     """Load testing for market data streaming"""
 
-    def __init__(self, websocket_url: str = "wss://horizon.stellar.org"):
+    def __init__(self, websocket_url: str = "wss://horizon.stellar.org") -> None:
         self.websocket_url = websocket_url
         self.logger = logging.getLogger(self.__class__.__name__)
         self.results: List[PerformanceResult] = []
@@ -427,7 +427,7 @@ class StellarMarketDataLoadTest(LoadTestEngine):
 class StellarLoadTestSuite:
     """Comprehensive load testing suite for Stellar connector"""
 
-    def __init__(self, connector_instance=None):
+    def __init__(self, connector_instance=None) -> None:
         self.connector = connector_instance
         self.logger = logging.getLogger(self.__class__.__name__)
         self.test_engines: Dict[LoadTestType, LoadTestEngine] = {

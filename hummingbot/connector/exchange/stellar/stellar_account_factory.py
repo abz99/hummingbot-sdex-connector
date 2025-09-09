@@ -31,7 +31,7 @@ class StellarAccountFactory:
         network_manager: StellarNetworkManager,
         hd_manager: HierarchicalKeyManager,
         master_wallet_id: str,
-    ):
+    ) -> None:
         self.network_manager = network_manager
         self.hd_manager = hd_manager
         self.master_wallet_id = master_wallet_id

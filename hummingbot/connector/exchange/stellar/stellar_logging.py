@@ -114,7 +114,7 @@ def format_exception(logger: WrappedLogger, method_name: str, event_dict: EventD
 class StellarLogger:
     """Enhanced structured logger for Stellar connector."""
 
-    def __init__(self, logger_name: str = "stellar_connector"):
+    def __init__(self, logger_name: str = "stellar_connector") -> None:
         """Initialize structured logger."""
         self.logger_name = logger_name
         self._configure_structlog()
@@ -216,7 +216,7 @@ class StellarLogger:
 class CorrelatedLogger:
     """Logger with correlation ID context."""
 
-    def __init__(self, logger: structlog.BoundLogger, corr_id: str):
+    def __init__(self, logger: structlog.BoundLogger, corr_id: str) -> None:
         self.logger = logger
         self.correlation_id = corr_id
         self.bound_logger = logger.bind(correlation_id=corr_id)
@@ -281,7 +281,7 @@ class CorrelatedLogger:
 class RequestLogger:
     """Logger for HTTP request/response tracking."""
 
-    def __init__(self, base_logger: StellarLogger):
+    def __init__(self, base_logger: StellarLogger) -> None:
         self.base_logger = base_logger
 
     async def log_request(
@@ -344,7 +344,7 @@ class RequestLogger:
 class PerformanceLogger:
     """Logger for performance metrics."""
 
-    def __init__(self, base_logger: StellarLogger):
+    def __init__(self, base_logger: StellarLogger) -> None:
         self.base_logger = base_logger
 
     async def log_operation_start(self, operation: str, **context: Any) -> str:

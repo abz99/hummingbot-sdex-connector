@@ -1,0 +1,401 @@
+# Default values for stellar-hummingbot-connector
+# This is a YAML-formatted file
+
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# Image configuration
+image:
+  registry: docker.io
+  repository: stellar/hummingbot-connector
+  tag: "v3.0.0"
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+# Application configuration
+application:
+  environment: production
+  stellarNetwork: MAINNET
+  logLevel: INFO
+  
+  # Trading features
+  trading:
+    enabled: true
+    arbitrageEnabled: true
+    pathPaymentsEnabled: true
+    sorobanContractsEnabled: true
+    advancedRoutingEnabled: true
+    mevProtectionEnabled: true
+  
+  # Performance settings
+  performance:
+    maxConcurrentOperations: 200
+    requestTimeout: 45
+    retryAttempts: 5
+    circuitBreakerThreshold: 10
+    
+  # Rate limiting
+  rateLimiting:
+    horizonSubmit: 20
+    horizonAccount: 7200
+    horizonLedger: 14400
+    sorobanRpc: 1200
+    
+  # External services
+  externalServices:
+    horizonUrl: "https://horizon.stellar.org"
+    sorobanRpcUrl: "https://soroban-rpc.mainnet.stellar.gateway.fm"
+    backupHorizonUrl: "https://horizon-backup.stellar.org"
+
+# Deployment configuration
+replicaCount: 3
+
+deployment:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  
+  annotations: {}
+  labels: {}
+  
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/metrics"
+  
+  podLabels: {}
+  
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 2000
+  
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: 1000
+    capabilities:
+      drop:
+        - ALL
+
+# Resource configuration
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi" 
+    cpu: "1500m"
+
+# Health checks
+healthChecks:
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health/live
+      port: health
+    initialDelaySeconds: 120
+    periodSeconds: 30
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+  
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health/ready
+      port: health
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /health/startup
+      port: health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 60
+
+# Service configuration
+service:
+  type: ClusterIP
+  annotations: {}
+  ports:
+    metrics:
+      port: 8000
+      targetPort: metrics
+      protocol: TCP
+    health:
+      port: 8080
+      targetPort: health
+      protocol: TCP
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+  hosts:
+    - host: api.stellar-hummingbot.com
+      paths:
+        - path: /health
+          pathType: Prefix
+          service:
+            name: stellar-hummingbot-connector
+            port: 8080
+        - path: /metrics
+          pathType: Prefix
+          service:
+            name: stellar-hummingbot-connector
+            port: 8000
+  tls:
+    - secretName: stellar-tls-secret
+      hosts:
+        - api.stellar-hummingbot.com
+
+# Auto-scaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 15
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 70
+  
+  # Custom metrics scaling
+  customMetrics:
+    enabled: true
+    metrics:
+      - type: Pods
+        pods:
+          metric:
+            name: stellar_concurrent_operations
+          target:
+            type: AverageValue
+            averageValue: "150"
+      - type: Pods
+        pods:
+          metric:
+            name: stellar_request_rate_per_second
+          target:
+            type: AverageValue
+            averageValue: "200"
+  
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 600
+      policies:
+        - type: Percent
+          value: 20
+          periodSeconds: 120
+        - type: Pods
+          value: 2
+          periodSeconds: 120
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 120
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60
+        - type: Pods
+          value: 4
+          periodSeconds: 60
+      selectPolicy: Max
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Network Policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+
+# Volume configuration
+volumes:
+  config:
+    enabled: true
+    mountPath: /app/config
+  secrets:
+    enabled: true
+    mountPath: /app/secrets
+    defaultMode: 0400
+  logs:
+    enabled: true
+    mountPath: /app/logs
+    emptyDir:
+      sizeLimit: 1Gi
+  temp:
+    enabled: true
+    mountPath: /tmp
+    emptyDir:
+      sizeLimit: 500Mi
+
+# Persistence
+persistence:
+  enabled: false
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 5Gi
+  annotations: {}
+
+# Node selection
+nodeSelector: {}
+
+tolerations:
+  - key: "stellar.io/trading-workload"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: stellar.io/workload-type
+              operator: In
+              values: ["trading", "compute"]
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values: ["stellar-hummingbot-connector"]
+        topologyKey: kubernetes.io/hostname
+
+# Environment variables
+env: []
+envFrom: []
+
+# Configuration and secrets
+config:
+  create: true
+  data: {}
+  
+secrets:
+  create: true
+  data: {}
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  
+  prometheus:
+    enabled: true
+    namespace: stellar-monitoring
+    serviceMonitor:
+      enabled: true
+      namespace: stellar-monitoring
+      interval: 30s
+      scrapeTimeout: 10s
+      labels: {}
+      annotations: {}
+  
+  grafana:
+    enabled: true
+    namespace: stellar-monitoring
+    dashboards:
+      enabled: true
+      labels:
+        grafana_dashboard: "1"
+  
+  alerts:
+    enabled: true
+    namespace: stellar-monitoring
+    labels: {}
+    annotations: {}
+
+# Redis cache (optional)
+redis:
+  enabled: false
+  auth:
+    enabled: true
+    password: "stellar-redis-password"
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+  replica:
+    replicaCount: 2
+
+# PostgreSQL database (optional)
+postgresql:
+  enabled: false
+  auth:
+    postgresPassword: "stellar-postgres-password"
+    database: "stellar_hummingbot"
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+  automountServiceAccountToken: false
+
+# RBAC
+rbac:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["configmaps", "secrets", "pods"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["apps"]
+      resources: ["deployments"]
+      verbs: ["get", "list", "watch"]
+
+# Tests
+tests:
+  enabled: true
+  image:
+    repository: busybox
+    tag: latest
+    pullPolicy: IfNotPresent
+
+# Extra objects to deploy
+extraObjects: []

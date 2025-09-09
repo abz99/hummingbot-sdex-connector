@@ -283,7 +283,7 @@ class StellarHealthMonitor:
         failure_threshold: int = 3,
         recovery_threshold: int = 2,
         history_size: int = 100,
-    ):
+    ) -> None:
         self.logger = get_stellar_logger()
         self.metrics = get_stellar_metrics()
         self.error_manager = StellarErrorManager()
@@ -354,7 +354,7 @@ class StellarHealthMonitor:
 
         self.logger.info("Health monitoring stopped", category=LogCategory.HEALTH_CHECK)
 
-    def add_endpoint(self, url: str, check_type: HealthCheckType):
+    def add_endpoint(self, url: str, check_type: HealthCheckType) -> None:
         """Add an endpoint for monitoring."""
         if url not in self.endpoint_health:
             self.endpoint_health[url] = EndpointHealth(url=url, check_type=check_type)
@@ -382,15 +382,15 @@ class StellarHealthMonitor:
                 f"Removed endpoint from monitoring: {url}", category=LogCategory.HEALTH_CHECK
             )
 
-    def add_alert_handler(self, handler: Callable[[Alert], Awaitable[None]]):
+    def add_alert_handler(self, handler: Callable[[Alert], Awaitable[None]]) -> None:
         """Add an alert handler."""
         self.alert_handlers.append(handler)
 
-    def add_failure_callback(self, callback: Callable[[str, HealthCheckResult], Awaitable[None]]):
+    def add_failure_callback(self, callback: Callable[[str, HealthCheckResult], Awaitable[None]]) -> None:
         """Add a callback for endpoint failures."""
         self.failure_callbacks.append(callback)
 
-    def add_recovery_callback(self, callback: Callable[[str, HealthCheckResult], Awaitable[None]]):
+    def add_recovery_callback(self, callback: Callable[[str, HealthCheckResult], Awaitable[None]]) -> None:
         """Add a callback for endpoint recoveries."""
         self.recovery_callbacks.append(callback)
 

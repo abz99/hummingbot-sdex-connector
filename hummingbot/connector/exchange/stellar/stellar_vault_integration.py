@@ -71,7 +71,7 @@ class VaultToken:
 class VaultKeyStore(KeyStoreBackend):
     """HashiCorp Vault key storage backend."""
 
-    def __init__(self, config: VaultConfig):
+    def __init__(self, config: VaultConfig) -> None:
         self.config = config
         self.logger = get_stellar_logger()
         self._session: Optional[aiohttp.ClientSession] = None

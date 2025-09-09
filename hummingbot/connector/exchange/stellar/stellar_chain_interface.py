@@ -26,7 +26,7 @@ class StellarNetworkConfig:
     network_passphrase: str
     fallback_urls: List[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.fallback_urls is None:
             self.fallback_urls = []
 

@@ -49,7 +49,7 @@ class EnterpriseSecurityFramework:
 
     def __init__(
         self, config: "StellarNetworkConfig", observability: "StellarObservabilityFramework"
-    ):
+    ) -> None:
         self.config = config
         self.observability = observability
 

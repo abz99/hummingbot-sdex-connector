@@ -20,7 +20,7 @@ from .stellar_security_types import SecurityLevel
 class HierarchicalKeyManager:
     """Manager for hierarchical deterministic key operations."""
 
-    def __init__(self, security_level: SecurityLevel = SecurityLevel.PRODUCTION):
+    def __init__(self, security_level: SecurityLevel = SecurityLevel.PRODUCTION) -> None:
         self.security_level = security_level
         self.logger = get_stellar_logger()
         self.derivation = SecureKeyDerivation(security_level)

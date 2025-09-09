@@ -224,7 +224,7 @@ class StellarThrottler:
     - Graceful degradation under load
     """
 
-    def __init__(self, rate_limits: Optional[List[RateLimit]] = None, enable_metrics: bool = True):
+    def __init__(self, rate_limits: Optional[List[RateLimit]] = None, enable_metrics: bool = True) -> None:
         self.logger = get_stellar_logger()
 
         # Use provided rate limits or defaults

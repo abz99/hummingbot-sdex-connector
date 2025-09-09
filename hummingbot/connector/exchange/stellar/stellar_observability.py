@@ -76,7 +76,7 @@ class AlertRule:
     labels: Dict[str, str] = None
     enabled: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.labels is None:
             self.labels = {}
 
@@ -95,7 +95,7 @@ class Alert:
     labels: Dict[str, str] = None
     correlation_id: str = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.labels is None:
             self.labels = {}
 
@@ -120,7 +120,7 @@ class HealthCheckResult:
     details: Dict[str, Any] = None
     timestamp: float = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.details is None:
             self.details = {}
         if self.timestamp is None:
@@ -135,7 +135,7 @@ class StellarObservabilityFramework:
         metrics_port: int = 8000,
         pushgateway_url: Optional[str] = None,
         alert_webhook_url: Optional[str] = None,
-    ):
+    ) -> None:
         self.logger = get_stellar_logger()
         self.metrics = get_stellar_metrics()
         self.metrics_port = metrics_port
@@ -167,7 +167,7 @@ class StellarObservabilityFramework:
         self._init_default_alert_rules()
         self._init_health_checks()
 
-    def _init_production_metrics(self):
+    def _init_production_metrics(self) -> None:
         """Initialize production-specific metrics."""
 
         # Observability system metrics
@@ -231,7 +231,7 @@ class StellarObservabilityFramework:
             registry=self.metrics.registry,
         )
 
-    def _init_default_alert_rules(self):
+    def _init_default_alert_rules(self) -> None:
         """Initialize default alert rules for production monitoring."""
 
         default_rules = [
@@ -303,7 +303,7 @@ class StellarObservabilityFramework:
         for rule in default_rules:
             self.add_alert_rule(rule)
 
-    def _init_health_checks(self):
+    def _init_health_checks(self) -> None:
         """Initialize health check functions."""
 
         self.add_health_check("system_resources", self._check_system_resources)
@@ -311,7 +311,7 @@ class StellarObservabilityFramework:
         self.add_health_check("database_connection", self._check_database_connection)
         self.add_health_check("metrics_system", self._check_metrics_system)
 
-    def add_alert_rule(self, rule: AlertRule):
+    def add_alert_rule(self, rule: AlertRule) -> None:
         """Add an alert rule."""
         self.alert_rules[rule.name] = rule
         self.logger.info(
@@ -324,11 +324,11 @@ class StellarObservabilityFramework:
             del self.alert_rules[rule_name]
             self.logger.info(f"Removed alert rule: {rule_name}", category=LogCategory.CONFIGURATION)
 
-    def add_alert_callback(self, callback: Callable[[Alert], None]):
+    def add_alert_callback(self, callback: Callable[[Alert], None]) -> None:
         """Add a callback for alert notifications."""
         self.alert_callbacks.append(callback)
 
-    def add_health_check(self, name: str, check_func: Callable[[], HealthCheckResult]):
+    def add_health_check(self, name: str, check_func: Callable[[], HealthCheckResult]) -> None:
         """Add a health check function."""
         self.health_checks[name] = check_func
         self.logger.info(f"Added health check: {name}", category=LogCategory.HEALTH_CHECK)

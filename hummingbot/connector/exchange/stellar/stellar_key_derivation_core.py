@@ -32,7 +32,7 @@ from .stellar_security_types import SecurityLevel
 class SecureKeyDerivation:
     """Secure key derivation system with multiple algorithms."""
 
-    def __init__(self, security_level: SecurityLevel = SecurityLevel.PRODUCTION):
+    def __init__(self, security_level: SecurityLevel = SecurityLevel.PRODUCTION) -> None:
         self.security_level = security_level
         self.logger = get_stellar_logger()
 

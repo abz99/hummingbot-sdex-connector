@@ -31,7 +31,7 @@ class StellarTestAccountManager:
         self,
         network_manager: StellarNetworkManager,
         storage_path: Optional[str] = None,
-    ):
+    ) -> None:
         self.network_manager = network_manager
         self.storage_path = storage_path or "test_accounts.json"
         self.logger = get_stellar_logger()
