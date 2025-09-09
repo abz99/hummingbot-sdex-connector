@@ -246,7 +246,9 @@ class StellarMainConfig(BaseModel):
     )
 
     @validator("networks")
-    def validate_default_network_exists(cls, v: Dict[StellarNetworkType, StellarNetworkConfig], values: Dict[str, Any]) -> Dict[StellarNetworkType, StellarNetworkConfig]:
+    def validate_default_network_exists(
+        cls, v: Dict[StellarNetworkType, StellarNetworkConfig], values: Dict[str, Any]
+    ) -> Dict[StellarNetworkType, StellarNetworkConfig]:
         """Ensure default network exists in networks configuration."""
         default_network = values.get("default_network")
         if default_network and default_network not in v:
@@ -256,7 +258,9 @@ class StellarMainConfig(BaseModel):
         return v
 
     @validator("well_known_assets")
-    def validate_asset_networks(cls, v: Dict[str, Dict[str, AssetConfig]], values: Dict[str, Any]) -> Dict[str, Dict[str, AssetConfig]]:
+    def validate_asset_networks(
+        cls, v: Dict[str, Dict[str, AssetConfig]], values: Dict[str, Any]
+    ) -> Dict[str, Dict[str, AssetConfig]]:
         """Validate that asset networks exist in network configuration."""
         # networks = values.get("networks", {})  # Removed unused variable
         for network_name in v.keys():
