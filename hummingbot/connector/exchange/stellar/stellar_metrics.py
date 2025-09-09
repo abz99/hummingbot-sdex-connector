@@ -45,7 +45,7 @@ class MetricDefinition:
     metric_type: MetricType
     labels: List[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.labels is None:
             self.labels = []
 
@@ -65,7 +65,7 @@ class StellarMetrics:
         # Start background tasks
         self._background_tasks: List[asyncio.Task] = []
 
-    def _init_core_metrics(self):
+    def _init_core_metrics(self) -> None:
         """Initialize core Stellar connector metrics."""
 
         # Network metrics
@@ -359,7 +359,7 @@ class StellarMetrics:
     # Network metrics methods
     def record_network_request(
         self, network: str, endpoint_type: str, status: str, duration: float
-    ):
+    ) -> None:
         """Record a network request."""
         self.network_requests_total.labels(
             network=network, endpoint_type=endpoint_type, status=status
@@ -368,36 +368,36 @@ class StellarMetrics:
             duration
         )
 
-    def record_network_error(self, network: str, endpoint_type: str, error_type: str):
+    def record_network_error(self, network: str, endpoint_type: str, error_type: str) -> None:
         """Record a network error."""
         self.network_errors_total.labels(
             network=network, endpoint_type=endpoint_type, error_type=error_type
         ).inc()
 
-    def set_active_connections(self, network: str, count: int):
+    def set_active_connections(self, network: str, count: int) -> None:
         """Set the number of active connections."""
         self.active_connections.labels(network=network).set(count)
 
     # Trading metrics methods
-    def record_order_placement(self, network: str, trading_pair: str, side: str, status: str):
+    def record_order_placement(self, network: str, trading_pair: str, side: str, status: str) -> None:
         """Record an order placement."""
         self.orders_placed_total.labels(
             network=network, trading_pair=trading_pair, side=side, status=status
         ).inc()
 
-    def record_order_fill(self, network: str, trading_pair: str, side: str, duration: float):
+    def record_order_fill(self, network: str, trading_pair: str, side: str, duration: float) -> None:
         """Record an order fill."""
         self.order_fill_duration.labels(
             network=network, trading_pair=trading_pair, side=side
         ).observe(duration)
 
-    def record_trading_volume(self, network: str, trading_pair: str, side: str, volume_xlm: float):
+    def record_trading_volume(self, network: str, trading_pair: str, side: str, volume_xlm: float) -> None:
         """Record trading volume."""
         self.trading_volume.labels(network=network, trading_pair=trading_pair, side=side).inc(
             volume_xlm
         )
 
-    def set_order_book_spread(self, network: str, trading_pair: str, spread_percent: float):
+    def set_order_book_spread(self, network: str, trading_pair: str, spread_percent: float) -> None:
         """Set the current order book spread."""
         self.order_book_spread.labels(network=network, trading_pair=trading_pair).set(
             spread_percent
