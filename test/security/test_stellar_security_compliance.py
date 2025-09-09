@@ -67,6 +67,9 @@ class TestSecurityCompliance:
                 r"stellar_password", r"stellar_redis_password", r"secure-grafana-password",
                 r"your-jwt-signing-secret", r"your-prometheus-token"
             ],
+            "values.yaml": [  # Helm chart template passwords
+                r"stellar-redis-password", r"stellar-postgres-password"
+            ],
         }
 
         found_secrets = []

@@ -42,7 +42,7 @@ class FriendbotConfig(BaseModel):
     funding_amount: Optional[int] = Field(None, ge=1, description="Funding amount in XLM")
 
     @validator("url")
-    def validate_url_if_enabled(cls, v, values):
+    def validate_url_if_enabled(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
         if values.get("enabled", False) and not v:
             raise ValueError("Friendbot URL is required when enabled=True")
         return v
@@ -57,7 +57,7 @@ class AssetConfig(BaseModel):
     verified: bool = Field(default=False, description="Whether asset is verified")
 
     @validator("issuer")
-    def validate_stellar_public_key(cls, v):
+    def validate_stellar_public_key(cls, v: str) -> str:
         """Validate Stellar public key format."""
         if not v.startswith("G") or len(v) != 56:
             raise ValueError("Invalid Stellar public key format")
@@ -246,7 +246,7 @@ class StellarMainConfig(BaseModel):
     )
 
     @validator("networks")
-    def validate_default_network_exists(cls, v, values):
+    def validate_default_network_exists(cls, v: Dict[StellarNetworkType, StellarNetworkConfig], values: Dict[str, Any]) -> Dict[StellarNetworkType, StellarNetworkConfig]:
         """Ensure default network exists in networks configuration."""
         default_network = values.get("default_network")
         if default_network and default_network not in v:
@@ -256,7 +256,7 @@ class StellarMainConfig(BaseModel):
         return v
 
     @validator("well_known_assets")
-    def validate_asset_networks(cls, v, values):
+    def validate_asset_networks(cls, v: Dict[str, Dict[str, AssetConfig]], values: Dict[str, Any]) -> Dict[str, Dict[str, AssetConfig]]:
         """Validate that asset networks exist in network configuration."""
         # networks = values.get("networks", {})  # Removed unused variable
         for network_name in v.keys():

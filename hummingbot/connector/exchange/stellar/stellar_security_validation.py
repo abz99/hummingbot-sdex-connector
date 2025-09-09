@@ -82,42 +82,42 @@ class SecurityValidator:
             "base64_string": re.compile(r"^[A-Za-z0-9+/]*={0,2}$"),
         }
 
-    def validate_stellar_public_key(self, public_key: str) -> bool:
+    def validate_stellar_public_key(self, public_key: Any) -> bool:
         """Validate Stellar public key format."""
         if not isinstance(public_key, str):
             return False
 
         return bool(self.patterns["stellar_public_key"].match(public_key))
 
-    def validate_stellar_secret_key(self, secret_key: str) -> bool:
+    def validate_stellar_secret_key(self, secret_key: Any) -> bool:
         """Validate Stellar secret key format."""
         if not isinstance(secret_key, str):
             return False
 
         return bool(self.patterns["stellar_secret_key"].match(secret_key))
 
-    def validate_key_id(self, key_id: str) -> bool:
+    def validate_key_id(self, key_id: Any) -> bool:
         """Validate key ID format."""
         if not isinstance(key_id, str):
             return False
 
         return bool(self.patterns["key_id"].match(key_id))
 
-    def validate_session_id(self, session_id: str) -> bool:
+    def validate_session_id(self, session_id: Any) -> bool:
         """Validate session ID format."""
         if not isinstance(session_id, str):
             return False
 
         return bool(self.patterns["session_id"].match(session_id))
 
-    def validate_derivation_path(self, path: str) -> bool:
+    def validate_derivation_path(self, path: Any) -> bool:
         """Validate BIP-44 derivation path."""
         if not isinstance(path, str):
             return False
 
         return bool(self.patterns["derivation_path"].match(path))
 
-    def validate_network_name(self, network: str) -> bool:
+    def validate_network_name(self, network: Any) -> bool:
         """Validate network name."""
         if not isinstance(network, str):
             return False
@@ -133,7 +133,7 @@ class SecurityValidator:
         length = len(str(value))
         return min_len <= length <= max_len
 
-    def sanitize_string(self, value: str, max_length: int = 256) -> str:
+    def sanitize_string(self, value: Any, max_length: int = 256) -> str:
         """Sanitize string input to prevent injection attacks."""
         if not isinstance(value, str):
             return ""
@@ -352,10 +352,10 @@ def require_validation(
     session_id: Optional[str] = None,
     network: Optional[str] = None,
     max_length: int = 256,
-) -> Callable[[Callable], Callable]:
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Decorator to add input validation to methods."""
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
             validator = SecurityValidator()
@@ -372,10 +372,10 @@ def require_validation(
 
 def require_rate_limit(
     operation: str, scope: RateLimitScope = RateLimitScope.GLOBAL
-) -> Callable[[Callable], Callable]:
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Decorator to add rate limiting to methods."""
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
             # Get rate limiter instance (would need to be injected or global)
