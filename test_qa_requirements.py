@@ -37,7 +37,7 @@ async def test_req_ord_001_order_placement():
     mock_obs = AsyncMock()
     
     # Mock asset manager to return supported assets
-    mock_asset.is_asset_supported = AsyncMock(return_value=True)
+    mock_asset.validate_asset = AsyncMock(return_value=True)
     
     # Mock chain interface for order submission
     mock_chain.create_manage_offer_transaction = AsyncMock()
@@ -50,7 +50,7 @@ async def test_req_ord_001_order_placement():
     mock_result.operations_results[0].offer_id = 12345
     mock_chain.submit_transaction.return_value = mock_result
     
-    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account")
+    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account", TEST_ISSUER_KEYPAIR)
     
     # Test order placement
     selling_asset = Asset.native()
@@ -77,9 +77,9 @@ async def test_req_ord_002_status_transitions():
     mock_chain = AsyncMock()
     mock_asset = AsyncMock()
     mock_obs = AsyncMock()
-    mock_asset.is_asset_supported = AsyncMock(return_value=True)
+    mock_asset.validate_asset = AsyncMock(return_value=True)
     
-    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account")
+    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account", TEST_ISSUER_KEYPAIR)
     
     # Create a test order directly
     order = EnhancedStellarOrder(
@@ -136,7 +136,7 @@ async def test_req_ord_003_cancellation_idempotency():
     mock_asset = AsyncMock()
     mock_obs = AsyncMock()
     
-    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account")
+    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account", TEST_ISSUER_KEYPAIR)
     
     # Create and track an order
     order_id = "test_order_idempotent"
@@ -180,7 +180,7 @@ async def test_req_ord_004_external_order_protection():
     mock_asset = AsyncMock()
     mock_obs = AsyncMock()
     
-    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account")
+    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account", TEST_ISSUER_KEYPAIR)
     
     # Try to cancel an external order (not in connector_order_ids)
     external_order_id = "external_order_not_ours"
@@ -203,7 +203,7 @@ async def test_req_ord_005_correlation_tracking():
     mock_chain = AsyncMock()
     mock_asset = AsyncMock()
     mock_obs = AsyncMock()
-    mock_asset.is_asset_supported = AsyncMock(return_value=True)
+    mock_asset.validate_asset = AsyncMock(return_value=True)
     
     # Mock transaction submission
     mock_result = Mock()
@@ -213,7 +213,7 @@ async def test_req_ord_005_correlation_tracking():
     mock_chain.create_manage_offer_transaction = AsyncMock()
     mock_chain.submit_transaction = AsyncMock(return_value=mock_result)
     
-    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account")
+    manager = ModernStellarOrderManager(mock_chain, mock_asset, mock_obs, "test_account", TEST_ISSUER_KEYPAIR)
     
     # Create order
     order = await manager.place_order(

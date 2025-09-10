@@ -6,6 +6,7 @@ QA_IDs: REQ-ORD-001, REQ-ORD-002, REQ-ORD-003, REQ-ORD-004, REQ-ORD-005
 """
 
 import pytest
+import pytest_asyncio
 from unittest.mock import AsyncMock, Mock, patch, call
 from decimal import Decimal
 from typing import Dict, Any, Optional
@@ -18,6 +19,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../src'))
 
 from hummingbot_stubs.core.data_type.common import OrderType, TradeType
 from hummingbot_stubs.core.data_type.order_candidate import OrderCandidate
+
+# Enable asyncio mode for all tests in this module
+pytestmark = pytest.mark.asyncio
 
 
 class MockStellarOrder:

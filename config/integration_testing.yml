@@ -1,0 +1,320 @@
+# Integration Testing Configuration
+# Configuration for Phase 4A Real-World Validation
+
+testing:
+  # Test environment configuration
+  environment:
+    name: "stellar_testnet_validation"
+    network: "testnet"
+    log_level: "INFO"
+    
+  # Stellar testnet configuration for integration testing
+  stellar_testnet:
+    network_passphrase: "Test SDF Network ; September 2015"
+    
+    # Primary endpoints
+    endpoints:
+      horizon:
+        primary: "https://horizon-testnet.stellar.org"
+        fallbacks:
+          - "https://horizon-testnet-1.stellar.org" 
+          - "https://horizon-testnet-2.stellar.org"
+        timeout: 30
+        max_retries: 3
+        
+      soroban:
+        primary: "https://soroban-testnet.stellar.org"
+        fallbacks:
+          - "https://soroban-testnet-1.stellar.org"
+        timeout: 25
+        max_retries: 3
+        
+      friendbot:
+        url: "https://friendbot.stellar.org"
+        funding_amount: 10000  # XLM for test accounts
+        
+    # Test assets for integration testing
+    test_assets:
+      USDC:
+        code: "USDC"
+        issuer: "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+        domain: "centre.io"
+        
+      TEST:
+        code: "TEST"  
+        issuer: "GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z"
+        domain: "testnet.stellar.org"
+        
+    # Trading pairs for testing
+    trading_pairs:
+      - "XLM-USDC"
+      - "XLM-TEST"
+      - "USDC-TEST"
+      
+  # Performance benchmarking configuration
+  performance:
+    # Throughput testing
+    throughput:
+      concurrent_requests: 50
+      min_success_rate: 0.9  # 90% success rate
+      min_throughput: 10     # requests per second
+      
+    # Latency testing  
+    latency:
+      request_count: 20
+      max_avg_latency: 2000   # milliseconds
+      max_single_latency: 5000 # milliseconds
+      
+    # Load testing
+    load_testing:
+      duration: 300  # 5 minutes
+      ramp_up: 60    # 1 minute ramp up
+      max_concurrent_users: 100
+      
+  # Security testing configuration
+  security:
+    # Key management testing
+    key_management:
+      test_key_generation: true
+      test_key_rotation: true
+      test_secure_storage: true
+      
+    # Transaction security testing
+    transaction_security:
+      test_signing: true
+      test_validation: true
+      test_replay_protection: true
+      
+    # Network security testing
+    network_security:
+      test_tls_verification: true
+      test_certificate_validation: true
+      test_rate_limiting: true
+      
+  # Error resilience testing
+  error_resilience:
+    # Network error simulation
+    network_errors:
+      timeout_scenarios: true
+      connection_failures: true
+      partial_responses: true
+      
+    # Invalid data handling
+    invalid_data:
+      malformed_responses: true
+      invalid_transactions: true
+      corrupt_data: true
+      
+    # Recovery testing
+    recovery:
+      failover_testing: true
+      circuit_breaker_testing: true
+      retry_logic_testing: true
+      
+  # Monitoring and observability testing
+  observability:
+    # Metrics collection testing
+    metrics:
+      test_metric_collection: true
+      test_metric_accuracy: true
+      test_metric_performance: true
+      
+    # Logging testing
+    logging:
+      test_structured_logging: true
+      test_log_levels: true
+      test_sensitive_data_filtering: true
+      
+    # Alerting testing
+    alerting:
+      test_error_alerts: true
+      test_performance_alerts: true
+      test_security_alerts: true
+      
+  # Integration validation scenarios
+  validation_scenarios:
+    # Basic functionality validation
+    basic_operations:
+      - name: "network_connectivity"
+        description: "Test basic network connectivity to all endpoints"
+        priority: "P0"
+        
+      - name: "account_operations" 
+        description: "Test account creation, funding, and management"
+        priority: "P0"
+        
+      - name: "trustline_operations"
+        description: "Test trustline creation and management"  
+        priority: "P0"
+        
+      - name: "order_operations"
+        description: "Test order placement, modification, and cancellation"
+        priority: "P0"
+        
+    # Advanced functionality validation
+    advanced_operations:
+      - name: "multi_asset_trading"
+        description: "Test trading across multiple asset pairs"
+        priority: "P1"
+        
+      - name: "high_frequency_operations"
+        description: "Test high-frequency order operations" 
+        priority: "P1"
+        
+      - name: "complex_transactions"
+        description: "Test complex multi-operation transactions"
+        priority: "P1"
+        
+      - name: "soroban_integration"
+        description: "Test Soroban smart contract interactions"
+        priority: "P2"
+        
+    # Security validation scenarios
+    security_operations:
+      - name: "secure_key_management"
+        description: "Test enterprise security framework"
+        priority: "P0"
+        
+      - name: "transaction_signing"
+        description: "Test secure transaction signing processes"
+        priority: "P0"
+        
+      - name: "audit_logging"
+        description: "Test security audit logging and monitoring"
+        priority: "P1"
+        
+    # Performance validation scenarios  
+    performance_operations:
+      - name: "throughput_benchmarks"
+        description: "Test system throughput under normal load"
+        priority: "P1"
+        
+      - name: "latency_benchmarks" 
+        description: "Test system response latency"
+        priority: "P1"
+        
+      - name: "stress_testing"
+        description: "Test system behavior under stress conditions"
+        priority: "P2"
+        
+    # Resilience validation scenarios
+    resilience_operations:
+      - name: "network_failover"
+        description: "Test network failover and recovery"
+        priority: "P0"
+        
+      - name: "error_handling"
+        description: "Test error handling and recovery mechanisms"
+        priority: "P0"
+        
+      - name: "circuit_breaker"
+        description: "Test circuit breaker functionality"
+        priority: "P1"
+        
+  # Test data configuration
+  test_data:
+    # Account configuration
+    accounts:
+      primary_test_account:
+        generate_random: true
+        initial_funding: 10000  # XLM
+        
+      secondary_test_account:
+        generate_random: true
+        initial_funding: 5000   # XLM
+        
+    # Order configuration for testing
+    orders:
+      small_orders:
+        min_amount: 1.0
+        max_amount: 10.0
+        
+      medium_orders:
+        min_amount: 10.0
+        max_amount: 100.0
+        
+      large_orders:
+        min_amount: 100.0
+        max_amount: 1000.0
+        
+    # Price ranges for testing
+    price_ranges:
+      conservative:
+        min_deviation: 0.01  # 1% from market
+        max_deviation: 0.05  # 5% from market
+        
+      moderate:
+        min_deviation: 0.05  # 5% from market
+        max_deviation: 0.15  # 15% from market
+        
+  # Test execution configuration
+  execution:
+    # Parallel test execution
+    parallel:
+      enabled: true
+      max_workers: 4
+      
+    # Test timeouts
+    timeouts:
+      individual_test: 300    # 5 minutes per test
+      full_suite: 3600       # 1 hour for full suite
+      
+    # Retry configuration
+    retries:
+      max_retries: 3
+      retry_delay: 5  # seconds
+      
+    # Test reporting
+    reporting:
+      generate_html_report: true
+      generate_json_report: true
+      include_performance_metrics: true
+      include_coverage_report: true
+      
+  # Environment cleanup
+  cleanup:
+    # Account cleanup
+    cleanup_test_accounts: true
+    cleanup_test_orders: true
+    cleanup_test_trustlines: false  # Keep for analysis
+    
+    # Data cleanup
+    cleanup_logs: false  # Keep for debugging
+    cleanup_metrics: false  # Keep for analysis
+    
+# Monitoring configuration during testing
+monitoring:
+  # Real-time monitoring
+  realtime:
+    enabled: true
+    update_interval: 5  # seconds
+    
+  # Performance monitoring
+  performance:
+    track_response_times: true
+    track_throughput: true
+    track_error_rates: true
+    
+  # Resource monitoring
+  resources:
+    track_memory_usage: true
+    track_cpu_usage: true
+    track_network_usage: true
+    
+# Alert configuration during testing
+alerts:
+  # Performance alerts
+  performance:
+    high_latency_threshold: 3000  # milliseconds
+    low_throughput_threshold: 5   # requests/second
+    high_error_rate_threshold: 0.1 # 10%
+    
+  # Security alerts
+  security:
+    failed_authentication_threshold: 5
+    suspicious_activity_threshold: 10
+    
+  # System alerts
+  system:
+    high_memory_usage_threshold: 0.8  # 80%
+    high_cpu_usage_threshold: 0.8     # 80%
