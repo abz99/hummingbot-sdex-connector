@@ -461,46 +461,46 @@ class TestHealthMonitoring:
         monitor.remove_endpoint("https://test.com")
         assert "https://test.com" not in monitor.endpoint_health
 
-    @pytest.mark.skip(reason="Async mock configuration complex - will be fixed in follow-up PR")
     @pytest.mark.asyncio
     async def test_health_check_horizon(self):
         """Test Horizon health check."""
-        import unittest.mock
         from hummingbot.connector.exchange.stellar.stellar_health_monitor import (
             HorizonHealthChecker,
             HealthStatus,
         )
 
-        # Create health checker (no constructor arguments needed)
+        # Create health checker
         health_checker = HorizonHealthChecker()
 
-        # Mock aiohttp session with proper context manager
-        with unittest.mock.patch("aiohttp.ClientSession") as mock_session_class:
-            mock_session = AsyncMock()
-            mock_session_class.return_value = mock_session
+        # Create a simple mock session that behaves properly
+        mock_session = Mock()
 
-            # Create mock response
-            mock_response = AsyncMock()
-            mock_response.status = 200
-            mock_response.json = AsyncMock(
-                return_value={
-                    "horizon_version": "2.0.0",
-                    "core_version": "19.0.0",
-                    "current_protocol_version": 19,
-                    "network_passphrase": "Public Global Stellar Network ; September 2015",
-                }
-            )
+        # Create mock response with proper async context manager behavior
+        mock_response = Mock()
+        mock_response.status = 200
+        mock_response.json = AsyncMock(
+            return_value={
+                "horizon_version": "2.0.0",
+                "core_version": "19.0.0",
+                "current_protocol_version": 19,
+                "network_passphrase": "Public Global Stellar Network ; September 2015",
+            }
+        )
 
-            # Configure async context manager
-            mock_session.get.return_value.__aenter__.return_value = mock_response
-            mock_session.get.return_value.__aexit__.return_value = None
+        # Create a proper async context manager
+        async_context_manager = AsyncMock()
+        async_context_manager.__aenter__ = AsyncMock(return_value=mock_response)
+        async_context_manager.__aexit__ = AsyncMock(return_value=None)
 
-            # Test health check using the correct method signature
-            result = await health_checker.check_health("https://horizon.stellar.org", mock_session)
+        # Configure the session.get() to return our async context manager
+        mock_session.get = Mock(return_value=async_context_manager)
 
-            # Verify result
-            assert result.status == HealthStatus.HEALTHY
-            assert result.response_time > 0
+        # Test health check
+        result = await health_checker.check_health("https://horizon.stellar.org", mock_session)
+
+        # Verify result
+        assert result.status == HealthStatus.HEALTHY
+        assert result.response_time > 0
 
         print("✅ Horizon health check test completed")
 
@@ -514,9 +514,15 @@ class TestHealthMonitoring:
 
         checker = HorizonHealthChecker()
 
-        # Mock failed response
+        # Mock failed response - need to mock the async context manager properly
         mock_session = Mock()
-        mock_session.get = AsyncMock(side_effect=aiohttp.ClientError("Connection failed"))
+
+        # Create a mock async context manager that raises exception on entry
+        mock_context_manager = AsyncMock()
+        mock_context_manager.__aenter__.side_effect = aiohttp.ClientError("Connection failed")
+        mock_context_manager.__aexit__ = AsyncMock(return_value=None)
+
+        mock_session.get = Mock(return_value=mock_context_manager)
 
         result = await checker.check_health("https://bad-endpoint.com", mock_session)
 

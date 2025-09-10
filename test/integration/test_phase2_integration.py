@@ -152,10 +152,10 @@ class TestPhase2ComponentValidation:
             pytest.skip(f"Stellar error handler module not available: {e}")
 
 
-@pytest.mark.asyncio
 class TestPhase2IntegrationPatterns:
     """Test Phase 2 integration patterns work correctly."""
 
+    @pytest.mark.asyncio
     async def test_mock_integration_flow(self):
         """Test mocked integration flow to validate patterns."""
 

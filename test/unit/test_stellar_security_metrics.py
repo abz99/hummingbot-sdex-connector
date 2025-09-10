@@ -306,7 +306,6 @@ class TestConvenienceFunctions:
         assert "🔒 SECURITY REQUIREMENTS TRACKING" in section
 
 
-@pytest.mark.asyncio
 class TestIntegration:
     """Integration tests for security metrics system."""
 
