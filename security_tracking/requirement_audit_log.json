@@ -2095,5 +2095,77 @@
     "completion_percentage": 100,
     "user": "dev_team",
     "notes": "Finished"
+  },
+  {
+    "timestamp": 1757488086.0704567,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757488086.1067045,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757488086.1253364,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757488086.1451144,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757489014.1690338,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757489014.204017,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757489014.2227657,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757489014.2440174,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
   }
 ]
