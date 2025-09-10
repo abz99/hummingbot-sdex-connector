@@ -8,7 +8,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import auto, Enum
-from typing import Any, Awaitable, Callable, Dict, Optional, Type, Union
+from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Type, Union
 
 import aiohttp
 from stellar_sdk.exceptions import (
@@ -418,7 +418,7 @@ class StellarErrorManager:
         # Register default handlers
         self._register_default_handlers()
 
-    def _register_default_handlers(self):
+    def _register_default_handlers(self) -> None:
         """Register default error recovery handlers."""
         self.handlers[RecoveryStrategy.RETRY_WITH_BACKOFF] = RetryWithBackoffHandler()
         self.handlers[RecoveryStrategy.RETRY_WITH_JITTER] = RetryWithJitterHandler()
@@ -437,7 +437,7 @@ class StellarErrorManager:
         error: Exception,
         context: ErrorContext,
         operation_callback: Optional[Callable[[], Awaitable[Any]]] = None,
-    ) -> tuple[bool, Any]:
+    ) -> Tuple[bool, Any]:
         """
         Handle an error with appropriate recovery strategy.
 

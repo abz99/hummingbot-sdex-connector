@@ -359,7 +359,7 @@ class HardwareWalletManager:
         # Initialize supported wallet types
         self._initialize_wallet_support()
 
-    def _initialize_wallet_support(self):
+    def _initialize_wallet_support(self) -> None:
         """Initialize hardware wallet support."""
         try:
             # Check for Ledger support
@@ -502,7 +502,7 @@ class HardwareWalletManager:
             )
             return None
 
-    async def disconnect_all(self):
+    async def disconnect_all(self) -> None:
         """Disconnect all connected hardware wallets."""
         for wallet_name, wallet in self._wallets.items():
             try:

@@ -6,7 +6,7 @@ Production-ready implementation with connection pooling and failover.
 import asyncio
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
+from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union
 
 import aiohttp
 from stellar_sdk import Account, Asset, Keypair, Network, ServerAsync, TransactionBuilder

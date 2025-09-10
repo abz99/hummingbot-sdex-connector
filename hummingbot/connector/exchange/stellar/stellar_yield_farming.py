@@ -173,9 +173,9 @@ class StellarYieldFarming:
         self._opportunities: Dict[str, YieldOpportunity] = {}
 
         # Background tasks
-        self._monitoring_tasks: Dict[str, asyncio.Task] = {}
-        self._compound_task: Optional[asyncio.Task] = None
-        self._opportunity_scanner_task: Optional[asyncio.Task] = None
+        self._monitoring_tasks: Dict[str, asyncio.Task[None]] = {}
+        self._compound_task: Optional[asyncio.Task[None]] = None
+        self._opportunity_scanner_task: Optional[asyncio.Task[None]] = None
 
         # Performance tracking
         self._total_rewards_earned: Dict[str, Decimal] = defaultdict(lambda: Decimal("0"))

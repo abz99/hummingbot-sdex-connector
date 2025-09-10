@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 import yaml
 from stellar_sdk import Account, Asset, Keypair, Network, Server
@@ -87,7 +87,7 @@ class EnhancedStellarNetworkManager:
         self.health_status: Dict[StellarNetworkType, NetworkHealth] = {}
 
         # Background tasks
-        self._background_tasks: List[asyncio.Task] = []
+        self._background_tasks: List[asyncio.Task[None]] = []
         self._running = False
 
         # Load and validate configuration
@@ -556,7 +556,7 @@ class EnhancedStellarNetworkManager:
 
     async def verify_asset(
         self, asset_code: str, issuer: str, network: Optional[StellarNetworkType] = None
-    ):
+    ) -> None:
         """Verify an asset using the asset verification system."""
         if not self.asset_verifier:
             raise RuntimeError("Asset verification is not enabled")

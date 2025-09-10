@@ -18,7 +18,7 @@ class MemoryKeyStore:
     """In-memory key storage (development only)."""
 
     def __init__(self) -> None:
-        self._keys: Dict[str, tuple[bytes, KeyMetadata]] = {}
+        self._keys: Dict[str, Tuple[bytes, KeyMetadata]] = {}
         self.logger = get_stellar_logger()
 
     async def store_key(self, key_id: str, key_data: bytes, metadata: KeyMetadata) -> bool:

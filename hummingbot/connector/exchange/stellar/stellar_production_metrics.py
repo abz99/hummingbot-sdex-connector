@@ -103,7 +103,7 @@ class StellarProductionMetricsFramework:
         self.anomaly_detectors: Dict[str, Callable] = {}
 
         # Background tasks
-        self._background_tasks: List[asyncio.Task] = []
+        self._background_tasks: List[asyncio.Task[None]] = []
         self._running = False
         self._collection_interval = 30  # seconds
 
@@ -331,7 +331,7 @@ class StellarProductionMetricsFramework:
             "user_behavior_anomaly": self._detect_user_behavior_anomaly,
         }
 
-    async def start_production_metrics_collection(self):
+    async def start_production_metrics_collection(self) -> None:
         """Start production metrics collection."""
         if self._running:
             return
@@ -358,7 +358,7 @@ class StellarProductionMetricsFramework:
             anomaly_detectors=len(self.anomaly_detectors),
         )
 
-    async def stop_production_metrics_collection(self):
+    async def stop_production_metrics_collection(self) -> None:
         """Stop production metrics collection."""
         if not self._running:
             return
@@ -374,7 +374,7 @@ class StellarProductionMetricsFramework:
 
         self.logger.info("Production metrics collection stopped", category=LogCategory.METRICS)
 
-    async def _collect_business_kpis(self):
+    async def _collect_business_kpis(self) -> None:
         """Collect business KPI metrics."""
         while self._running:
             try:
@@ -403,7 +403,7 @@ class StellarProductionMetricsFramework:
                 )
                 await asyncio.sleep(600)
 
-    async def _collect_technical_slas(self):
+    async def _collect_technical_slas(self) -> None:
         """Collect technical SLA metrics."""
         while self._running:
             try:
@@ -430,7 +430,7 @@ class StellarProductionMetricsFramework:
                 )
                 await asyncio.sleep(120)
 
-    async def _collect_capacity_metrics(self):
+    async def _collect_capacity_metrics(self) -> None:
         """Collect capacity planning metrics."""
         while self._running:
             try:
@@ -460,7 +460,7 @@ class StellarProductionMetricsFramework:
                 )
                 await asyncio.sleep(240)
 
-    async def _collect_cost_metrics(self):
+    async def _collect_cost_metrics(self) -> None:
         """Collect cost optimization metrics."""
         while self._running:
             try:
@@ -488,7 +488,7 @@ class StellarProductionMetricsFramework:
                 )
                 await asyncio.sleep(1200)
 
-    async def _run_anomaly_detection(self):
+    async def _run_anomaly_detection(self) -> None:
         """Run anomaly detection algorithms."""
         while self._running:
             try:
@@ -520,7 +520,7 @@ class StellarProductionMetricsFramework:
                 )
                 await asyncio.sleep(360)
 
-    async def _generate_predictive_insights(self):
+    async def _generate_predictive_insights(self) -> None:
         """Generate predictive insights and forecasts."""
         while self._running:
             try:
@@ -620,7 +620,7 @@ class StellarProductionMetricsFramework:
             achievement_percentage=(kpi.current_value / kpi.target_value) * 100,
         )
 
-    async def _check_kpi_thresholds(self, kpi_name: str, kpi: BusinessKPI):
+    async def _check_kpi_thresholds(self, kpi_name: str, kpi: BusinessKPI) -> None:
         """Check KPI threshold violations and trigger alerts."""
         if kpi.current_value <= kpi.critical_threshold:
             await self._trigger_kpi_alert(
@@ -633,7 +633,7 @@ class StellarProductionMetricsFramework:
 
     async def _trigger_kpi_alert(
         self, kpi_name: str, kpi: BusinessKPI, severity: AlertSeverity, message: str
-    ):
+    ) -> None:
         """Trigger KPI threshold alert."""
         alert_context = {
             "kpi_name": kpi_name,
@@ -710,7 +710,7 @@ class StellarProductionMetricsFramework:
         """Detect user behavior anomalies."""
         return 0.3  # Mock anomaly score
 
-    async def _handle_anomaly_alert(self, detector_name: str, score: float):
+    async def _handle_anomaly_alert(self, detector_name: str, score: float) -> None:
         """Handle high anomaly score alert."""
         self.logger.warning(
             f"Anomaly detected: {detector_name}",
@@ -730,7 +730,7 @@ class StellarProductionMetricsFramework:
         return {"predicted_cost": 120.0, "accuracy": 0.78, "confidence": 0.85}
 
     @asynccontextmanager
-    async def track_business_operation(self, operation_name: str, business_context: Dict[str, Any]):
+    async def track_business_operation(self, operation_name: str, business_context: Dict[str, Any]) -> None:
         """Context manager for tracking business operations."""
         start_time = time.time()
         operation_id = f"{operation_name}_{int(start_time)}"

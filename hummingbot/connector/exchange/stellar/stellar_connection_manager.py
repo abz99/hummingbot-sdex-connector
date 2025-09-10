@@ -120,11 +120,11 @@ class StellarConnectionManager:
         self._circuit_breakers: Dict[str, Dict[str, Any]] = {}
 
         # Background tasks
-        self._cleanup_task: Optional[asyncio.Task] = None
-        self._metrics_task: Optional[asyncio.Task] = None
+        self._cleanup_task: Optional[asyncio.Task[None]] = None
+        self._metrics_task: Optional[asyncio.Task[None]] = None
         self._running = False
 
-    async def start(self):
+    async def start(self) -> None:
         """Start the connection manager."""
         if self._running:
             return
@@ -142,7 +142,7 @@ class StellarConnectionManager:
             load_balance_strategy=self.load_balance_strategy.name,
         )
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop the connection manager and clean up resources."""
         if not self._running:
             return
@@ -487,7 +487,7 @@ class StellarConnectionManager:
 
     async def _update_request_metrics(
         self, service_name: str, endpoint: EndpointConfig, success: bool, response_time: float
-    ):
+    ) -> None:
         """Update request metrics."""
         endpoint_key = f"{service_name}:{endpoint.url}"
         metrics = self.connection_metrics.get(endpoint_key, ConnectionMetrics())
@@ -515,7 +515,7 @@ class StellarConnectionManager:
         status = "success" if success else "error"
         self.metrics.record_network_request(service_name, "http", status, response_time)
 
-    async def _connection_cleanup_loop(self):
+    async def _connection_cleanup_loop(self) -> None:
         """Background task to clean up stale connections."""
         while self._running:
             try:
@@ -534,7 +534,7 @@ class StellarConnectionManager:
                 )
                 await asyncio.sleep(60)
 
-    async def _metrics_collection_loop(self):
+    async def _metrics_collection_loop(self) -> None:
         """Background task to collect and report metrics."""
         while self._running:
             try:
@@ -552,7 +552,7 @@ class StellarConnectionManager:
                 await asyncio.sleep(30)
 
     # Request tracing callbacks
-    async def _on_request_start(self, session, trace_config_ctx, params):
+    async def _on_request_start(self, session, trace_config_ctx, params) -> None:
         """Called when request starts."""
         trace_config_ctx.start_time = time.time()
 
@@ -563,7 +563,7 @@ class StellarConnectionManager:
         if endpoint_key in self.connection_metrics:
             self.connection_metrics[endpoint_key].active_connections += 1
 
-    async def _on_request_end(self, session, trace_config_ctx, params):
+    async def _on_request_end(self, session, trace_config_ctx, params) -> None:
         """Called when request ends."""
         if hasattr(trace_config_ctx, "start_time"):
             # duration = time.time() - trace_config_ctx.start_time
@@ -571,7 +571,7 @@ class StellarConnectionManager:
             # Update metrics would be handled in the main request method
             pass
 
-    async def _on_request_exception(self, session, trace_config_ctx, params):
+    async def _on_request_exception(self, session, trace_config_ctx, params) -> None:
         """Called when request raises an exception."""
         # Update active connections
         service_name = getattr(trace_config_ctx, "service_name", "unknown")
@@ -582,13 +582,13 @@ class StellarConnectionManager:
                 0, self.connection_metrics[endpoint_key].active_connections - 1
             )
 
-    async def _on_connection_create(self, session, trace_config_ctx, params):
+    async def _on_connection_create(self, session, trace_config_ctx, params) -> None:
         """Called when new connection is being created."""
         self.logger.debug(
             f"Creating new connection to {params.host}:{params.port}", category=LogCategory.NETWORK
         )
 
-    async def _on_connection_created(self, session, trace_config_ctx, params):
+    async def _on_connection_created(self, session, trace_config_ctx, params) -> None:
         """Called when new connection is created."""
         self.logger.debug(
             f"Connection created to {params.host}:{params.port}", category=LogCategory.NETWORK

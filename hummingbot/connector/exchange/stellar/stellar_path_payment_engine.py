@@ -9,7 +9,7 @@ import time
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Tuple
 
 from stellar_sdk import Asset
 
@@ -109,7 +109,7 @@ class EnhancedPathPaymentEngine:
         self._mev_protection_enabled = True
         self._private_mempool_enabled = False
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize path payment engine."""
         try:
             # Initialize DEX endpoints
@@ -134,7 +134,7 @@ class EnhancedPathPaymentEngine:
             await self.observability.log_error("path_engine_init_failed", e)
             raise
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup path payment engine resources."""
         self._route_cache.clear()
         self._arbitrage_cache.clear()
@@ -1053,7 +1053,7 @@ class EnhancedPathPaymentEngine:
 
         return filtered[:10]  # Return top 10 opportunities
 
-    async def _initialize_dex_endpoints(self):
+    async def _initialize_dex_endpoints(self) -> None:
         """Initialize DEX endpoint configuration."""
         # Implementation stub
         self._dex_endpoints = {
@@ -1062,7 +1062,7 @@ class EnhancedPathPaymentEngine:
             "phoenix": "soroban",
         }
 
-    async def _load_liquidity_sources(self):
+    async def _load_liquidity_sources(self) -> None:
         """Load available liquidity sources."""
         # Implementation stub
         self._liquidity_sources = {
@@ -1070,7 +1070,7 @@ class EnhancedPathPaymentEngine:
             "amm_pools": {"type": "liquidity_pool", "active": True},
         }
 
-    async def _setup_route_monitoring(self):
+    async def _setup_route_monitoring(self) -> None:
         """Setup real-time route monitoring."""
         # Implementation stub
         pass

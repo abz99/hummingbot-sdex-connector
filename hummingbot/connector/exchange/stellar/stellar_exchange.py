@@ -6,7 +6,7 @@ Production-ready implementation with enhanced error handling and observability.
 import asyncio
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 # Hummingbot imports (using stubs for development)
 from src.hummingbot_stubs.connector.exchange_base import ExchangeBase
@@ -79,7 +79,7 @@ class StellarExchange(ExchangeBase):
         self._ready: bool = False
         self._last_timestamp: Optional[float] = None
 
-    async def start_network(self):
+    async def start_network(self) -> None:
         """Initialize all components and establish network connections."""
         try:
             # Initialize observability first
@@ -129,7 +129,7 @@ class StellarExchange(ExchangeBase):
             await self._error_handler.handle_startup_error(e)
             raise
 
-    async def stop_network(self):
+    async def stop_network(self) -> None:
         """Gracefully shut down all components."""
         self._ready = False
 
@@ -144,7 +144,7 @@ class StellarExchange(ExchangeBase):
         if self._observability:
             await self._observability.stop()
 
-    def _get_stellar_rate_limits(self) -> Dict:
+    def _get_stellar_rate_limits(self) -> Dict[str, Any]:
         """Define rate limits for Stellar API endpoints."""
         return {
             "horizon": {"requests_per_second": 100},

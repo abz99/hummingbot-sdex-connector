@@ -152,7 +152,7 @@ class StellarObservabilityFramework:
         self.health_status: Dict[str, HealthCheckResult] = {}
 
         # Background tasks
-        self._background_tasks: List[asyncio.Task] = []
+        self._background_tasks: List[asyncio.Task[None]] = []
         self._running = False
 
         # Performance tracking
@@ -333,7 +333,7 @@ class StellarObservabilityFramework:
         self.health_checks[name] = check_func
         self.logger.info(f"Added health check: {name}", category=LogCategory.HEALTH_CHECK)
 
-    async def start_observability_system(self):
+    async def start_observability_system(self) -> None:
         """Start the production observability system."""
         if self._running:
             return
@@ -396,7 +396,7 @@ class StellarObservabilityFramework:
             **(context or {}),
         )
 
-    async def stop_observability_system(self):
+    async def stop_observability_system(self) -> None:
         """Stop the observability system."""
         if not self._running:
             return
@@ -419,7 +419,7 @@ class StellarObservabilityFramework:
 
         self.logger.info("Observability system stopped", category=LogCategory.METRICS)
 
-    async def _monitor_alerts(self):
+    async def _monitor_alerts(self) -> None:
         """Monitor metrics for alert conditions."""
         while self._running:
             try:
@@ -431,7 +431,7 @@ class StellarObservabilityFramework:
                 )
                 await asyncio.sleep(60)
 
-    async def _check_alert_conditions(self):
+    async def _check_alert_conditions(self) -> None:
         """Check all alert rule conditions."""
         current_time = time.time()
 
@@ -494,7 +494,7 @@ class StellarObservabilityFramework:
         # For now, return a mock value or query the metric from our registry
         return 0.0
 
-    async def _fire_alert(self, alert: Alert):
+    async def _fire_alert(self, alert: Alert) -> None:
         """Fire an alert."""
         self.active_alerts[alert.rule_name] = alert
 
@@ -525,7 +525,7 @@ class StellarObservabilityFramework:
                     "Error in alert callback", category=LogCategory.ERROR_HANDLING, exception=e
                 )
 
-    async def _resolve_alert(self, rule_name: str):
+    async def _resolve_alert(self, rule_name: str) -> None:
         """Resolve an active alert."""
         if rule_name in self.active_alerts:
             # alert = self.active_alerts[rule_name]  # Unused
@@ -537,7 +537,7 @@ class StellarObservabilityFramework:
                 alert_rule=rule_name,
             )
 
-    async def _run_health_checks(self):
+    async def _run_health_checks(self) -> None:
         """Run health checks periodically."""
         while self._running:
             try:
@@ -549,7 +549,7 @@ class StellarObservabilityFramework:
                 )
                 await asyncio.sleep(120)
 
-    async def _execute_health_checks(self):
+    async def _execute_health_checks(self) -> None:
         """Execute all health checks."""
         for name, check_func in self.health_checks.items():
             try:
@@ -673,7 +673,7 @@ class StellarObservabilityFramework:
                 message=f"Metrics system error: {e}",
             )
 
-    async def _collect_performance_metrics(self):
+    async def _collect_performance_metrics(self) -> None:
         """Collect performance metrics periodically."""
         while self._running:
             try:
@@ -713,7 +713,7 @@ class StellarObservabilityFramework:
                 )
                 await asyncio.sleep(60)
 
-    async def _update_system_metrics(self):
+    async def _update_system_metrics(self) -> None:
         """Update system-level metrics."""
         while self._running:
             try:
@@ -733,7 +733,7 @@ class StellarObservabilityFramework:
                 await asyncio.sleep(300)
 
     @asynccontextmanager
-    async def observe_operation(self, operation_name: str):
+    async def observe_operation(self, operation_name: str) -> None:
         """Context manager to observe operation performance."""
         start_time = time.time()
         operation_id = f"{operation_name}_{int(start_time)}"
@@ -790,7 +790,7 @@ class StellarObservabilityFramework:
             "system_uptime": time.time() - self.performance_metrics["startup_time"],
         }
 
-    async def register_qa_alerts(self):
+    async def register_qa_alerts(self) -> None:
         """Register QA-specific alert rules."""
         qa_alert_rules = {
             "qa_coverage_low": AlertRule(
@@ -839,7 +839,7 @@ class StellarObservabilityFramework:
             await self.register_alert_rule(rule)
             self.logger.info(f"Registered QA alert rule: {rule_name}")
 
-    async def handle_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]):
+    async def handle_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]) -> None:
         """Handle QA-specific observability events."""
         try:
             self.observability_events.labels(event_type=event_type.value, status="triggered").inc()
@@ -872,7 +872,7 @@ class StellarObservabilityFramework:
             self.logger.error(f"Error handling QA event {event_type.value}: {str(e)}")
             self.observability_events.labels(event_type=event_type.value, status="error").inc()
 
-    async def _handle_coverage_alert(self, context: Dict[str, Any]):
+    async def _handle_coverage_alert(self, context: Dict[str, Any]) -> None:
         """Handle low coverage alerts."""
         coverage_percentage = context.get("coverage_percentage", 0)
         module = context.get("module", "unknown")
@@ -887,7 +887,7 @@ class StellarObservabilityFramework:
 
         await self.fire_alert(alert)
 
-    async def _handle_test_failure_alert(self, context: Dict[str, Any]):
+    async def _handle_test_failure_alert(self, context: Dict[str, Any]) -> None:
         """Handle test failure alerts."""
         success_rate = context.get("success_rate", 0)
         test_suite = context.get("test_suite", "unknown")
@@ -902,7 +902,7 @@ class StellarObservabilityFramework:
 
         await self.fire_alert(alert)
 
-    async def _handle_quality_alert(self, context: Dict[str, Any]):
+    async def _handle_quality_alert(self, context: Dict[str, Any]) -> None:
         """Handle code quality alerts."""
         quality_score = context.get("quality_score", 0)
 
@@ -916,7 +916,7 @@ class StellarObservabilityFramework:
 
         await self.fire_alert(alert)
 
-    async def _handle_compliance_alert(self, context: Dict[str, Any]):
+    async def _handle_compliance_alert(self, context: Dict[str, Any]) -> None:
         """Handle compliance alerts."""
         requirement_id = context.get("requirement_id", "unknown")
         category = context.get("category", "unknown")
@@ -931,7 +931,7 @@ class StellarObservabilityFramework:
 
         await self.fire_alert(alert)
 
-    async def _handle_defect_alert(self, context: Dict[str, Any]):
+    async def _handle_defect_alert(self, context: Dict[str, Any]) -> None:
         """Handle defect rate alerts."""
         defect_rate = context.get("defect_rate", 0)
         severity = context.get("severity", "unknown")
@@ -946,7 +946,7 @@ class StellarObservabilityFramework:
 
         await self.fire_alert(alert)
 
-    async def _handle_stale_metrics_alert(self, context: Dict[str, Any]):
+    async def _handle_stale_metrics_alert(self, context: Dict[str, Any]) -> None:
         """Handle stale metrics alerts."""
         last_update = context.get("last_update", "unknown")
 

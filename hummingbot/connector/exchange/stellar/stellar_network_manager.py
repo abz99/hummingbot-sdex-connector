@@ -8,7 +8,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 import aiohttp
 import yaml
@@ -77,7 +77,7 @@ class StellarNetworkConfig:
     native_asset: str
     rate_limits: Dict[str, int]
     friendbot: Optional[Dict[str, Any]] = None
-    well_known_assets: Dict[str, Any] = field(default_factory=dict)
+    well_known_assets: Dict[str, Any] = field(default_factory=Dict[str, Any])
 
 
 class StellarNetworkManager:
@@ -92,7 +92,7 @@ class StellarNetworkManager:
         self.health_status: Dict[StellarNetwork, NetworkHealth] = {}
 
         # Connection management
-        self._health_check_task: Optional[asyncio.Task] = None
+        self._health_check_task: Optional[asyncio.Task[None]] = None
         self._session: Optional[aiohttp.ClientSession] = None
 
         # Performance tracking

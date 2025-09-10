@@ -65,7 +65,7 @@ class EnterpriseSecurityFramework:
         # Hardware wallet connections
         self._hw_wallet_connections: Dict[str, Any] = {}
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize security framework and connect to providers."""
         try:
             # Initialize based on configuration
@@ -86,7 +86,7 @@ class EnterpriseSecurityFramework:
             await self.observability.log_error("security_initialization_failed", e)
             raise
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup security resources."""
         # Cleanup connections to security providers
         for provider, client in self._provider_clients.items():

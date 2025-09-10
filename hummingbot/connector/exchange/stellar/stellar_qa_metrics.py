@@ -334,7 +334,7 @@ class StellarQAMetricsCollector:
 
         return results
 
-    async def update_monitoring_metrics(self, results: List[QAMetricResult]):
+    async def update_monitoring_metrics(self, results: List[QAMetricResult]) -> None:
         """Update the monitoring system with collected QA metrics."""
 
         for result in results:

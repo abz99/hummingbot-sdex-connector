@@ -73,7 +73,7 @@ class AssetInventory:
     average_cost: Decimal
     unrealized_pnl: Decimal
     last_rebalance: float = field(default_factory=time.time)
-    price_history: deque = field(default_factory=lambda: deque(maxlen=100))
+    price_history: deque[Any] = field(default_factory=lambda: deque(maxlen=100))
     volatility: Decimal = field(default=Decimal("0"))
 
     @property
@@ -192,14 +192,14 @@ class StellarLiquidityManagement:
         self._spread_data: Dict[str, deque] = defaultdict(lambda: deque(maxlen=100))
 
         # Performance tracking
-        self._metrics_history: deque = deque(maxlen=1440)  # 24 hours at 1-minute intervals
+        self._metrics_history: deque[Any] = deque(maxlen=1440)  # 24 hours at 1-minute intervals
         self._trade_history: List[Dict] = []
         self._rebalance_history: List[Dict] = []
 
         # Background tasks
-        self._inventory_monitor_task: Optional[asyncio.Task] = None
-        self._rebalance_task: Optional[asyncio.Task] = None
-        self._metrics_task: Optional[asyncio.Task] = None
+        self._inventory_monitor_task: Optional[asyncio.Task[None]] = None
+        self._rebalance_task: Optional[asyncio.Task[None]] = None
+        self._metrics_task: Optional[asyncio.Task[None]] = None
 
         # Configuration
         self._inventory_targets = {
@@ -264,7 +264,7 @@ class StellarLiquidityManagement:
             self.logger().error(f"Failed to initialize inventories: {e}")
             raise
 
-    def _parse_asset_from_balance(self, balance: Dict) -> Optional[Asset]:
+    def _parse_asset_from_balance(self, balance: Dict[str, Any]) -> Optional[Asset]:
         """Parse Stellar asset from balance record"""
         try:
             if balance["asset_type"] == "native":
@@ -279,7 +279,7 @@ class StellarLiquidityManagement:
             self.logger().warning(f"Failed to parse asset from balance: {e}")
             return None
 
-    async def _create_inventory(self, asset: Asset, balance: Dict) -> AssetInventory:
+    async def _create_inventory(self, asset: Asset, balance: Dict[str, Any]) -> AssetInventory:
         """Create inventory object for asset"""
         try:
             total_balance = Decimal(balance["balance"])
@@ -413,7 +413,7 @@ class StellarLiquidityManagement:
         except Exception as e:
             self.logger().warning(f"Failed to update inventories: {e}")
 
-    def _calculate_volatility(self, prices: deque) -> Decimal:
+    def _calculate_volatility(self, prices: deque[Any]) -> Decimal:
         """Calculate price volatility using standard deviation"""
         try:
             if len(prices) < 2:

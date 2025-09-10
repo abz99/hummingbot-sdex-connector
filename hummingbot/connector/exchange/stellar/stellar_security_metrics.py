@@ -9,9 +9,10 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from enum import auto, Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from .stellar_logging import get_stellar_logger, LogCategory
+from decimal import Decimal
 
 
 class RequirementStatus(Enum):
@@ -204,7 +205,7 @@ class SecurityRequirementsTracker:
         if not self.requirements:
             self._initialize_default_requirements()
 
-    def _load_requirements(self):
+    def _load_requirements(self) -> None:
         """Load requirements from persistent storage."""
         if self.requirements_file.exists():
             try:
@@ -229,7 +230,7 @@ class SecurityRequirementsTracker:
                     exception=e,
                 )
 
-    def _load_metrics(self):
+    def _load_metrics(self) -> None:
         """Load metrics from persistent storage."""
         if self.metrics_file.exists():
             try:
@@ -249,7 +250,7 @@ class SecurityRequirementsTracker:
                     exception=e,
                 )
 
-    def _save_requirements(self):
+    def _save_requirements(self) -> None:
         """Save requirements to persistent storage."""
         try:
             # Convert to serializable format
@@ -276,7 +277,7 @@ class SecurityRequirementsTracker:
                 exception=e,
             )
 
-    def _save_metrics(self):
+    def _save_metrics(self) -> None:
         """Save metrics to persistent storage."""
         if self.metrics:
             try:
@@ -295,7 +296,7 @@ class SecurityRequirementsTracker:
                     exception=e,
                 )
 
-    def _initialize_default_requirements(self):
+    def _initialize_default_requirements(self) -> None:
         """Initialize with default security requirements."""
         default_requirements = [
             # Critical Requirements (P0)
@@ -460,7 +461,7 @@ class SecurityRequirementsTracker:
             completion=requirement.completion_percentage,
         )
 
-    def _log_audit_event(self, audit_entry: Dict[str, Any]):
+    def _log_audit_event(self, audit_entry: Dict[str, Any]) -> None:
         """Log audit event to persistent audit trail."""
         try:
             audit_log = []
@@ -619,9 +620,15 @@ class SecurityRequirementsTracker:
                     }
                 )
 
+        # Ensure metrics are calculated
+        if not self.metrics:
+            self.calculate_security_metrics()
+        
+        metrics = self.metrics or SecurityMetrics()  # Fallback to default
+        
         report = {
             "timestamp": datetime.now().isoformat(),
-            "overall_security_score": self.metrics.security_posture_score,
+            "overall_security_score": metrics.security_posture_score,
             "requirement_summary": {
                 "total": len(self.requirements),
                 "completed": len(self.get_requirements_by_status(RequirementStatus.COMPLETED)),
@@ -631,16 +638,16 @@ class SecurityRequirementsTracker:
                 "overdue": len(self.get_overdue_requirements()),
             },
             "completion_rates": {
-                "critical": self.metrics.critical_completion_rate,
-                "high": self.metrics.high_completion_rate,
-                "medium": self.metrics.medium_completion_rate,
-                "regulatory": self.metrics.regulatory_completion_rate,
+                "critical": metrics.critical_completion_rate,
+                "high": metrics.high_completion_rate,
+                "medium": metrics.medium_completion_rate,
+                "regulatory": metrics.regulatory_completion_rate,
             },
             "operational_metrics": {
-                "security_incidents": self.metrics.security_incidents,
-                "vulnerability_response_time_days": self.metrics.vulnerability_response_time_days,
-                "hsm_success_rate": self.metrics.hsm_operation_success_rate,
-                "auth_failure_rate": self.metrics.authentication_failure_rate,
+                "security_incidents": metrics.security_incidents,
+                "vulnerability_response_time_days": metrics.vulnerability_response_time_days,
+                "hsm_success_rate": metrics.hsm_operation_success_rate,
+                "auth_failure_rate": metrics.authentication_failure_rate,
             },
             "active_requirements": active_requirements[:10],  # Top 10
             "overdue_requirements": [
@@ -724,7 +731,7 @@ def update_security_requirement(
     completion_percentage: Optional[int] = None,
     notes: str = "",
     user: str = "system",
-):
+) -> None:
     """Update a security requirement status."""
     tracker = get_security_tracker()
     tracker.update_requirement_status(req_id, status, completion_percentage, notes, user)

@@ -7,7 +7,7 @@ import asyncio
 import time
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Callable, Dict, List, Optional, Set, TYPE_CHECKING, Tuple
 
 import aiohttp
 from stellar_sdk import Asset
@@ -76,11 +76,11 @@ class StellarOrderBookTracker:
 
         # Order book data
         self._order_books: Dict[str, StellarOrderBook] = {}
-        self._tracked_pairs: set = set()
+        self._tracked_pairs: Set = set()
 
         # Streaming connections
         self._stream_sessions: Dict[str, aiohttp.ClientSession] = {}
-        self._stream_tasks: Dict[str, asyncio.Task] = {}
+        self._stream_tasks: Dict[str, asyncio.Task[None]] = {}
 
         # Event handling
         self._update_handlers: List[Callable[[str, StellarOrderBook], None]] = []
@@ -94,7 +94,7 @@ class StellarOrderBookTracker:
         self._last_update_times: Dict[str, float] = {}
         self._update_counts: Dict[str, int] = {}
 
-    async def start(self):
+    async def start(self) -> None:
         """Start order book tracker."""
         try:
             self._connected = True
@@ -111,7 +111,7 @@ class StellarOrderBookTracker:
             await self.observability.log_error("order_book_tracker_start_failed", e)
             raise
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop order book tracker."""
         self._connected = False
 
@@ -132,7 +132,7 @@ class StellarOrderBookTracker:
 
         await self.observability.log_event("order_book_tracker_stopped")
 
-    async def add_trading_pair(self, trading_pair: str):
+    async def add_trading_pair(self, trading_pair: str) -> None:
         """Add trading pair to track."""
         if trading_pair in self._tracked_pairs:
             return
@@ -153,7 +153,7 @@ class StellarOrderBookTracker:
             {"trading_pair": trading_pair, "total_pairs": len(self._tracked_pairs)},
         )
 
-    async def remove_trading_pair(self, trading_pair: str):
+    async def remove_trading_pair(self, trading_pair: str) -> None:
         """Remove trading pair from tracking."""
         if trading_pair not in self._tracked_pairs:
             return
@@ -195,7 +195,7 @@ class StellarOrderBookTracker:
         if handler in self._update_handlers:
             self._update_handlers.remove(handler)
 
-    async def _start_pair_tracking(self, trading_pair: str):
+    async def _start_pair_tracking(self, trading_pair: str) -> None:
         """Start tracking for a specific trading pair."""
         if trading_pair in self._stream_tasks:
             return
@@ -208,7 +208,7 @@ class StellarOrderBookTracker:
         task = asyncio.create_task(self._track_pair_orderbook(trading_pair, session))
         self._stream_tasks[trading_pair] = task
 
-    async def _track_pair_orderbook(self, trading_pair: str, session: aiohttp.ClientSession):
+    async def _track_pair_orderbook(self, trading_pair: str, session: aiohttp.ClientSession) -> None:
         """Track order book for a specific trading pair."""
         while self._connected:
             try:

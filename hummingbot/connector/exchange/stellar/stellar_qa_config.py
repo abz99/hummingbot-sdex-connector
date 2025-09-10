@@ -13,7 +13,7 @@ import os
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Optional, TYPE_CHECKING, Union
+from typing import Any, Dict, Optional, Set, TYPE_CHECKING, Union
 
 from .stellar_logging import get_stellar_logger, LogCategory
 
@@ -349,7 +349,7 @@ class QAConfigManager:
         """Get runtime statistics."""
         return self._runtime_stats.copy()
 
-    def reset_runtime_stats(self):
+    def reset_runtime_stats(self) -> None:
         """Reset runtime statistics."""
         self._runtime_stats = {
             "collector_switches": 0,

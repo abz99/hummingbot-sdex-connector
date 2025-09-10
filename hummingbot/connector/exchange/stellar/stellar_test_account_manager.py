@@ -54,7 +54,7 @@ class StellarTestAccountManager:
         # Initialize
         asyncio.create_task(self._initialize())
 
-    async def _initialize(self):
+    async def _initialize(self) -> None:
         """Initialize the test account manager."""
         try:
             # Create master HD wallet for deterministic accounts

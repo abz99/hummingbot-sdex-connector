@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional, Set, TYPE_CHECKING, NamedTuple, Any
+from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
 
 import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
@@ -239,7 +239,7 @@ class ModernStellarOrderManager:
         self.order_status_cb = CircuitBreaker(failure_threshold=10, recovery_timeout=30)
 
         # Background tasks
-        self._monitoring_task: Optional[asyncio.Task] = None
+        self._monitoring_task: Optional[asyncio.Task[None]] = None
         self._monitoring_interval = 5.0  # seconds
 
         # Logging
@@ -251,12 +251,12 @@ class ModernStellarOrderManager:
         self.min_price = Decimal("0.0000001")
         self.max_price = Decimal("1000000000")  # 1B price ratio
 
-    async def start(self):
+    async def start(self) -> None:
         """Start order manager and background monitoring."""
         self._monitoring_task = asyncio.create_task(self._monitor_orders())
         await self.observability.log_event("order_manager_started")
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop order manager and cleanup."""
         if self._monitoring_task:
             self._monitoring_task.cancel()

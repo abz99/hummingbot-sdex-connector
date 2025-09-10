@@ -57,14 +57,14 @@ class ModernAssetManager:
             "https://stellar.expert/api/explorer/directory",
         ]
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize asset manager and load registries."""
         await self._load_asset_directories()
         await self.observability.log_event(
             "asset_manager_initialized", {"registered_assets": len(self.asset_registry)}
         )
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup asset manager resources."""
         self.asset_registry.clear()
         self.trustline_cache.clear()
@@ -128,7 +128,7 @@ class ModernAssetManager:
             return "XLM:native"
         return f"{asset.code}:{asset.issuer}"
 
-    async def _load_asset_directories(self):
+    async def _load_asset_directories(self) -> None:
         """Load asset information from directories."""
         # Implementation stub - would fetch from actual directories
         await self.observability.log_event("asset_directories_loaded")

@@ -11,7 +11,7 @@ Version: 3.0.0
 import asyncio
 import time
 import statistics
-from typing import Dict, List, Tuple, Optional, Any, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -71,7 +71,7 @@ class PerformanceResult:
     value: float
     unit: str
     test_type: LoadTestType
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=Dict[str, Any])
 
 
 @dataclass
@@ -90,7 +90,7 @@ class LoadTestReport:
     throughput_rps: float
     error_rate: float
     performance_results: List[PerformanceResult] = field(default_factory=list)
-    resource_utilization: Dict[str, float] = field(default_factory=dict)
+    resource_utilization: Dict[str, float] = field(default_factory=Dict[str, Any])
     recommendations: List[str] = field(default_factory=list)
 
 
@@ -175,7 +175,7 @@ class StellarTradingLoadTest(LoadTestEngine):
             "results": [r for r in results if not isinstance(r, Exception)]
         }
 
-    async def _execute_trading_operation(self, semaphore: asyncio.Semaphore, order: Dict, index: int) -> Dict[str, Any]:
+    async def _execute_trading_operation(self, semaphore: asyncio.Semaphore, order: Dict[str, Any], index: int) -> Dict[str, Any]:
         """Execute single trading operation with timing"""
         async with semaphore:
             start_time = time.time()
@@ -223,7 +223,7 @@ class StellarTradingLoadTest(LoadTestEngine):
                     "order_id": order.get("client_order_id")
                 }
 
-    async def _simulate_order_placement(self, order: Dict) -> Dict[str, Any]:
+    async def _simulate_order_placement(self, order: Dict[str, Any]) -> Dict[str, Any]:
         """Simulate order placement for testing"""
         # Simulate network latency and processing time
         await asyncio.sleep(0.05 + np.random.exponential(0.02))
@@ -241,7 +241,7 @@ class StellarTradingLoadTest(LoadTestEngine):
             "price": order["price"]
         }
 
-    def _generate_report(self, config: LoadTestConfig, start_time: datetime, end_time: datetime, results: Dict) -> LoadTestReport:
+    def _generate_report(self, config: LoadTestConfig, start_time: datetime, end_time: datetime, results: Dict[str, Any]) -> LoadTestReport:
         """Generate comprehensive load test report"""
         # Calculate response time statistics
         response_times = [r.value for r in self.results if r.metric == PerformanceMetric.ORDER_LATENCY]
@@ -347,8 +347,8 @@ class StellarMarketDataLoadTest(LoadTestEngine):
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        total_messages = sum(r.get("messages", 0) for r in results if isinstance(r, dict))
-        successful_streams = sum(1 for r in results if isinstance(r, dict) and r.get("success", False))
+        total_messages = sum(r.get("messages", 0) for r in results if isinstance(r, Dict[str, Any]))
+        successful_streams = sum(1 for r in results if isinstance(r, Dict[str, Any]) and r.get("success", False))
 
         return {
             "total_streams": len(results),
@@ -388,7 +388,7 @@ class StellarMarketDataLoadTest(LoadTestEngine):
                 self.logger.error(f"Market data streaming failed for {trading_pair}: {str(e)}")
                 return {"success": False, "messages": message_count, "error": str(e), "trading_pair": trading_pair}
 
-    def _generate_streaming_report(self, config: LoadTestConfig, start_time: datetime, end_time: datetime, results: Dict) -> LoadTestReport:
+    def _generate_streaming_report(self, config: LoadTestConfig, start_time: datetime, end_time: datetime, results: Dict[str, Any]) -> LoadTestReport:
         """Generate market data streaming report"""
         # Calculate streaming-specific metrics
         latencies = [r.value for r in self.results if r.metric == PerformanceMetric.MARKET_DATA_LATENCY]
@@ -527,7 +527,7 @@ if __name__ == "__main__":
         trading_pairs=["XLM/USDC", "XLM/BTC"]
     )
 
-    async def run_load_tests():
+    async def run_load_tests() -> None:
         """Run load testing example"""
         suite = StellarLoadTestSuite()
 

@@ -506,7 +506,7 @@ class StellarSecurityManager:
         derived = hashlib.sha256(data).digest()
         return derived
 
-    def create_backup(self, backup_name: str) -> dict:
+    def create_backup(self, backup_name: str) -> Dict[str, Any]:
         """Create backup of keys - stub implementation."""
         import secrets
 
@@ -552,7 +552,7 @@ class StellarSecurityManager:
             )
             return False
 
-    def get_security_status(self) -> dict:
+    def get_security_status(self) -> Dict[str, Any]:
         """Get current security status."""
         return {
             "security_level": self.config.security_level.name,

@@ -308,7 +308,7 @@ class StellarHealthMonitor:
         self.suppressed_alerts: Set[str] = set()
 
         # Background tasks
-        self._monitoring_task: Optional[asyncio.Task] = None
+        self._monitoring_task: Optional[asyncio.Task[None]] = None
         self._session: Optional[aiohttp.ClientSession] = None
         self._running = False
 
@@ -316,7 +316,7 @@ class StellarHealthMonitor:
         self.failure_callbacks: List[Callable[[str, HealthCheckResult], Awaitable[None]]] = []
         self.recovery_callbacks: List[Callable[[str, HealthCheckResult], Awaitable[None]]] = []
 
-    async def start(self):
+    async def start(self) -> None:
         """Start health monitoring."""
         if self._running:
             return
@@ -335,7 +335,7 @@ class StellarHealthMonitor:
             check_interval=self.check_interval,
         )
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop health monitoring."""
         if not self._running:
             return
@@ -417,7 +417,7 @@ class StellarHealthMonitor:
 
             return result
 
-    async def _monitoring_loop(self):
+    async def _monitoring_loop(self) -> None:
         """Main monitoring loop."""
         while self._running:
             try:
@@ -436,7 +436,7 @@ class StellarHealthMonitor:
                 )
                 await asyncio.sleep(min(self.check_interval, 60))
 
-    async def _process_health_result(self, url: str, result: HealthCheckResult):
+    async def _process_health_result(self, url: str, result: HealthCheckResult) -> None:
         """Process health check result and update tracking."""
         endpoint_health = self.endpoint_health[url]
 
@@ -499,7 +499,7 @@ class StellarHealthMonitor:
             is_healthy=result.status == HealthStatus.HEALTHY,
         )
 
-    async def _handle_failure(self, url: str, result: HealthCheckResult):
+    async def _handle_failure(self, url: str, result: HealthCheckResult) -> None:
         """Handle endpoint failure."""
         endpoint_health = self.endpoint_health[url]
 
@@ -544,7 +544,7 @@ class StellarHealthMonitor:
                     "Error in failure callback", category=LogCategory.HEALTH_CHECK, exception=e
                 )
 
-    async def _handle_recovery(self, url: str, result: HealthCheckResult):
+    async def _handle_recovery(self, url: str, result: HealthCheckResult) -> None:
         """Handle endpoint recovery."""
         endpoint_health = self.endpoint_health[url]
 
@@ -583,7 +583,7 @@ class StellarHealthMonitor:
                     "Error in recovery callback", category=LogCategory.HEALTH_CHECK, exception=e
                 )
 
-    async def _send_alert(self, alert: Alert):
+    async def _send_alert(self, alert: Alert) -> None:
         """Send alert to all registered handlers."""
         # Check if this type of alert is suppressed
         alert_key = f"{alert.endpoint}:{alert.check_type.name if alert.check_type else 'none'}"

@@ -7,7 +7,7 @@ import asyncio
 import json
 import time
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 from urllib.parse import urljoin, urlparse
 
 try:
@@ -74,7 +74,7 @@ class StellarEndpointConfig:
     retry_backoff_factor: float = 2.0
     enable_ssl_verify: bool = True
     user_agent: str = "Hummingbot-Stellar-Connector/3.0"
-    headers: Dict[str, str] = field(default_factory=dict)
+    headers: Dict[str, str] = field(default_factory=Dict[str, Any])
 
 
 class StellarAuthenticator:

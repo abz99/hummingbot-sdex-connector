@@ -113,7 +113,7 @@ class StellarAssetVerifier:
         # Asset directories
         self.asset_directories: List[AssetDirectory] = []
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> None:
         """Async context manager entry."""
         if not self.session:
             self.session = aiohttp.ClientSession(
@@ -122,7 +122,7 @@ class StellarAssetVerifier:
             )
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         """Async context manager exit."""
         if self._session_owned and self.session:
             await self.session.close()

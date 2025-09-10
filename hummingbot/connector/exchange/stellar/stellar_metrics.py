@@ -9,7 +9,7 @@ import time
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from enum import auto, Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 from prometheus_client import (
     CollectorRegistry,
@@ -63,7 +63,7 @@ class StellarMetrics:
         self._init_core_metrics()
 
         # Start background tasks
-        self._background_tasks: List[asyncio.Task] = []
+        self._background_tasks: List[asyncio.Task[None]] = []
 
     def _init_core_metrics(self) -> None:
         """Initialize core Stellar connector metrics."""
@@ -565,7 +565,7 @@ class StellarMetrics:
         return summary
 
     @asynccontextmanager
-    async def time_operation(self, metric_name: str, **labels):
+    async def time_operation(self, metric_name: str, **labels) -> None:
         """Context manager to time operations."""
         if metric_name not in self._metrics:
             raise ValueError(f"Unknown metric: {metric_name}")
@@ -601,13 +601,13 @@ class StellarMetrics:
 
         return thread
 
-    async def start_background_metrics_collection(self):
+    async def start_background_metrics_collection(self) -> None:
         """Start background tasks for metrics collection."""
         self._background_tasks.append(asyncio.create_task(self._collect_system_metrics()))
 
         self.logger.info("Background metrics collection started", category=LogCategory.METRICS)
 
-    async def stop_background_metrics_collection(self):
+    async def stop_background_metrics_collection(self) -> None:
         """Stop background metrics collection."""
         for task in self._background_tasks:
             task.cancel()
@@ -618,7 +618,7 @@ class StellarMetrics:
 
         self.logger.info("Background metrics collection stopped", category=LogCategory.METRICS)
 
-    async def _collect_system_metrics(self):
+    async def _collect_system_metrics(self) -> None:
         """Collect system-level metrics in the background."""
         import gc
 

@@ -59,7 +59,7 @@ class StellarUserStreamTracker:
         # Stream management
         self._tracked_accounts: Set[str] = set()
         self._stream_sessions: Dict[str, aiohttp.ClientSession] = {}
-        self._stream_tasks: Dict[str, asyncio.Task[None]] = {}
+        self._stream_tasks: Dict[str, asyncio.Task[None][None]] = {}
         self._event_handlers: List[Callable[[StellarUserStreamData], Any]] = []
 
         # Connection state
@@ -70,7 +70,7 @@ class StellarUserStreamTracker:
 
         # Event queues
         self._event_queue: asyncio.Queue[StellarUserStreamData] = asyncio.Queue()
-        self._processing_task: Optional[asyncio.Task[None]] = None
+        self._processing_task: Optional[asyncio.Task[None][None]] = None
 
     async def start(self) -> None:
         """Start user stream tracker."""

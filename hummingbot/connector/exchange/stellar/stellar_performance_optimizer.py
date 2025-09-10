@@ -10,7 +10,7 @@ import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING, Tuple
 
 import aiohttp
 
@@ -79,7 +79,7 @@ class RequestCache:
         self.max_entries = max_entries
         self.default_ttl = default_ttl
         self._cache: Dict[str, CacheEntry] = {}
-        self._access_order: deque[str] = deque()  # LRU tracking
+        self._access_order: deque[Any] = deque()  # LRU tracking
 
     def _generate_key(self, endpoint: str, params: Dict[str, Any]) -> str:
         """Generate cache key from endpoint and parameters."""
@@ -154,7 +154,7 @@ class RequestBatcher:
         self.batch_size = batch_size
         self.batch_timeout = batch_timeout
         self._pending_batches: Dict[str, RequestBatch] = {}
-        self._batch_tasks: Dict[str, asyncio.Task[None]] = {}
+        self._batch_tasks: Dict[str, asyncio.Task[None][None]] = {}
 
     async def add_request(
         self, batch_key: str, endpoint: str, params: Dict[str, Any], callback: Callable[[Any], None]
@@ -231,7 +231,7 @@ class StellarPerformanceOptimizer:
         self.request_batcher = RequestBatcher(batch_size=10, batch_timeout=0.1)
 
         # Performance metrics
-        self._request_times: deque[float] = deque(maxlen=1000)
+        self._request_times: deque[Any] = deque(maxlen=1000)
         self._cache_hits = 0
         self._cache_misses = 0
         self._batched_requests = 0

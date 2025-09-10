@@ -109,12 +109,12 @@ class StellarSecurityHardening:
         self.rate_limits: Dict[str, Dict[str, Any]] = {}
 
         # Background tasks
-        self._background_tasks: List[asyncio.Task] = []
+        self._background_tasks: List[asyncio.Task[None]] = []
         self._running = False
 
         self._initialize_security_framework()
 
-    def _initialize_security_framework(self):
+    def _initialize_security_framework(self) -> None:
         """Initialize the security hardening framework."""
         self.logger.info(
             "Initializing security hardening framework",
@@ -134,7 +134,7 @@ class StellarSecurityHardening:
         # Setup access controls
         self._initialize_access_controls()
 
-    def _initialize_cryptography(self):
+    def _initialize_cryptography(self) -> None:
         """Initialize cryptographic components."""
         # Generate or load encryption key
         self.encryption_key = self._get_or_generate_encryption_key()
@@ -211,7 +211,7 @@ class StellarSecurityHardening:
 
             return {"private": private_key, "public": public_key}
 
-    def _load_security_policies(self):
+    def _load_security_policies(self) -> None:
         """Load security policies based on hardening level."""
         base_policies = [
             SecurityPolicy(
@@ -291,7 +291,7 @@ class StellarSecurityHardening:
             active_controls_count=len(self.active_controls),
         )
 
-    def _initialize_threat_detection(self):
+    def _initialize_threat_detection(self) -> None:
         """Initialize threat detection signatures."""
         self.threat_signatures = {
             "sql_injection": {
@@ -334,7 +334,7 @@ class StellarSecurityHardening:
             },
         }
 
-    def _initialize_access_controls(self):
+    def _initialize_access_controls(self) -> None:
         """Initialize access control mechanisms."""
         # Rate limiting configuration
         self.rate_limits = {
@@ -343,7 +343,7 @@ class StellarSecurityHardening:
             "password_reset": {"limit": 3, "window": 3600, "block_duration": 3600},
         }
 
-    async def start_security_hardening(self):
+    async def start_security_hardening(self) -> None:
         """Start security hardening framework."""
         if self._running:
             return
@@ -365,7 +365,7 @@ class StellarSecurityHardening:
             background_tasks=len(self._background_tasks),
         )
 
-    async def stop_security_hardening(self):
+    async def stop_security_hardening(self) -> None:
         """Stop security hardening framework."""
         if not self._running:
             return
@@ -637,7 +637,7 @@ class StellarSecurityHardening:
             **event.details,
         )
 
-    async def _monitor_security_events(self):
+    async def _monitor_security_events(self) -> None:
         """Monitor and respond to security events."""
         while self._running:
             try:
@@ -663,7 +663,7 @@ class StellarSecurityHardening:
                 )
                 await asyncio.sleep(120)
 
-    async def _handle_critical_events(self, events: List[SecurityEvent]):
+    async def _handle_critical_events(self, events: List[SecurityEvent]) -> None:
         """Handle critical security events."""
         for event in events:
             self.logger.critical(
@@ -686,7 +686,7 @@ class StellarSecurityHardening:
                 if source_ip:
                     self.blocked_ips.add(source_ip)
 
-    async def _check_system_integrity(self):
+    async def _check_system_integrity(self) -> None:
         """Check system integrity."""
         while self._running:
             try:
@@ -703,7 +703,7 @@ class StellarSecurityHardening:
                 )
                 await asyncio.sleep(7200)
 
-    async def _update_threat_intelligence(self):
+    async def _update_threat_intelligence(self) -> None:
         """Update threat intelligence data."""
         while self._running:
             try:
@@ -720,7 +720,7 @@ class StellarSecurityHardening:
                 )
                 await asyncio.sleep(7200)
 
-    async def _cleanup_expired_sessions(self):
+    async def _cleanup_expired_sessions(self) -> None:
         """Clean up expired sessions."""
         while self._running:
             try:
@@ -748,7 +748,7 @@ class StellarSecurityHardening:
                 )
                 await asyncio.sleep(600)
 
-    async def _rotate_security_keys(self):
+    async def _rotate_security_keys(self) -> None:
         """Rotate security keys periodically."""
         while self._running:
             try:

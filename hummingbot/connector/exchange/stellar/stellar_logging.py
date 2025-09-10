@@ -9,7 +9,7 @@ import time
 import uuid
 from contextvars import ContextVar
 from enum import Enum
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import structlog
 from structlog import BoundLogger
@@ -122,7 +122,7 @@ class StellarLogger:
 
     def _configure_structlog(self) -> None:
         """Configure structlog with our processors."""
-        processors: list[Processor] = [
+        processors: List[str][Processor] = [
             structlog.contextvars.merge_contextvars,
             add_correlation_id,
             add_timestamp,

@@ -156,7 +156,7 @@ class StellarAMMIntegration:
 
         # Pool management
         self._pools: Dict[str, LiquidityPool] = {}
-        self._pool_update_tasks: Dict[str, asyncio.Task] = {}
+        self._pool_update_tasks: Dict[str, asyncio.Task[None]] = {}
         self._positions: Dict[str, LiquidityPosition] = {}
 
         # Routing and optimization
@@ -213,7 +213,7 @@ class StellarAMMIntegration:
             self.logger().error(f"Failed to discover pools: {e}")
             raise
 
-    async def _parse_pool_record(self, pool_record: Dict) -> Optional[LiquidityPool]:
+    async def _parse_pool_record(self, pool_record: Dict[str, Any]) -> Optional[LiquidityPool]:
         """Parse Stellar pool record into LiquidityPool object"""
         try:
             pool_id = pool_record["id"]
@@ -333,7 +333,7 @@ class StellarAMMIntegration:
         except Exception as e:
             self.logger().warning(f"Failed to load positions: {e}")
 
-    async def _create_position_from_balance(self, balance: Dict) -> Optional[LiquidityPosition]:
+    async def _create_position_from_balance(self, balance: Dict[str, Any]) -> Optional[LiquidityPosition]:
         """Create position object from account balance"""
         # Implementation would parse balance and create position
         # This is a placeholder

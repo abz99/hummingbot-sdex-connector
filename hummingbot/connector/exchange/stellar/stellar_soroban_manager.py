@@ -10,7 +10,7 @@ import time
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
+from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Tuple, Union
 
 import aiohttp
 
@@ -62,7 +62,7 @@ class ContractInfo:
     verified: bool = False
     deployed_at: Optional[int] = None
     creator: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=Dict[str, Any])
 
 
 @dataclass
@@ -150,7 +150,7 @@ class SorobanContractManager:
             cls._logger = logging.getLogger(__name__)
         return cls._logger
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize Soroban contract manager."""
         try:
             # Load known contracts (implementation stub)
@@ -174,7 +174,7 @@ class SorobanContractManager:
             await self.observability.log_error("soroban_manager_init_failed", e)
             raise
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup Soroban manager resources."""
         self._contract_cache.clear()
         self._quote_cache.clear()
@@ -677,7 +677,7 @@ class SorobanContractManager:
         return f"standard_{time.time()}"
 
     # Private methods
-    async def _load_known_contracts(self):
+    async def _load_known_contracts(self) -> None:
         """Load known contract registry."""
         # Implementation stub - load from registry in Phase 3
         known_amm_contracts = {
@@ -699,12 +699,12 @@ class SorobanContractManager:
             self._known_contracts[info["address"]] = contract_info
             self._verified_contracts[info["address"]] = contract_info
 
-    async def _initialize_amm_contracts(self):
+    async def _initialize_amm_contracts(self) -> None:
         """Initialize AMM contract integration."""
         # Implementation stub
         self._amm_contracts = {"stellar_amm": "CAMM123...", "phoenix_amm": "CPHX456..."}
 
-    async def _setup_gas_monitoring(self):
+    async def _setup_gas_monitoring(self) -> None:
         """Setup gas price monitoring."""
         # Implementation stub - real-time gas monitoring in Phase 3
         pass
@@ -743,7 +743,7 @@ class SorobanContractManager:
 
         return None
 
-    def _convert_parameters_to_scval(self, parameters: Dict[str, Any]) -> List:
+    def _convert_parameters_to_scval(self, parameters: Dict[str, Any]) -> List[Any]:
         """Convert parameters to Soroban SCVal format."""
         try:
             # Check if Soroban types are available

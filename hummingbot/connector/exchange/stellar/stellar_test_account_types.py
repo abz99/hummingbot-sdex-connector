@@ -48,7 +48,7 @@ class TestAccountConfig:
     multisig_signers: List[str] = field(default_factory=list)
     expiry_hours: Optional[int] = 24
     tags: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=Dict[str, Any])
 
 
 @dataclass
@@ -63,12 +63,12 @@ class TestAccount:
     created_at: float = field(default_factory=time.time)
     last_used: float = 0
     xlm_balance: float = 0
-    custom_assets: Dict[str, float] = field(default_factory=dict)
+    custom_assets: Dict[str, float] = field(default_factory=Dict[str, Any])
     trustlines: List[str] = field(default_factory=list)
     multisig_config: Optional[Dict[str, Any]] = None
     expiry_time: Optional[float] = None
     tags: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=Dict[str, Any])
     usage_count: int = 0
 
     def to_dict(self) -> Dict[str, Any]:

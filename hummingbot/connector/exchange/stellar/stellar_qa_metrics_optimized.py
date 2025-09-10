@@ -614,7 +614,7 @@ class OptimizedStellarQAMetricsCollector:
 
         return None
 
-    async def _update_monitoring_metrics_batch(self, results: List[QAMetricResult]):
+    async def _update_monitoring_metrics_batch(self, results: List[QAMetricResult]) -> None:
         """Update monitoring system with batched results for better performance."""
         if not results:
             return
@@ -636,7 +636,7 @@ class OptimizedStellarQAMetricsCollector:
 
     async def _update_metrics_by_type(
         self, metric_type: QAMetricType, results: List[QAMetricResult]
-    ):
+    ) -> None:
         """Update metrics for a specific type efficiently."""
         try:
             if metric_type == QAMetricType.COVERAGE:
@@ -654,7 +654,7 @@ class OptimizedStellarQAMetricsCollector:
                 category=LogCategory.ERROR_HANDLING,
             )
 
-    async def _batch_update_coverage_metrics(self, results: List[QAMetricResult]):
+    async def _batch_update_coverage_metrics(self, results: List[QAMetricResult]) -> None:
         """Batch update coverage metrics."""
         for result in results:
             if not result.success:
@@ -669,7 +669,7 @@ class OptimizedStellarQAMetricsCollector:
                     result.module, result.value, "critical"
                 )
 
-    async def _batch_update_test_metrics(self, results: List[QAMetricResult]):
+    async def _batch_update_test_metrics(self, results: List[QAMetricResult]) -> None:
         """Batch update test metrics."""
         for result in results:
             if not result.success:
@@ -678,7 +678,7 @@ class OptimizedStellarQAMetricsCollector:
             test_type = result.metadata.get("test_type", "unit")
             self.metrics.update_test_success_rate(result.module, result.value / 100.0, test_type)
 
-    async def _batch_update_quality_metrics(self, results: List[QAMetricResult]):
+    async def _batch_update_quality_metrics(self, results: List[QAMetricResult]) -> None:
         """Batch update quality metrics."""
         for result in results:
             if not result.success:
@@ -686,7 +686,7 @@ class OptimizedStellarQAMetricsCollector:
 
             self.metrics.update_code_quality_score(result.module, result.value / 10.0, "overall")
 
-    async def _batch_update_compliance_metrics(self, results: List[QAMetricResult]):
+    async def _batch_update_compliance_metrics(self, results: List[QAMetricResult]) -> None:
         """Batch update compliance metrics."""
         for result in results:
             if not result.success:
@@ -707,7 +707,7 @@ class OptimizedStellarQAMetricsCollector:
             current = current.parent
         return Path.cwd()
 
-    async def _initialize_file_monitoring(self):
+    async def _initialize_file_monitoring(self) -> None:
         """Initialize file monitoring for incremental updates."""
         stellar_path = self.project_root / "hummingbot/connector/exchange/stellar"
         for file_path in stellar_path.glob("*.py"):
@@ -732,7 +732,7 @@ class OptimizedStellarQAMetricsCollector:
 
         return changed_files if changed_files else None
 
-    async def _update_file_monitoring(self):
+    async def _update_file_monitoring(self) -> None:
         """Update file monitoring timestamps."""
         self.last_full_scan = time.time()
         for file_path_str in self.monitored_files:
@@ -761,7 +761,7 @@ class OptimizedStellarQAMetricsCollector:
         """Load coverage JSON file asynchronously."""
         try:
 
-            def load_json():
+            def load_json() -> Any:
                 with open(file_path, "r") as f:
                     return json.load(f)
 
@@ -773,7 +773,7 @@ class OptimizedStellarQAMetricsCollector:
         """Load test report JSON file asynchronously."""
         try:
 
-            def load_json():
+            def load_json() -> Any:
                 with open(file_path, "r") as f:
                     return json.load(f)
 
@@ -841,14 +841,14 @@ class OptimizedStellarQAMetricsCollector:
 
     # Incremental collection methods
     async def _collect_incremental_coverage(
-        self, modules: Set[str], base_data: Dict
+        self, modules: Set[str], base_data: Dict[str, Any]
     ) -> List[QAMetricResult]:
         """Collect coverage for specific modules only."""
         # Implementation for incremental coverage collection
         return []
 
     async def _collect_incremental_quality(
-        self, modules: Set[str], base_data: Dict
+        self, modules: Set[str], base_data: Dict[str, Any]
     ) -> List[QAMetricResult]:
         """Collect quality metrics for specific modules only."""
         # Implementation for incremental quality collection

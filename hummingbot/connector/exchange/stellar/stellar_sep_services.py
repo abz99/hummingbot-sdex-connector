@@ -97,12 +97,12 @@ class StellarSEPServices:
         # HTTP session for API calls
         self._session: Optional[aiohttp.ClientSession] = None
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize SEP services."""
         self._session = aiohttp.ClientSession()
         await self.observability.log_event("sep_services_initialized")
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup SEP services."""
         if self._session:
             await self._session.close()

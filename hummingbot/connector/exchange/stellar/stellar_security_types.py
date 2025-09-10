@@ -7,7 +7,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import auto, Enum
-from typing import Any, Dict, List, Optional, Protocol, runtime_checkable, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Tuple, runtime_checkable
 
 
 class SecurityLevel(Enum):

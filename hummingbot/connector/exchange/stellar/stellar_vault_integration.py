@@ -9,7 +9,7 @@ import json
 import time
 from dataclasses import dataclass, field
 from enum import auto, Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import aiohttp
 from stellar_sdk import Keypair
@@ -65,7 +65,7 @@ class VaultToken:
     expires_at: float
     renewable: bool = False
     policies: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=Dict[str, Any])
 
 
 class VaultKeyStore(KeyStoreBackend):
@@ -78,16 +78,16 @@ class VaultKeyStore(KeyStoreBackend):
         self._token: Optional[VaultToken] = None
         self._authenticated = False
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> None:
         """Async context manager entry."""
         await self.initialize()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         """Async context manager exit."""
         await self.cleanup()
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize Vault connection."""
         connector = aiohttp.TCPConnector(verify_ssl=self.config.verify_ssl)
         self._session = aiohttp.ClientSession(
@@ -105,7 +105,7 @@ class VaultKeyStore(KeyStoreBackend):
             auth_method=self.config.auth_method.name,
         )
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup Vault connection."""
         if self._session:
             await self._session.close()
@@ -346,7 +346,7 @@ class VaultKeyStore(KeyStoreBackend):
             )
             return False
 
-    async def retrieve_key(self, key_id: str) -> Optional[tuple[bytes, KeyMetadata]]:
+    async def retrieve_key(self, key_id: str) -> Optional[Tuple[bytes, KeyMetadata]]:
         """Retrieve a key from Vault."""
         if not self._authenticated:
             raise Exception("Not authenticated with Vault")
