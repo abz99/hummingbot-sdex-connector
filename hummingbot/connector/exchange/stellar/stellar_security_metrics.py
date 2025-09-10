@@ -623,9 +623,9 @@ class SecurityRequirementsTracker:
         # Ensure metrics are calculated
         if not self.metrics:
             self.calculate_security_metrics()
-        
+
         metrics = self.metrics or SecurityMetrics()  # Fallback to default
-        
+
         report = {
             "timestamp": datetime.now().isoformat(),
             "overall_security_score": metrics.security_posture_score,

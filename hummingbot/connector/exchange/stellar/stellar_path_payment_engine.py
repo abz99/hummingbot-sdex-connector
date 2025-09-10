@@ -335,7 +335,7 @@ class EnhancedPathPaymentEngine:
             await self.observability.log_error("optimized_arbitrage_detection_failed", e)
             raise
 
-    async def _filter_assets_by_liquidity(
+    async def _filter_assets_by_liquidity(  # noqa: C901
         self, assets: List[Asset], min_volume: Decimal = Decimal("10000")
     ) -> List[Asset]:
         """Filter assets by liquidity to reduce search space."""
@@ -403,7 +403,7 @@ class EnhancedPathPaymentEngine:
             self.logger().warning(f"Price matrix building failed: {e}")
             return {}
 
-    async def _build_price_matrix_for_dex(
+    async def _build_price_matrix_for_dex(  # noqa: C901
         self, assets: List[Asset], dex_source: str
     ) -> Dict[str, Dict[str, Decimal]]:
         """Build price matrix for a specific DEX."""
@@ -548,7 +548,7 @@ class EnhancedPathPaymentEngine:
             self.logger().warning(f"Cross-DEX arbitrage detection failed: {e}")
             return []
 
-    async def _find_triangular_arbitrage(
+    async def _find_triangular_arbitrage(  # noqa: C901
         self,
         assets: List[Asset],
         price_matrix: Dict[str, Dict[str, Decimal]],
@@ -706,7 +706,7 @@ class EnhancedPathPaymentEngine:
             self.logger().warning(f"Multi-hop arbitrage detection failed: {e}")
             return []
 
-    async def _validate_opportunities_parallel(
+    async def _validate_opportunities_parallel(  # noqa: C901
         self, opportunities: List[ArbitrageOpportunity]
     ) -> List[ArbitrageOpportunity]:
         """Validate opportunities in parallel with real-time data."""

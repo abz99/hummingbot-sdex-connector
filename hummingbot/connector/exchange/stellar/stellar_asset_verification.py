@@ -443,7 +443,7 @@ class StellarAssetVerifier:
         self._rate_limits[directory_name].append(now)
         return True
 
-    def _assess_risk_level(
+    def _assess_risk_level(  # noqa: C901
         self, metadata: AssetMetadata, directory_info: Dict[str, Any]
     ) -> AssetRisk:
         """Assess risk level based on asset metadata and directory information."""

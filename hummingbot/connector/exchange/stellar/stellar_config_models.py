@@ -7,7 +7,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field, HttpUrl, validator
+from pydantic import BaseModel, Field, HttpUrl, field_validator, ValidationInfo, ConfigDict
 
 
 class StellarNetworkType(str, Enum):
@@ -41,9 +41,10 @@ class FriendbotConfig(BaseModel):
     url: Optional[HttpUrl] = Field(None, description="Friendbot URL")
     funding_amount: Optional[int] = Field(None, ge=1, description="Funding amount in XLM")
 
-    @validator("url")
-    def validate_url_if_enabled(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
-        if values.get("enabled", False) and not v:
+    @field_validator("url")
+    @classmethod
+    def validate_url_if_enabled(cls, v: Optional[str], info: ValidationInfo) -> Optional[str]:
+        if info.data.get("enabled", False) and not v:
             raise ValueError("Friendbot URL is required when enabled=True")
         return v
 
@@ -56,7 +57,8 @@ class AssetConfig(BaseModel):
     domain: str = Field(..., description="Asset domain")
     verified: bool = Field(default=False, description="Whether asset is verified")
 
-    @validator("issuer")
+    @field_validator("issuer")
+    @classmethod
     def validate_stellar_public_key(cls, v: str) -> str:
         """Validate Stellar public key format."""
         if not v.startswith("G") or len(v) != 56:
@@ -245,24 +247,25 @@ class StellarMainConfig(BaseModel):
         default_factory=SecurityConfig, description="Security settings"
     )
 
-    @validator("networks")
+    @field_validator("networks")
+    @classmethod
     def validate_default_network_exists(
-        cls, v: Dict[StellarNetworkType, StellarNetworkConfig], values: Dict[str, Any]
+        cls, v: Dict[StellarNetworkType, StellarNetworkConfig], info: ValidationInfo
     ) -> Dict[StellarNetworkType, StellarNetworkConfig]:
         """Ensure default network exists in networks configuration."""
-        default_network = values.get("default_network")
+        default_network = info.data.get("default_network")
         if default_network and default_network not in v:
             raise ValueError(
                 f"Default network '{default_network}' not found in networks configuration"
             )
         return v
 
-    @validator("well_known_assets")
+    @field_validator("well_known_assets")
+    @classmethod
     def validate_asset_networks(
-        cls, v: Dict[str, Dict[str, AssetConfig]], values: Dict[str, Any]
+        cls, v: Dict[str, Dict[str, AssetConfig]]
     ) -> Dict[str, Dict[str, AssetConfig]]:
         """Validate that asset networks exist in network configuration."""
-        # networks = values.get("networks", {})  # Removed unused variable
         for network_name in v.keys():
             try:
                 StellarNetworkType(network_name)
@@ -270,12 +273,11 @@ class StellarMainConfig(BaseModel):
                 raise ValueError(f"Unknown network '{network_name}' in well_known_assets")
         return v
 
-    class Config:
-        """Pydantic configuration."""
-
-        use_enum_values = True
-        validate_assignment = True
-        extra = "forbid"  # Forbid extra fields not defined in model
+    model_config = ConfigDict(
+        use_enum_values=True,
+        validate_assignment=True,
+        extra="forbid",  # Forbid extra fields not defined in model
+    )
 
 
 class StellarConfigValidator:

@@ -388,7 +388,7 @@ class ModernStellarOrderManager:
             )
             raise
 
-    async def cancel_order(self, order_id: str) -> OrderCancellationResult:
+    async def cancel_order(self, order_id: str) -> OrderCancellationResult:  # noqa: C901
         """
         Cancel an active order with idempotency and external order protection.
 

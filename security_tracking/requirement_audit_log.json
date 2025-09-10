@@ -1951,5 +1951,149 @@
     "completion_percentage": 100,
     "user": "dev_team",
     "notes": "Finished"
+  },
+  {
+    "timestamp": 1757487239.718977,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757487239.752749,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757487239.7696223,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757487239.785525,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757487398.7989666,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757487398.8314219,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757487398.8478673,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757487398.8644748,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757487880.9438303,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757487880.9746127,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757487880.9922442,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757487881.019199,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
+  },
+  {
+    "timestamp": 1757487926.115209,
+    "requirement_id": "SR-CRIT-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 60,
+    "user": "system",
+    "notes": "Test convenience function"
+  },
+  {
+    "timestamp": 1757487926.1526191,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "not_started",
+    "new_status": "in_progress",
+    "completion_percentage": 25,
+    "user": "dev_team",
+    "notes": "Started"
+  },
+  {
+    "timestamp": 1757487926.2322078,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "in_progress",
+    "completion_percentage": 75,
+    "user": "dev_team",
+    "notes": "Nearly done"
+  },
+  {
+    "timestamp": 1757487926.2496018,
+    "requirement_id": "INT-TEST-001",
+    "old_status": "in_progress",
+    "new_status": "completed",
+    "completion_percentage": 100,
+    "user": "dev_team",
+    "notes": "Finished"
   }
 ]
