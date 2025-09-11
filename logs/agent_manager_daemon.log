@@ -1,0 +1,11 @@
+2025-09-10 15:40:33,377 - __main__ - INFO - Initialized agent: ProjectManager (coordinator)
+2025-09-10 15:40:33,379 - __main__ - INFO - Initialized agent: Architect (reviewer)
+2025-09-10 15:40:33,381 - __main__ - INFO - Initialized agent: SecurityEngineer (reviewer)
+2025-09-10 15:40:33,382 - __main__ - INFO - Initialized agent: QAEngineer (reviewer)
+2025-09-10 15:40:33,384 - __main__ - INFO - Initialized agent: Implementer (implementer)
+2025-09-10 15:40:33,385 - __main__ - INFO - Initialized agent: DevOpsEngineer (implementer)
+2025-09-10 15:40:33,387 - __main__ - INFO - Initialized agent: PerformanceEngineer (specialist)
+2025-09-10 15:40:33,389 - __main__ - INFO - Initialized agent: DocumentationEngineer (specialist)
+2025-09-10 15:40:33,389 - __main__ - INFO - Initialized 8 agents and 0 tasks
+2025-09-10 15:40:33,392 - __main__ - INFO - Started agent monitoring
+🚀 Agent manager started. Press Ctrl+C to stop.

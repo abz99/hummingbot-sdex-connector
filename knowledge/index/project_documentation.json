@@ -1,0 +1,44 @@
+{
+  "id": "project_documentation",
+  "type": "multi_file",
+  "description": "Core project documentation including status, checklists, and specifications",
+  "files": [
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/PROJECT_STATUS.md",
+      "hash": "72c338d2eeac3e5752ae85351d9e5eec37e346735040c1d782adfe4d2e916312",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/stellar_sdex_checklist_v3.md",
+      "hash": "fa2bcdf124528f76a46e31e9de27d57423dbcab4e913266e9d106bc62b789b48",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/stellar_sdex_tdd_v3.md",
+      "hash": "35eb8755b7c63e1ba5c26c5be8300a331283d080eb7e14ce5c9bd22e7a6cc1e6",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/README.md",
+      "hash": "cdfbb8c0ee56a0027204d11ad5462cddae55708104de9e17f10b8dbc7362219c",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/CONFIGURATION.md",
+      "hash": "2bc811fe00ab8f5c37c7dce8e6889daed092df6057b2b9cb75674bdbd5c815f1",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/CHANGELOG.md",
+      "hash": "f1c799f99a97702b6c0d6562b3f3dc199e32dbdf93bc5aa94275ca3025abcac5",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/PHASE_*_COMPLETION_REPORT.md",
+      "hash": null,
+      "exists": false
+    }
+  ],
+  "last_indexed": "2025-09-11T07:51:50.645318+00:00",
+  "hash": "9435a168c8621268c6fbf85a3f1e664b5f526f1b9ccd50313d67d00e955c18a3"
+}

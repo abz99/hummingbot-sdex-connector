@@ -89,7 +89,8 @@ class ModernStellarChainInterface:
             # Initialize Horizon servers with failover
             horizon_urls = [str(self.config.horizon.primary)] + [str(url) for url in self.config.horizon.fallbacks]
             for horizon_url in horizon_urls:
-                aiohttp_client = AiohttpClient(session=self.session_pool)
+                # AiohttpClient manages its own session internally
+                aiohttp_client = AiohttpClient()
                 server = ServerAsync(horizon_url=horizon_url, client=aiohttp_client)
                 self.horizon_servers.append(server)
                 self._horizon_health_status[horizon_url] = True

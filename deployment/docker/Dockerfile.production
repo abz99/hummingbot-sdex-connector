@@ -1,0 +1,139 @@
+# Multi-stage production Dockerfile for Stellar Hummingbot Connector v3.0
+# Optimized for security, performance, and minimal attack surface
+
+# Stage 1: Build Dependencies
+FROM python:3.11-slim as builder
+
+# Install system dependencies needed for building
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    libffi-dev \
+    libssl-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for building
+RUN groupadd --gid 1000 builder && \
+    useradd --uid 1000 --gid builder --shell /bin/bash --create-home builder
+
+# Set up Python environment
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt requirements-prod.txt ./
+RUN pip install --upgrade pip && \
+    pip install --user --no-cache-dir -r requirements.txt && \
+    pip install --user --no-cache-dir -r requirements-prod.txt
+
+# Stage 2: Runtime Environment
+FROM python:3.11-slim as runtime
+
+# Install only essential runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create application user with no shell for security
+RUN groupadd --gid 1000 stellarbot && \
+    useradd --uid 1000 --gid stellarbot --shell /sbin/nologin --create-home stellarbot
+
+# Copy Python packages from builder stage
+COPY --from=builder /root/.local /home/stellarbot/.local
+
+# Set up application directory
+WORKDIR /app
+COPY --chown=stellarbot:stellarbot . .
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/logs /app/cache /app/tmp /app/config && \
+    chown -R stellarbot:stellarbot /app && \
+    chmod -R 755 /app
+
+# Switch to non-root user
+USER stellarbot
+
+# Set environment variables
+ENV PYTHONPATH=/app:/home/stellarbot/.local/lib/python3.11/site-packages \
+    PATH=/home/stellarbot/.local/bin:$PATH \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    STELLAR_NETWORK=mainnet \
+    LOG_LEVEL=INFO \
+    METRICS_ENABLED=true \
+    HSM_ENABLED=false
+
+# Health check endpoints
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Expose ports
+EXPOSE 8080 8443
+
+# Create startup script
+RUN cat > /app/start.sh << 'EOF'
+#!/bin/bash
+set -euo pipefail
+
+# Function to handle shutdown signals
+cleanup() {
+    echo "Received shutdown signal, cleaning up..."
+    # Graceful shutdown logic here
+    pkill -TERM -f stellar-hummingbot || true
+    sleep 10
+    exit 0
+}
+
+# Set up signal handlers
+trap cleanup SIGTERM SIGINT
+
+# Verify required environment variables
+if [[ -z "${STELLAR_NETWORK:-}" ]]; then
+    echo "ERROR: STELLAR_NETWORK environment variable not set"
+    exit 1
+fi
+
+# Create log directory if it doesn't exist
+mkdir -p /app/logs
+
+# Start the application with proper logging
+echo "Starting Stellar Hummingbot Connector v3.0..."
+echo "Network: ${STELLAR_NETWORK}"
+echo "Log Level: ${LOG_LEVEL}"
+echo "Metrics Enabled: ${METRICS_ENABLED}"
+echo "HSM Enabled: ${HSM_ENABLED}"
+
+# Start application
+exec python -m hummingbot.connector.exchange.stellar.stellar_exchange \
+    --network="${STELLAR_NETWORK}" \
+    --log-level="${LOG_LEVEL}" \
+    --metrics-enabled="${METRICS_ENABLED}" \
+    --config-dir="/app/config" \
+    --log-dir="/app/logs" \
+    --cache-dir="/app/cache" \
+    2>&1 | tee -a /app/logs/stellar-hummingbot.log
+EOF
+
+RUN chmod +x /app/start.sh
+
+# Default command
+CMD ["/app/start.sh"]
+
+# Labels for metadata
+LABEL maintainer="Stellar Hummingbot Team" \
+      version="3.0" \
+      description="Production-ready Stellar Hummingbot Connector v3.0" \
+      org.opencontainers.image.title="Stellar Hummingbot Connector" \
+      org.opencontainers.image.description="Enterprise-grade Stellar trading connector for Hummingbot" \
+      org.opencontainers.image.version="3.0" \
+      org.opencontainers.image.vendor="Stellar Development Foundation" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.source="https://github.com/stellar/stellar-hummingbot-connector-v3" \
+      security.scan.enabled="true" \
+      security.non-root-user="stellarbot"

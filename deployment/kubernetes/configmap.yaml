@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stellar-hummingbot-config
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: config
+data:
+  # Application Configuration
+  app.yaml: |
+    stellar:
+      networks:
+        mainnet:
+          name: "stellar_mainnet"
+          network_passphrase: "Public Global Stellar Network ; September 2015"
+          horizon:
+            primary: "https://horizon.stellar.org"
+            fallbacks:
+              - "https://horizon-1.stellar.org"
+              - "https://horizon-2.stellar.org"
+          soroban:
+            primary: "https://soroban-rpc.stellar.org"
+          rate_limits:
+            requests_per_second: 10
+            burst_limit: 20
+        testnet:
+          name: "stellar_testnet"
+          network_passphrase: "Test SDF Network ; September 2015"
+          horizon:
+            primary: "https://horizon-testnet.stellar.org"
+          soroban:
+            primary: "https://soroban-testnet.stellar.org"
+          rate_limits:
+            requests_per_second: 5
+            burst_limit: 10
+      
+      trading:
+        default_trading_pairs:
+          - "XLM-USDC"
+          - "XLM-USDT"
+          - "BTC-XLM"
+          - "ETH-XLM"
+        default_order_amount: "100.0"
+        max_order_age_seconds: 300
+        
+      security:
+        hsm_enabled: true
+        hardware_wallet_support: true
+        key_derivation_path: "m/44'/148'/0'"
+        require_confirmation: true
+        audit_logging: true
+        
+      monitoring:
+        metrics_enabled: true
+        health_check_interval: 30
+        log_level: "INFO"
+        prometheus_endpoint: ":8080/metrics"
+        
+  # Logging Configuration  
+  logging.yaml: |
+    version: 1
+    disable_existing_loggers: false
+    formatters:
+      json:
+        format: '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "message": "%(message)s", "process": "%(process)d", "thread": "%(thread)d"}'
+      standard:
+        format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        level: INFO
+        formatter: json
+        stream: ext://sys.stdout
+      file:
+        class: logging.handlers.RotatingFileHandler
+        level: DEBUG
+        formatter: json
+        filename: /var/log/stellar-hummingbot/app.log
+        maxBytes: 104857600  # 100MB
+        backupCount: 5
+    loggers:
+      stellar_hummingbot:
+        level: DEBUG
+        handlers: [console, file]
+        propagate: false
+      hummingbot:
+        level: INFO
+        handlers: [console, file]
+        propagate: false
+    root:
+      level: INFO
+      handlers: [console]
+
+  # Prometheus Configuration
+  prometheus.yaml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    rule_files:
+      - "/etc/prometheus/rules/*.yml"
+    
+    scrape_configs:
+      - job_name: 'stellar-hummingbot'
+        static_configs:
+          - targets: ['stellar-hummingbot-service:8080']
+        metrics_path: /metrics
+        scrape_interval: 10s
+        
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - stellar-hummingbot
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__

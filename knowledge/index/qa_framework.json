@@ -1,0 +1,44 @@
+{
+  "id": "qa_framework",
+  "type": "multi_file",
+  "description": "Complete quality assurance framework including guidelines and test specifications",
+  "files": [
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/qa/quality_catalogue.yml",
+      "hash": "e516a0cd8aa8624742cba528debcc1ce1b3ffc9b181d8f9120cd4ec9f6004b95",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/qa/quality_catalogue.json",
+      "hash": "c55185c0c4bf7b1cad831314e8a776dfa8a0222e3b6c19f469069381eb2737fe",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/QUALITY_GUIDELINES.md",
+      "hash": "4456e13c46e6353f32a1eb1ac26dbd87d10e8927e9f686d7251294ff80d43c8b",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/test_qa_requirements.py",
+      "hash": "6601ed4dd9f884a501580aa3b5de06fb06522df7f73bb6abe573f63968184c3b",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/.github/workflows/ci.yml",
+      "hash": "6306f6f22c8afba3f33a684723a154fcde899baef9f17b33b575cfb9cf4018f7",
+      "exists": true
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/tests/unit/test_*.py",
+      "hash": null,
+      "exists": false
+    },
+    {
+      "path": "/home/abz/projects/stellar-hummingbot-connector-v3/tests/integration/test_*.py",
+      "hash": null,
+      "exists": false
+    }
+  ],
+  "last_indexed": "2025-09-10T15:54:53.591097+00:00",
+  "hash": "90665a8d5d41bb3a31903dca5acd58c678a6347314e9592d6ab4f1fb19a14e9c"
+}

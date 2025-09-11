@@ -1,0 +1,31 @@
+{
+  "name": "DocumentationEngineer",
+  "role": "Technical Documentation Specialist",
+  "category": "specialist",
+  "status": "initializing",
+  "priority": 4,
+  "capabilities": [
+    "technical_writing",
+    "api_documentation",
+    "developer_experience_design",
+    "documentation_automation"
+  ],
+  "specializations": [
+    "api_documentation_tools",
+    "developer_onboarding",
+    "integration_guides",
+    "documentation_as_code"
+  ],
+  "current_task": null,
+  "last_activity": "2025-09-10T15:40:33.401949+00:00",
+  "message_queue_size": 0,
+  "knowledge_base_sources": [
+    "knowledge/sdk_docs",
+    "knowledge/hummingbot_guide",
+    "knowledge/project_documentation",
+    "README.md",
+    "docs/",
+    "CONFIGURATION.md",
+    "docs/COMPONENT_API_REFERENCE.md"
+  ]
+}

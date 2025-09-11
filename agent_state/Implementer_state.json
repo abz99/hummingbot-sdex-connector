@@ -1,0 +1,29 @@
+{
+  "name": "Implementer",
+  "role": "Senior Software Engineer",
+  "category": "implementer",
+  "status": "initializing",
+  "priority": 3,
+  "capabilities": [
+    "code_implementation",
+    "refactoring",
+    "debugging",
+    "documentation"
+  ],
+  "specializations": [
+    "async_python_development",
+    "stellar_sdk_integration",
+    "hummingbot_connectors",
+    "financial_systems"
+  ],
+  "current_task": null,
+  "last_activity": "2025-09-10T15:40:33.399203+00:00",
+  "message_queue_size": 0,
+  "knowledge_base_sources": [
+    "knowledge/repo_index",
+    "hummingbot/connector/exchange/stellar/",
+    "knowledge/qa_framework",
+    "stellar_sdex_checklist_v3.md",
+    "stellar_sdex_tdd_v3.md"
+  ]
+}

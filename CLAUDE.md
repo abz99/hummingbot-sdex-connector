@@ -26,20 +26,31 @@
 
 **These principles supersede all other instructions and must guide every decision.**
 
-## 🎯 SESSION STARTUP CHECKLIST (MANDATORY)
+## 🎯 SESSION STARTUP CHECKLIST (AUTOMATED)
 
-**ALWAYS perform these steps at the start of each new session:**
+**AUTOMATIC STARTUP SEQUENCE** - Runs automatically when Claude Code starts:
 
-1. **Read PROJECT_STATUS.md** - Get current project state overview
-2. **Read CORE INSTRUCTION FILES** ⭐:
+The system now includes **automated startup** via `.claude_code_startup.py` which:
+
+1. ✅ **Validates Prerequisites** - Checks Python version, dependencies, required files
+2. ✅ **Validates Configuration** - Ensures `team_startup.yaml` is valid  
+3. ✅ **Updates Knowledge Base** - Automatically indexes all documentation and code
+4. ✅ **Initializes Persistent Agents** - Starts all 8 specialized agents with state persistence
+5. ✅ **Starts Background Services** - Monitors file changes and agent health
+6. ✅ **Displays System Status** - Shows agents, tasks, and knowledge base status
+
+**MANUAL OVERRIDE** (if needed):
+- Set `SKIP_CLAUDE_STARTUP=1` to skip automated startup
+- Run `python .claude_code_startup.py` to manually trigger startup
+- Use `python scripts/agent_manager.py --status` for current system status
+
+**CORE INSTRUCTION FILES** ⭐ (Auto-indexed for all agents):
    - `stellar_sdex_checklist_v3.md` - **Master implementation roadmap**
-   - `stellar_sdex_tdd_v3.md` - **Technical design blueprint** 
-3. **Check git status** - Review uncommitted changes
-4. **Run auto-accept setup** - `source auto_accept_setup.sh`
-5. **Review recent commits** - `git log --oneline -5`
-6. **Check context files**:
-   - `PHASE_1_COMPLETION_REPORT.md` - Current achievements
-   - `DEVELOPMENT_RULES.md` - Development guidelines
+   - `stellar_sdex_tdd_v3.md` - **Technical design blueprint**
+   - `PROJECT_STATUS.md` - **Current project state** (auto-updated)
+   - `qa/quality_catalogue.yml` - **Quality requirements** (auto-tracked)
+
+**🚀 STARTUP EXECUTION** - Run this immediately upon session start:
 
 ## 📊 PROGRESS TRACKING SYSTEM
 

@@ -1,0 +1,15 @@
+{
+  "id": "sdk_docs",
+  "type": "web",
+  "url": "https://developers.stellar.org/docs",
+  "description": "Official Stellar SDK & Soroban documentation with APIs and patterns",
+  "includes": [
+    "https://developers.stellar.org/docs/data/horizon",
+    "https://developers.stellar.org/docs/data/rpc",
+    "https://developers.stellar.org/docs/smart-contracts",
+    "https://developers.stellar.org/docs/tokens",
+    "https://developers.stellar.org/network/horizon"
+  ],
+  "last_indexed": "2025-09-11T07:53:32.318806+00:00",
+  "hash": "09211f5472fde0f04d026636bfc182f03afb58593104e1cf86d2daab71832a82"
+}

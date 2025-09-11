@@ -1,0 +1,273 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stellar-hummingbot-connector
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: connector
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: stellar-hummingbot-connector
+      app.kubernetes.io/component: connector
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stellar-hummingbot-connector
+        app.kubernetes.io/component: connector
+        app.kubernetes.io/version: "3.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+        config.checksum: ${CONFIG_CHECKSUM}
+    spec:
+      serviceAccountName: stellar-hummingbot-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: stellar-hummingbot-connector
+        image: stellar-hummingbot-connector:3.0
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        ports:
+        - name: http-metrics
+          containerPort: 8080
+          protocol: TCP
+        - name: https-api
+          containerPort: 8443
+          protocol: TCP
+        env:
+        - name: STELLAR_NETWORK
+          value: "mainnet"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: METRICS_ENABLED
+          value: "true"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: STELLAR_HSM_ENABLED
+          valueFrom:
+            secretKeyRef:
+              name: stellar-hummingbot-secrets
+              key: hsm-enabled
+        - name: STELLAR_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stellar-hummingbot-secrets
+              key: private-key
+              optional: true
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        - name: secrets-volume
+          mountPath: /app/secrets
+          readOnly: true
+        - name: logs-volume
+          mountPath: /var/log/stellar-hummingbot
+        - name: temp-volume
+          mountPath: /tmp
+        - name: cache-volume
+          mountPath: /app/cache
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "1Gi"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+            ephemeral-storage: "5Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http-metrics
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http-metrics
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: http-metrics
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 30
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - "sleep 15 && pkill -TERM -f stellar-hummingbot"
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - name: config-volume
+        configMap:
+          name: stellar-hummingbot-config
+          defaultMode: 0444
+      - name: secrets-volume
+        secret:
+          secretName: stellar-hummingbot-secrets
+          defaultMode: 0400
+      - name: logs-volume
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: temp-volume
+        emptyDir:
+          sizeLimit: 1Gi
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 500Mi
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        node-type: compute
+      tolerations:
+      - key: "stellar-workload"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - stellar-hummingbot-connector
+              topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            preference:
+              matchExpressions:
+              - key: instance-type
+                operator: In
+                values:
+                - compute-optimized
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stellar-hummingbot-service
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 300
+  ports:
+  - name: http-metrics
+    port: 8080
+    targetPort: http-metrics
+    protocol: TCP
+  - name: https-api
+    port: 8443
+    targetPort: https-api
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: connector
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: stellar-hummingbot-sa
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: serviceaccount
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: stellar-hummingbot-role
+  namespace: stellar-hummingbot
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: stellar-hummingbot-rolebinding
+  namespace: stellar-hummingbot
+subjects:
+- kind: ServiceAccount
+  name: stellar-hummingbot-sa
+  namespace: stellar-hummingbot
+roleRef:
+  kind: Role
+  name: stellar-hummingbot-role
+  apiGroup: rbac.authorization.k8s.io

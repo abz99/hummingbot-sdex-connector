@@ -1,0 +1,17 @@
+{
+  "id": "devops_standards",
+  "type": "file",
+  "path": "/home/abz/projects/stellar-hummingbot-connector-v3/knowledge/devops_ci_cd.md",
+  "description": "CI/CD best practices, deployment strategies, and operational procedures",
+  "last_indexed": "2025-09-10T15:54:53.583434+00:00",
+  "hash": "fcde89f6e5c8bc78644d4ae8494fef7da1c5dedb8fe60b59a819a76c29d2e938",
+  "related_files": [
+    ".github/workflows/*.yml",
+    "config/**/*",
+    "scripts/deploy*.sh",
+    "scripts/*docker*",
+    "Dockerfile*",
+    "docker-compose*.yml",
+    "requirements*.txt"
+  ]
+}

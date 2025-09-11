@@ -1,0 +1,6 @@
+[2025-09-10 15:35:46] INFO: Starting Claude Code session startup sequence
+[2025-09-10 15:35:46] ERROR: Startup failed at step: Prerequisites
+[2025-09-10 15:36:23] INFO: Starting Claude Code session startup sequence
+[2025-09-10 15:36:33] INFO: Startup completed successfully in 10.4s
+[2025-09-10 15:40:31] INFO: Starting Claude Code session startup sequence
+[2025-09-10 15:40:35] INFO: Startup completed successfully in 4.2s

@@ -1,0 +1,58 @@
+{
+  "total_tests": 7,
+  "passed_tests": 6,
+  "failed_tests": 1,
+  "success_rate": 85.71428571428571,
+  "test_results": [
+    {
+      "test_name": "Configuration Validation",
+      "passed": true,
+      "message": "team_startup.yaml is valid",
+      "details": {},
+      "timestamp": "2025-09-10T15:54:26.526263"
+    },
+    {
+      "test_name": "Knowledge Base Indexing",
+      "passed": true,
+      "message": "9 knowledge bases, 3 files indexed",
+      "details": {},
+      "timestamp": "2025-09-10T15:54:37.123947"
+    },
+    {
+      "test_name": "Agent Initialization",
+      "passed": true,
+      "message": "8 agents initialized successfully",
+      "details": {},
+      "timestamp": "2025-09-10T15:54:38.827034"
+    },
+    {
+      "test_name": "System Monitoring",
+      "passed": true,
+      "message": "System health monitoring working - Status: critical",
+      "details": {},
+      "timestamp": "2025-09-10T15:54:42.433820"
+    },
+    {
+      "test_name": "Startup Automation",
+      "passed": true,
+      "message": "Startup automation working correctly",
+      "details": {},
+      "timestamp": "2025-09-10T15:54:44.176039"
+    },
+    {
+      "test_name": "File Change Detection",
+      "passed": false,
+      "message": "File change not detected after modification",
+      "details": {},
+      "timestamp": "2025-09-10T15:54:56.384001"
+    },
+    {
+      "test_name": "Workflow Task Creation",
+      "passed": true,
+      "message": "Task creation and status tracking working",
+      "details": {},
+      "timestamp": "2025-09-10T15:54:58.084094"
+    }
+  ],
+  "timestamp": "2025-09-10T15:54:59.084959"
+}

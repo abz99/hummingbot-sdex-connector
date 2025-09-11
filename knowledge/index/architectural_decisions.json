@@ -1,0 +1,51 @@
+{
+  "id": "architectural_decisions",
+  "type": "directory",
+  "description": "Architecture Decision Records (ADRs) and technical design documentation",
+  "path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/decisions",
+  "files": [
+    {
+      "path": "docs/decisions/ADR-003-enterprise-security-framework.md",
+      "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/decisions/ADR-003-enterprise-security-framework.md",
+      "hash": "66e1dc7b4a9bbcaff213ac4745065d959c25bc419a370dd44b0d5d7379a1d0bb",
+      "size": 4086,
+      "modified": "2025-09-06T11:16:00.597130+00:00"
+    },
+    {
+      "path": "docs/decisions/ADR-004-async-architecture-choice.md",
+      "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/decisions/ADR-004-async-architecture-choice.md",
+      "hash": "9c467f1f90d15559bb467b7d8a2f2e3bef15a833443d542c7ee012826a4141ba",
+      "size": 4989,
+      "modified": "2025-09-06T11:16:35.901395+00:00"
+    },
+    {
+      "path": "docs/decisions/ADR-002-hummingbot-v127-patterns.md",
+      "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/decisions/ADR-002-hummingbot-v127-patterns.md",
+      "hash": "bc2fec16a9ec8a34fed672533549a4891ed7db07c4ebb409f6b4729f011f65dd",
+      "size": 3461,
+      "modified": "2025-09-06T11:14:04.944058+00:00"
+    },
+    {
+      "path": "docs/decisions/README.md",
+      "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/decisions/README.md",
+      "hash": "ccbe1cac63922c08a8e1bd176454fd715d4dbbdff175efadcc94e9223ef5af5e",
+      "size": 1507,
+      "modified": "2025-09-06T11:12:47.947143+00:00"
+    },
+    {
+      "path": "docs/decisions/ADR-001-stellar-sdk-v8-adoption.md",
+      "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/decisions/ADR-001-stellar-sdk-v8-adoption.md",
+      "hash": "633ade0e196266dda280c26af822975ea65d22771d9084a99d59eca62c539617",
+      "size": 2906,
+      "modified": "2025-09-06T11:13:39.455775+00:00"
+    }
+  ],
+  "file_count": 5,
+  "related_files": [
+    "PHASE_1_COMPLETION_REPORT.md",
+    "docs/COMPONENT_API_REFERENCE.md",
+    "docs/*.md"
+  ],
+  "last_indexed": "2025-09-10T15:54:53.595584+00:00",
+  "hash": "96f28c42fd7ebfe74d23801900b71a1382cdfea1f3dda997d61c0b4933f7a506"
+}

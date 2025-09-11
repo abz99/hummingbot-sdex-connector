@@ -1,0 +1,15 @@
+{
+  "id": "security_standards",
+  "type": "file",
+  "path": "/home/abz/projects/stellar-hummingbot-connector-v3/knowledge/security_best_practices.md",
+  "description": "Comprehensive security guidelines, threat models, and compliance requirements",
+  "last_indexed": "2025-09-10T15:54:53.580833+00:00",
+  "hash": "bb6e0a126508e777b7048ce5b0154b48017c1e72a0083ef53cf24135f7ab7d83",
+  "related_files": [
+    "security_tracking/*.json",
+    "SECURITY_REQUIREMENTS_DOCUMENT.md",
+    "DEVELOPMENT_SECURITY_THREAT_MODEL.md",
+    "docs/security/*.md",
+    "scripts/*security*.py"
+  ]
+}

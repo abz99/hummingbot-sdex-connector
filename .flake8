@@ -44,8 +44,8 @@ application-package-names = hummingbot
 
 # Per-file ignores
 per-file-ignores = 
-    # Test files can have unused imports and long lines
-    tests/*:F401,E501
+    # Test files can have unused imports, variables and long lines
+    tests/*:F401,F841,E501,C901
     # __init__.py files can have unused imports
     __init__.py:F401
     # Configuration files can have long lines

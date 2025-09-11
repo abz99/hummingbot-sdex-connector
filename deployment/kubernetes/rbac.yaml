@@ -1,0 +1,222 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: stellar-hummingbot-sa
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: service-account
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT-ID:role/stellar-hummingbot-service-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: stellar-hummingbot-role
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: rbac
+rules:
+# Secrets access for configuration
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+  resourceNames: ["stellar-hummingbot-secrets"]
+  
+# ConfigMap access for configuration
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+  resourceNames: ["stellar-hummingbot-config"]
+  
+# Service access for health checks
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list"]
+  resourceNames: ["stellar-hummingbot-service"]
+  
+# Pod access for self-monitoring
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+  
+# Events for logging and monitoring
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: stellar-hummingbot-rolebinding
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: rbac
+subjects:
+- kind: ServiceAccount
+  name: stellar-hummingbot-sa
+  namespace: stellar-hummingbot
+roleRef:
+  kind: Role
+  name: stellar-hummingbot-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Monitoring ServiceAccount for Prometheus/Grafana
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: stellar-hummingbot-monitoring-sa
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-monitoring
+    app.kubernetes.io/component: service-account
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: stellar-hummingbot-monitoring-role
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-monitoring
+    app.kubernetes.io/component: rbac
+rules:
+# Metrics access
+- apiGroups: [""]
+  resources: ["services", "endpoints", "pods"]
+  verbs: ["get", "list", "watch"]
+  
+# ConfigMap access for dashboards
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+  
+# Secret access for monitoring credentials
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+  resourceNames: ["grafana-secrets", "prometheus-secrets"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: stellar-hummingbot-monitoring-rolebinding
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-monitoring
+    app.kubernetes.io/component: rbac
+subjects:
+- kind: ServiceAccount
+  name: stellar-hummingbot-monitoring-sa
+  namespace: stellar-hummingbot
+roleRef:
+  kind: Role
+  name: stellar-hummingbot-monitoring-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Network Policy for secure inter-pod communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: stellar-hummingbot-network-policy
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: network-security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: stellar-hummingbot-connector
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from monitoring (Prometheus)
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+    ports:
+    - protocol: TCP
+      port: 8080  # Metrics port
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: grafana
+    ports:
+    - protocol: TCP
+      port: 8080  # Health check port
+  # Allow ingress from load balancer for external access
+  - from: []
+    ports:
+    - protocol: TCP
+      port: 8443  # HTTPS port
+  egress:
+  # Allow egress to Stellar networks
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443  # HTTPS to Stellar Horizon/Soroban
+  # Allow egress to DNS
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+  # Allow egress to monitoring systems
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+    ports:
+    - protocol: TCP
+      port: 9090
+---
+# Pod Security Policy for enhanced security
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: stellar-hummingbot-psp-restrictive
+  namespace: stellar-hummingbot
+  labels:
+    app.kubernetes.io/name: stellar-hummingbot-connector
+    app.kubernetes.io/component: security-policy
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  runAsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1000
+        max: 65535
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1000
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1000
+        max: 65535
+  readOnlyRootFilesystem: true

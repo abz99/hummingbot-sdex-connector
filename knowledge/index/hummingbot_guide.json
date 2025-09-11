@@ -1,0 +1,13 @@
+{
+  "id": "hummingbot_guide",
+  "type": "web",
+  "url": "https://hummingbot.org/developers",
+  "description": "Hummingbot developer guide with connector templates and best practices",
+  "includes": [
+    "https://hummingbot.org/developers/connectors/",
+    "https://hummingbot.org/developers/debug-console/",
+    "https://hummingbot.org/developers/strategies/"
+  ],
+  "last_indexed": "2025-09-11T07:53:32.343746+00:00",
+  "hash": "a76d9839f2410805f4b71eafa3354345845100d04ae08d4022af8b9926376440"
+}

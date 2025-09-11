@@ -1,0 +1,15 @@
+{
+  "task_id": "c3e0daae-42ab-43b0-b039-274add9814ea",
+  "description": "Test task for integration testing",
+  "qa_ids": [
+    "TEST-001"
+  ],
+  "current_phase": "requirements",
+  "assigned_agent": null,
+  "created_at": "2025-09-10T15:53:16.806471+00:00",
+  "updated_at": "2025-09-10T15:53:16.806471+00:00",
+  "phase_approvals": {},
+  "phase_feedback": {},
+  "blocking_issues": [],
+  "priority": "low"
+}
