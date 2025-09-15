@@ -587,17 +587,38 @@ class StellarMetrics:
         return generate_latest(self.registry).decode("utf-8")
 
     def start_metrics_server(self, port: int = 8000) -> threading.Thread:
-        """Start metrics server in a separate thread."""
+        """Start metrics server in a separate thread with port conflict resolution."""
+        import socket
+
+        def find_free_port(start_port: int = 8000) -> int:
+            """Find a free port starting from start_port."""
+            for p in range(start_port, start_port + 100):
+                try:
+                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                        s.bind(('', p))
+                        return p
+                except OSError:
+                    continue
+            raise RuntimeError("Could not find a free port for metrics server")
 
         def run_server():
-            start_http_server(port, registry=self.registry)
+            try:
+                actual_port = find_free_port(port)
+                start_http_server(actual_port, registry=self.registry)
+                self.logger.info(
+                    f"Metrics server started on port {actual_port}",
+                    category=LogCategory.METRICS,
+                    port=actual_port
+                )
+            except Exception as e:
+                self.logger.error(
+                    f"Failed to start metrics server: {e}",
+                    category=LogCategory.METRICS,
+                    error=str(e)
+                )
 
         thread = threading.Thread(target=run_server, daemon=True)
         thread.start()
-
-        self.logger.info(
-            f"Metrics server started on port {port}", category=LogCategory.METRICS, port=port
-        )
 
         return thread
 

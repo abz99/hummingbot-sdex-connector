@@ -1,10 +1,10 @@
 #!/bin/bash
-"""
-Staging Deployment Script
-Stellar Hummingbot Connector v3.0
-
-Deploys the connector to staging environment for final validation.
-"""
+#
+# Staging Deployment Script
+# Stellar Hummingbot Connector v3.0
+#
+# Deploys the connector to staging environment for final validation.
+#
 
 set -euo pipefail
 

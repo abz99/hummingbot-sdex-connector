@@ -1,0 +1,244 @@
+{
+  "agentName": "SecurityEngineer",
+  "createdAt": "2025-09-14T20:54:13.551Z",
+  "lastAccessed": "2025-09-14T21:21:20.869Z",
+  "personalContext": {},
+  "workflowState": {
+    "workflow-1757883375307": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T20:56:15.342Z",
+      "metadata": {
+        "phase": "Security",
+        "result": {
+          "phase": "Security",
+          "agent": "SecurityEngineer",
+          "sessionId": "SecurityEngineer-08e0853d",
+          "startTime": "2025-09-14T20:56:15.341Z",
+          "context": {
+            "totalExperience": 4,
+            "relevantLearnings": 2,
+            "activeRelationships": 1,
+            "previousPhases": 2
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T20:56:15.342Z"
+      }
+    },
+    "workflow-1757883637906": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:00:37.943Z",
+      "metadata": {
+        "phase": "Security",
+        "result": {
+          "phase": "Security",
+          "agent": "SecurityEngineer",
+          "sessionId": "SecurityEngineer-29b48e82",
+          "startTime": "2025-09-14T21:00:37.941Z",
+          "context": {
+            "totalExperience": 7,
+            "relevantLearnings": 2,
+            "activeRelationships": 2,
+            "previousPhases": 2
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:00:37.942Z"
+      }
+    },
+    "workflow-1757883657254": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:00:57.292Z",
+      "metadata": {
+        "phase": "Security",
+        "result": {
+          "phase": "Security",
+          "agent": "SecurityEngineer",
+          "sessionId": "SecurityEngineer-be165332",
+          "startTime": "2025-09-14T21:00:57.290Z",
+          "context": {
+            "totalExperience": 10,
+            "relevantLearnings": 2,
+            "activeRelationships": 2,
+            "previousPhases": 2
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:00:57.292Z"
+      }
+    },
+    "workflow-1757884469334": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:14:29.410Z",
+      "metadata": {
+        "phase": "Security",
+        "result": {
+          "phase": "Security",
+          "agent": "SecurityEngineer",
+          "sessionId": "SecurityEngineer-35877cb1",
+          "startTime": "2025-09-14T21:14:29.408Z",
+          "context": {
+            "totalExperience": 13,
+            "relevantLearnings": 2,
+            "activeRelationships": 2,
+            "previousPhases": 2
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:14:29.409Z"
+      }
+    },
+    "workflow-1757884880853": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:21:20.900Z",
+      "metadata": {
+        "phase": "Security",
+        "result": {
+          "phase": "Security",
+          "agent": "SecurityEngineer",
+          "sessionId": "SecurityEngineer-44200453",
+          "startTime": "2025-09-14T21:21:20.898Z",
+          "context": {
+            "totalExperience": 16,
+            "relevantLearnings": 2,
+            "activeRelationships": 2,
+            "previousPhases": 2
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:21:20.900Z"
+      }
+    }
+  },
+  "learnings": [
+    {
+      "id": "597e77e9-7649-4498-bfa0-2bde1b1ad07a",
+      "timestamp": "2025-09-14T20:54:13.553Z",
+      "type": "security_assessment",
+      "content": "Agent memory system uses secure file-based persistence with proper isolation",
+      "context": {},
+      "confidence": 0.95,
+      "tags": [
+        "security",
+        "memory",
+        "isolation"
+      ]
+    },
+    {
+      "id": "04e965d2-30dd-4815-920e-f644fc19ae37",
+      "timestamp": "2025-09-14T20:55:18.325Z",
+      "type": "role_specialization",
+      "content": "SecurityEngineer specializes in their domain-specific responsibilities",
+      "context": {
+        "role": "SecurityEngineer",
+        "domain": "securityengineer"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "securityengineer",
+        "specialization",
+        "role"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 18,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {
+    "ProjectManager": {
+      "totalInteractions": 1,
+      "lastInteraction": "2025-09-14T20:55:18.346Z",
+      "interactionTypes": {
+        "security_approval": 1
+      },
+      "collaborationHistory": [
+        {
+          "timestamp": "2025-09-14T20:55:18.346Z",
+          "type": "security_approval",
+          "details": {
+            "review": "memory_system_security",
+            "status": "approved",
+            "notes": "Meets security requirements"
+          }
+        }
+      ]
+    },
+    "Architect": {
+      "totalInteractions": 5,
+      "lastInteraction": "2025-09-14T21:21:20.899Z",
+      "interactionTypes": {
+        "workflow_handoff": 5
+      },
+      "collaborationHistory": [
+        {
+          "timestamp": "2025-09-14T20:56:15.341Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883375307",
+            "fromPhase": "Architecture",
+            "toPhase": "Security",
+            "handoffTime": "2025-09-14T20:56:15.341Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:00:37.942Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883637906",
+            "fromPhase": "Architecture",
+            "toPhase": "Security",
+            "handoffTime": "2025-09-14T21:00:37.942Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:00:57.291Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883657254",
+            "fromPhase": "Architecture",
+            "toPhase": "Security",
+            "handoffTime": "2025-09-14T21:00:57.291Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:14:29.409Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757884469334",
+            "fromPhase": "Architecture",
+            "toPhase": "Security",
+            "handoffTime": "2025-09-14T21:14:29.408Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:21:20.899Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757884880853",
+            "fromPhase": "Architecture",
+            "toPhase": "Security",
+            "handoffTime": "2025-09-14T21:21:20.899Z"
+          }
+        }
+      ]
+    }
+  },
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-14T21:21:20.900Z"
+}

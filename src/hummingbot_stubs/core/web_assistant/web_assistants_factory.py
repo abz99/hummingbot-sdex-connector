@@ -14,5 +14,13 @@ class WebAssistantsFactory:
         self._throttler = throttler
         self._auth = auth
 
+    @property
+    def throttler(self) -> Any:
+        return self._throttler
+
+    @property
+    def auth(self) -> Any:
+        return self._auth
+
     async def get_ws_assistant(self) -> WSAssistant:
         return WSAssistant()

@@ -1,0 +1,302 @@
+{
+  "agentName": "ProjectManager",
+  "createdAt": "2025-09-14T20:53:42.236Z",
+  "lastAccessed": "2025-09-14T21:21:20.862Z",
+  "personalContext": {},
+  "workflowState": {
+    "workflow-1757883375307": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T20:56:15.333Z",
+      "metadata": {
+        "phase": "Requirements",
+        "result": {
+          "phase": "Requirements",
+          "agent": "ProjectManager",
+          "sessionId": "ProjectManager-ab8215f0",
+          "startTime": "2025-09-14T20:56:15.331Z",
+          "context": {
+            "totalExperience": 5,
+            "relevantLearnings": 2,
+            "activeRelationships": 2,
+            "previousPhases": 0
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T20:56:15.333Z"
+      }
+    },
+    "workflow-1757883637906": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:00:37.933Z",
+      "metadata": {
+        "phase": "Requirements",
+        "result": {
+          "phase": "Requirements",
+          "agent": "ProjectManager",
+          "sessionId": "ProjectManager-369e04c3",
+          "startTime": "2025-09-14T21:00:37.930Z",
+          "context": {
+            "totalExperience": 8,
+            "relevantLearnings": 3,
+            "activeRelationships": 2,
+            "previousPhases": 0
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:00:37.933Z"
+      }
+    },
+    "workflow-1757883657254": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:00:57.282Z",
+      "metadata": {
+        "phase": "Requirements",
+        "result": {
+          "phase": "Requirements",
+          "agent": "ProjectManager",
+          "sessionId": "ProjectManager-d89c658f",
+          "startTime": "2025-09-14T21:00:57.280Z",
+          "context": {
+            "totalExperience": 11,
+            "relevantLearnings": 4,
+            "activeRelationships": 2,
+            "previousPhases": 0
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:00:57.282Z"
+      }
+    },
+    "workflow-1757884469334": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:14:29.400Z",
+      "metadata": {
+        "phase": "Requirements",
+        "result": {
+          "phase": "Requirements",
+          "agent": "ProjectManager",
+          "sessionId": "ProjectManager-bc279203",
+          "startTime": "2025-09-14T21:14:29.396Z",
+          "context": {
+            "totalExperience": 14,
+            "relevantLearnings": 5,
+            "activeRelationships": 2,
+            "previousPhases": 0
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:14:29.400Z"
+      }
+    },
+    "workflow-1757884880853": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:21:20.885Z",
+      "metadata": {
+        "phase": "Requirements",
+        "result": {
+          "phase": "Requirements",
+          "agent": "ProjectManager",
+          "sessionId": "ProjectManager-669cc5aa",
+          "startTime": "2025-09-14T21:21:20.882Z",
+          "context": {
+            "totalExperience": 17,
+            "relevantLearnings": 5,
+            "activeRelationships": 2,
+            "previousPhases": 0
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:21:20.885Z"
+      }
+    }
+  },
+  "learnings": [
+    {
+      "id": "3b413852-0239-4188-8969-92d17ae53530",
+      "timestamp": "2025-09-14T20:53:42.256Z",
+      "type": "implementation_insight",
+      "content": "Agent memory system successfully integrates with MCP server architecture",
+      "context": {
+        "feature": "memory_persistence",
+        "phase": "testing"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "memory",
+        "architecture",
+        "mcp",
+        "persistence"
+      ]
+    },
+    {
+      "id": "2f7f8838-f1c4-4c63-91a0-756fdc175bf0",
+      "timestamp": "2025-09-14T20:55:18.318Z",
+      "type": "role_specialization",
+      "content": "ProjectManager specializes in their domain-specific responsibilities",
+      "context": {
+        "role": "ProjectManager",
+        "domain": "projectmanager"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "projectmanager",
+        "specialization",
+        "role"
+      ]
+    },
+    {
+      "id": "edff7215-90aa-4a53-8ff6-ca08928855cd",
+      "timestamp": "2025-09-14T20:56:15.356Z",
+      "type": "workflow_completion",
+      "content": "Successfully coordinated 6-phase workflow: Test memory-aware multi-agent workflow coordination",
+      "context": {
+        "workflowId": "workflow-1757883375307",
+        "duration": 48,
+        "phases": 6,
+        "priority": "high"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "workflow",
+        "coordination",
+        "completion",
+        "high"
+      ]
+    },
+    {
+      "id": "852ace7c-356c-4d99-9caa-f209436478ff",
+      "timestamp": "2025-09-14T21:00:37.957Z",
+      "type": "workflow_completion",
+      "content": "Successfully coordinated 6-phase workflow: Test memory-aware multi-agent workflow coordination",
+      "context": {
+        "workflowId": "workflow-1757883637906",
+        "duration": 51,
+        "phases": 6,
+        "priority": "high"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "workflow",
+        "coordination",
+        "completion",
+        "high"
+      ]
+    },
+    {
+      "id": "626a5f95-b491-4235-bdc0-812bd3c99444",
+      "timestamp": "2025-09-14T21:00:57.307Z",
+      "type": "workflow_completion",
+      "content": "Successfully coordinated 6-phase workflow: Phase 5 Production Launch: Address critical gaps in API alignment, load testing, security audit, and operational readiness",
+      "context": {
+        "workflowId": "workflow-1757883657254",
+        "duration": 52,
+        "phases": 6,
+        "priority": "critical"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "workflow",
+        "coordination",
+        "completion",
+        "critical"
+      ]
+    },
+    {
+      "id": "082c590d-bc56-4bd1-bb72-e421fd35398c",
+      "timestamp": "2025-09-14T21:14:29.425Z",
+      "type": "workflow_completion",
+      "content": "Successfully coordinated 6-phase workflow: Phase 5 Final Production Launch: Load testing, security audit, operational readiness, and deployment authorization",
+      "context": {
+        "workflowId": "workflow-1757884469334",
+        "duration": 90,
+        "phases": 6,
+        "priority": "critical"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "workflow",
+        "coordination",
+        "completion",
+        "critical"
+      ]
+    },
+    {
+      "id": "c517524e-528d-4518-bedc-5c0f0d516160",
+      "timestamp": "2025-09-14T21:21:20.915Z",
+      "type": "workflow_completion",
+      "content": "Successfully coordinated 6-phase workflow: Post-Production Strategic Assessment: Evaluate advanced capabilities, next-gen features, AI/ML integration, and cross-chain opportunities for Phase 6+",
+      "context": {
+        "workflowId": "workflow-1757884880853",
+        "duration": 61,
+        "phases": 6,
+        "priority": "strategic"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "workflow",
+        "coordination",
+        "completion",
+        "strategic"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 19,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {
+    "SecurityEngineer": {
+      "totalInteractions": 1,
+      "lastInteraction": "2025-09-14T20:54:13.548Z",
+      "interactionTypes": {
+        "collaboration": 1
+      },
+      "collaborationHistory": [
+        {
+          "timestamp": "2025-09-14T20:54:13.548Z",
+          "type": "collaboration",
+          "details": {
+            "task": "memory_system_security_review",
+            "outcome": "approved",
+            "notes": "Memory system meets security standards"
+          }
+        }
+      ]
+    },
+    "Implementer": {
+      "totalInteractions": 1,
+      "lastInteraction": "2025-09-14T20:55:18.344Z",
+      "interactionTypes": {
+        "task_delegation": 1
+      },
+      "collaborationHistory": [
+        {
+          "timestamp": "2025-09-14T20:55:18.344Z",
+          "type": "task_delegation",
+          "details": {
+            "task": "memory_system_implementation",
+            "status": "completed",
+            "outcome": "successful"
+          }
+        }
+      ]
+    }
+  },
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-14T21:21:20.915Z"
+}

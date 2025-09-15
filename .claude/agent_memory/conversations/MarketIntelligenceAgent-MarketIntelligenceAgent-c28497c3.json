@@ -1,0 +1,29 @@
+{
+  "sessionId": "MarketIntelligenceAgent-c28497c3",
+  "agentName": "MarketIntelligenceAgent",
+  "startTime": "2025-09-15T06:14:44.088Z",
+  "lastActivity": "2025-09-15T06:14:44.088Z",
+  "messages": [],
+  "context": {
+    "agentType": "ai_enhanced",
+    "baseAgent": "SecurityEngineer",
+    "capabilities": [
+      "sentiment_analysis",
+      "opportunity_detection",
+      "price_prediction"
+    ],
+    "aiModels": [
+      "sentiment_classifier",
+      "price_predictor",
+      "volatility_forecaster"
+    ],
+    "initializationTime": "2025-09-15T06:14:44.087Z"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "general",
+    "priority": "normal",
+    "relatedAgents": [],
+    "workflowPhase": "unknown"
+  }
+}

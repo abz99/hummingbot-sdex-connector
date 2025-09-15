@@ -1,0 +1,49 @@
+{
+  "agentName": "RiskManagementAI",
+  "createdAt": "2025-09-15T06:14:44.090Z",
+  "lastAccessed": "2025-09-15T06:14:44.090Z",
+  "personalContext": {},
+  "workflowState": {},
+  "learnings": [
+    {
+      "id": "5b2638e8-2a53-42e8-8a3f-1e435337eccb",
+      "timestamp": "2025-09-15T06:14:44.091Z",
+      "type": "ai_specialization",
+      "content": "RiskManagementAI specializes in AI-powered intelligent risk assessment and management",
+      "context": {
+        "capabilities": [
+          "portfolio_risk",
+          "position_sizing",
+          "stress_testing"
+        ],
+        "models": [
+          "var_models",
+          "kelly_criterion",
+          "regime_detector"
+        ],
+        "baseAgent": "Architect"
+      },
+      "confidence": 1,
+      "tags": [
+        "ai",
+        "specialization",
+        "riskmanagementai",
+        "portfolio_risk",
+        "position_sizing",
+        "stress_testing"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 1,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {},
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-15T06:14:44.091Z"
+}

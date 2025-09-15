@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="2.720" timestamp="2025-09-11T10:57:28.213732+00:00" hostname="an"><testcase classname="tests.integration.test_real_world_validation.TestErrorResilienceValidation" name="test_network_timeout_handling" time="0.013"><failure message="pydantic_core._pydantic_core.ValidationError: 4 validation errors for StellarNetworkConfig&#10;network_passphrase&#10;  Field required [type=missing, input_value={'name': 'testnet_timeout...request_timeout': 0.001}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.11/v/missing&#10;horizon&#10;  Field required [type=missing, input_value={'name': 'testnet_timeout...request_timeout': 0.001}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.11/v/missing&#10;soroban&#10;  Field required [type=missing, input_value={'name': 'testnet_timeout...request_timeout': 0.001}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.11/v/missing&#10;rate_limits&#10;  Field required [type=missing, input_value={'name': 'testnet_timeout...request_timeout': 0.001}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.11/v/missing">#x1B[1m#x1B[31mtests/integration/test_real_world_validation.py#x1B[0m:428: in test_network_timeout_handling
+    #x1B[0mtimeout_config = StellarNetworkConfig(#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   pydantic_core._pydantic_core.ValidationError: 4 validation errors for StellarNetworkConfig#x1B[0m
+#x1B[1m#x1B[31mE   network_passphrase#x1B[0m
+#x1B[1m#x1B[31mE     Field required [type=missing, input_value={'name': 'testnet_timeout...request_timeout': 0.001}, input_type=dict]#x1B[0m
+#x1B[1m#x1B[31mE       For further information visit https://errors.pydantic.dev/2.11/v/missing#x1B[0m
+#x1B[1m#x1B[31mE   horizon#x1B[0m
+#x1B[1m#x1B[31mE     Field required [type=missing, input_value={'name': 'testnet_timeout...request_timeout': 0.001}, input_type=dict]#x1B[0m
+#x1B[1m#x1B[31mE       For further information visit https://errors.pydantic.dev/2.11/v/missing#x1B[0m
+#x1B[1m#x1B[31mE   soroban#x1B[0m
+#x1B[1m#x1B[31mE     Field required [type=missing, input_value={'name': 'testnet_timeout...request_timeout': 0.001}, input_type=dict]#x1B[0m
+#x1B[1m#x1B[31mE       For further information visit https://errors.pydantic.dev/2.11/v/missing#x1B[0m
+#x1B[1m#x1B[31mE   rate_limits#x1B[0m
+#x1B[1m#x1B[31mE     Field required [type=missing, input_value={'name': 'testnet_timeout...request_timeout': 0.001}, input_type=dict]#x1B[0m
+#x1B[1m#x1B[31mE       For further information visit https://errors.pydantic.dev/2.11/v/missing#x1B[0m</failure></testcase><testcase classname="tests.integration.test_real_world_validation.TestErrorResilienceValidation" name="test_invalid_transaction_handling" time="1.064"><failure message="AttributeError: 'coroutine' object has no attribute 'public_key'">#x1B[1m#x1B[31mtests/integration/test_real_world_validation.py#x1B[0m:461: in test_invalid_transaction_handling
+    #x1B[0msecurity_framework._active_keypairs[funded_test_account.public_key] = funded_test_account#x1B[90m#x1B[39;49;00m
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   AttributeError: 'coroutine' object has no attribute 'public_key'#x1B[0m</failure></testcase></testsuite></testsuites>

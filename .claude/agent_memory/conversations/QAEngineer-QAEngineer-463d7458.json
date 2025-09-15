@@ -1,0 +1,20 @@
+{
+  "sessionId": "QAEngineer-463d7458",
+  "agentName": "QAEngineer",
+  "startTime": "2025-09-14T20:55:18.330Z",
+  "lastActivity": "2025-09-14T20:55:18.330Z",
+  "messages": [],
+  "context": {
+    "taskType": "context_isolation_test",
+    "priority": "normal",
+    "workflowPhase": "testing",
+    "agentRole": "QAEngineer"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "context_isolation_test",
+    "priority": "normal",
+    "relatedAgents": [],
+    "workflowPhase": "testing"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "sessionId": "ProjectManager-34c84443",
+  "agentName": "ProjectManager",
+  "startTime": "2025-09-14T20:54:13.543Z",
+  "lastActivity": "2025-09-14T20:54:13.543Z",
+  "messages": [],
+  "context": {
+    "taskType": "memory_validation",
+    "priority": "normal",
+    "workflowPhase": "testing"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "memory_validation",
+    "priority": "normal",
+    "relatedAgents": [],
+    "workflowPhase": "testing"
+  }
+}

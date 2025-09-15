@@ -1,0 +1,21 @@
+{
+  "sessionId": "QAEngineer-888cb2eb",
+  "agentName": "QAEngineer",
+  "startTime": "2025-09-14T20:56:15.321Z",
+  "lastActivity": "2025-09-14T20:56:15.321Z",
+  "messages": [],
+  "context": {
+    "taskType": "workflow_coordination",
+    "priority": "high",
+    "workflowPhase": "QA",
+    "workflowId": "workflow-1757883375307",
+    "taskDescription": "Test memory-aware multi-agent workflow coordination"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "workflow_coordination",
+    "priority": "high",
+    "relatedAgents": [],
+    "workflowPhase": "QA"
+  }
+}

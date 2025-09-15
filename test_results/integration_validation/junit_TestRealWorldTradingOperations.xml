@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.877" timestamp="2025-09-11T10:56:49.829453+00:00" hostname="an"><testcase classname="tests.integration.test_real_world_validation.TestRealWorldTradingOperations" name="test_order_placement_on_testnet" time="0.018"><failure message="AttributeError: 'async_generator' object has no attribute 'start_network'">#x1B[1m#x1B[31mtests/integration/test_real_world_validation.py#x1B[0m:234: in test_order_placement_on_testnet
+    #x1B[0m#x1B[94mawait#x1B[39;49;00m stellar_connector.start_network()#x1B[90m#x1B[39;49;00m
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   AttributeError: 'async_generator' object has no attribute 'start_network'#x1B[0m</failure></testcase></testsuite></testsuites>

@@ -26,21 +26,17 @@ pytestmark = pytest.mark.asyncio
 @pytest_asyncio.fixture
 async def hummingbot_config():
     """Configuration for Hummingbot integration testing."""
-    from hummingbot.connector.exchange.stellar.stellar_config_models import NetworkEndpointConfig, RateLimitConfig
+    from hummingbot.connector.exchange.stellar.stellar_config_models import (
+        NetworkEndpointConfig,
+        RateLimitConfig,
+    )
 
     return StellarNetworkConfig(
         name="hummingbot_testnet",
         network_passphrase="Test SDF Network ; September 2015",
-        horizon=NetworkEndpointConfig(
-            primary="https://horizon-testnet.stellar.org"
-        ),
-        soroban=NetworkEndpointConfig(
-            primary="https://soroban-testnet.stellar.org"
-        ),
-        rate_limits=RateLimitConfig(
-            requests_per_second=5,
-            burst_limit=10
-        )
+        horizon=NetworkEndpointConfig(primary="https://horizon-testnet.stellar.org"),
+        soroban=NetworkEndpointConfig(primary="https://soroban-testnet.stellar.org"),
+        rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10),
     )
 
 
@@ -48,7 +44,9 @@ async def hummingbot_config():
 async def stellar_connector(hummingbot_config):
     """Initialize Stellar connector for Hummingbot integration testing."""
     connector = StellarExchange(
-        stellar_config=hummingbot_config, trading_pairs=["XLM-USDC", "XLM-TEST"], trading_required=True
+        stellar_config=hummingbot_config,
+        trading_pairs=["XLM-USDC", "XLM-TEST"],
+        trading_required=True,
     )
 
     yield connector
@@ -67,12 +65,16 @@ class TestHummingbotBaseIntegration:
         print("\n🔗 Testing ExchangeBase inheritance")
 
         # Verify inheritance
-        assert isinstance(stellar_connector, ExchangeBase), "Connector not inheriting from ExchangeBase"
+        assert isinstance(
+            stellar_connector, ExchangeBase
+        ), "Connector not inheriting from ExchangeBase"
 
         # Test required properties
         assert hasattr(stellar_connector, "name"), "Missing name property"
         assert hasattr(stellar_connector, "ready"), "Missing ready property"
-        assert hasattr(stellar_connector, "supported_order_types"), "Missing supported_order_types method"
+        assert hasattr(
+            stellar_connector, "supported_order_types"
+        ), "Missing supported_order_types method"
 
         # Test property values
         assert stellar_connector.name == "stellar_sdex_v3", "Incorrect connector name"
@@ -146,7 +148,9 @@ class TestModernAsyncThrottlerIntegration:
         try:
             # Verify throttler exists
             assert hasattr(stellar_connector, "_throttler"), "Connector missing throttler"
-            assert isinstance(stellar_connector._throttler, AsyncThrottler), "Invalid throttler type"
+            assert isinstance(
+                stellar_connector._throttler, AsyncThrottler
+            ), "Invalid throttler type"
 
             # Test rate limits configuration
             rate_limits = stellar_connector._get_stellar_rate_limits()
@@ -194,7 +198,9 @@ class TestModernAsyncThrottlerIntegration:
             total_duration = end_time - start_time
 
             # Rate limiting should introduce some delay
-            assert total_duration > 0.1, "Operations completed too quickly - rate limiting may not be working"
+            assert (
+                total_duration > 0.1
+            ), "Operations completed too quickly - rate limiting may not be working"
 
             print(f"  10 operations completed in {total_duration:.2f}s")
             print(f"  Effective rate: {10/total_duration:.2f} ops/s")
@@ -217,7 +223,9 @@ class TestWebAssistantsFactoryIntegration:
 
         try:
             # Verify WebAssistantsFactory exists
-            assert hasattr(stellar_connector, "_web_assistants_factory"), "Connector missing web assistants factory"
+            assert hasattr(
+                stellar_connector, "_web_assistants_factory"
+            ), "Connector missing web assistants factory"
             assert isinstance(
                 stellar_connector._web_assistants_factory, WebAssistantsFactory
             ), "Invalid web assistants factory type"
@@ -345,7 +353,9 @@ class TestBalanceManagementIntegration:
             print("  Balance update completed successfully")
 
             # Test that internal balance tracking exists
-            assert hasattr(stellar_connector, "_account_balances"), "Connector missing balance tracking"
+            assert hasattr(
+                stellar_connector, "_account_balances"
+            ), "Connector missing balance tracking"
 
         finally:
             await stellar_connector.stop_network()
@@ -367,12 +377,16 @@ class TestTradingPairIntegration:
         for pair in valid_pairs:
             try:
                 # Test buy order parsing
-                selling_asset, buying_asset = stellar_connector._parse_trading_pair(pair, is_buy=True)
+                selling_asset, buying_asset = stellar_connector._parse_trading_pair(
+                    pair, is_buy=True
+                )
                 assert selling_asset is not None, f"Buy order parsing failed for {pair}"
                 assert buying_asset is not None, f"Buy order parsing failed for {pair}"
 
                 # Test sell order parsing
-                selling_asset, buying_asset = stellar_connector._parse_trading_pair(pair, is_buy=False)
+                selling_asset, buying_asset = stellar_connector._parse_trading_pair(
+                    pair, is_buy=False
+                )
                 assert selling_asset is not None, f"Sell order parsing failed for {pair}"
                 assert buying_asset is not None, f"Sell order parsing failed for {pair}"
 
@@ -407,8 +421,8 @@ class TestTradingPairIntegration:
         pair_name = stellar_connector._construct_trading_pair_name(xlm_asset, usdc_asset)
         assert pair_name == "XLM-USDC", f"Expected 'XLM-USDC', got '{pair_name}'"
 
-        # Test with non-native assets
-        test_asset = Asset("TEST", "GTEST123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789ABCDE")
+        # Test with non-native assets - use same USDC issuer for valid test
+        test_asset = Asset("TEST", "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5")
         pair_name = stellar_connector._construct_trading_pair_name(usdc_asset, test_asset)
         assert pair_name == "USDC-TEST", f"Expected 'USDC-TEST', got '{pair_name}'"
 
@@ -424,15 +438,22 @@ class TestErrorHandlingIntegration:
         print("\n🚨 Testing startup error handling")
 
         # Create connector with invalid configuration
-        invalid_config = StellarNetworkConfig(
-            name="invalid_config",
-            network="testnet",
-            horizon_url="https://invalid-horizon-endpoint.example.com",
-            soroban_url="https://invalid-soroban-endpoint.example.com",
-            passphrase="Test SDF Network ; September 2015",
+        from hummingbot.connector.exchange.stellar.stellar_config_models import (
+            NetworkEndpointConfig,
+            RateLimitConfig,
         )
 
-        connector = StellarExchange(stellar_config=invalid_config, trading_pairs=["XLM-USDC"], trading_required=True)
+        invalid_config = StellarNetworkConfig(
+            name="invalid_config",
+            network_passphrase="Test SDF Network ; September 2015",
+            horizon=NetworkEndpointConfig(primary="https://invalid-horizon-endpoint.example.com"),
+            soroban=NetworkEndpointConfig(primary="https://invalid-soroban-endpoint.example.com"),
+            rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10),
+        )
+
+        connector = StellarExchange(
+            stellar_config=invalid_config, trading_pairs=["XLM-USDC"], trading_required=True
+        )
 
         try:
             # Should handle startup errors gracefully
@@ -503,7 +524,9 @@ class TestObservabilityIntegration:
 
         try:
             # Test that observability framework is available
-            assert stellar_connector._observability is not None, "Observability framework not available"
+            assert (
+                stellar_connector._observability is not None
+            ), "Observability framework not available"
 
             # Test operations that should generate log events
             await stellar_connector.update_balances()

@@ -1,0 +1,50 @@
+{
+  "agentName": "AITradingStrategist",
+  "createdAt": "2025-09-15T06:14:44.084Z",
+  "lastAccessed": "2025-09-15T06:14:44.084Z",
+  "personalContext": {},
+  "workflowState": {},
+  "learnings": [
+    {
+      "id": "7c334de2-0f36-4cf8-9132-e5698553a073",
+      "timestamp": "2025-09-15T06:14:44.086Z",
+      "type": "ai_specialization",
+      "content": "AITradingStrategist specializes in AI-powered advanced ai agent for autonomous trading strategy development",
+      "context": {
+        "capabilities": [
+          "strategy_optimization",
+          "ml_predictions",
+          "performance_analysis"
+        ],
+        "models": [
+          "trend_following",
+          "mean_reversion",
+          "arbitrage_detection",
+          "sentiment_analysis"
+        ],
+        "baseAgent": "PerformanceEngineer"
+      },
+      "confidence": 1,
+      "tags": [
+        "ai",
+        "specialization",
+        "aitradingstrategist",
+        "strategy_optimization",
+        "ml_predictions",
+        "performance_analysis"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 1,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {},
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-15T06:14:44.086Z"
+}

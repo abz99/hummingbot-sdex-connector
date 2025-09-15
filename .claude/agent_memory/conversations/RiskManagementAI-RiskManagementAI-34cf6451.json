@@ -1,0 +1,29 @@
+{
+  "sessionId": "RiskManagementAI-34cf6451",
+  "agentName": "RiskManagementAI",
+  "startTime": "2025-09-15T06:14:44.090Z",
+  "lastActivity": "2025-09-15T06:14:44.090Z",
+  "messages": [],
+  "context": {
+    "agentType": "ai_enhanced",
+    "baseAgent": "Architect",
+    "capabilities": [
+      "portfolio_risk",
+      "position_sizing",
+      "stress_testing"
+    ],
+    "aiModels": [
+      "var_models",
+      "kelly_criterion",
+      "regime_detector"
+    ],
+    "initializationTime": "2025-09-15T06:14:44.090Z"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "general",
+    "priority": "normal",
+    "relatedAgents": [],
+    "workflowPhase": "unknown"
+  }
+}

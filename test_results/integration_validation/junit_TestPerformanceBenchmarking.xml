@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="2.023" timestamp="2025-09-11T10:57:03.768434+00:00" hostname="an"><testcase classname="tests.integration.test_real_world_validation.TestPerformanceBenchmarking" name="test_throughput_benchmarking" time="0.033"><failure message="AttributeError: 'coroutine' object has no attribute 'network_passphrase'">#x1B[1m#x1B[31mtests/integration/test_real_world_validation.py#x1B[0m:283: in test_throughput_benchmarking
+    #x1B[0mchain_interface = ModernStellarChainInterface(#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mhummingbot/connector/exchange/stellar/stellar_chain_interface.py#x1B[0m:68: in __init__
+    #x1B[0m#x1B[96mself#x1B[39;49;00m.network_passphrase = config.network_passphrase#x1B[90m#x1B[39;49;00m
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   AttributeError: 'coroutine' object has no attribute 'network_passphrase'#x1B[0m</failure></testcase><testcase classname="tests.integration.test_real_world_validation.TestPerformanceBenchmarking" name="test_latency_benchmarking" time="0.014"><failure message="ValueError: Duplicated timeseries in CollectorRegistry: {'stellar_observability_events_created', 'stellar_observability_events_total', 'stellar_observability_events'}">#x1B[1m#x1B[31mtests/integration/test_real_world_validation.py#x1B[0m:324: in test_latency_benchmarking
+    #x1B[0mconfig=testnet_config, security_framework=#x1B[94mNone#x1B[39;49;00m, observability=StellarObservabilityFramework()#x1B[90m#x1B[39;49;00m
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mhummingbot/connector/exchange/stellar/stellar_observability.py#x1B[0m:166: in __init__
+    #x1B[0m#x1B[96mself#x1B[39;49;00m._init_production_metrics()#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mhummingbot/connector/exchange/stellar/stellar_observability.py#x1B[0m:174: in _init_production_metrics
+    #x1B[0m#x1B[96mself#x1B[39;49;00m.observability_events = Counter(#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mvenv/lib/python3.11/site-packages/prometheus_client/metrics.py#x1B[0m:132: in __init__
+    #x1B[0mregistry.register(#x1B[96mself#x1B[39;49;00m)#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mvenv/lib/python3.11/site-packages/prometheus_client/registry.py#x1B[0m:43: in register
+    #x1B[0m#x1B[94mraise#x1B[39;49;00m #x1B[96mValueError#x1B[39;49;00m(#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   ValueError: Duplicated timeseries in CollectorRegistry: {'stellar_observability_events_created', 'stellar_observability_events_total', 'stellar_observability_events'}#x1B[0m</failure></testcase></testsuite></testsuites>

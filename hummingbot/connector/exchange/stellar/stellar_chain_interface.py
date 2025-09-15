@@ -562,6 +562,75 @@ class ModernStellarChainInterface:
             )
             raise
 
+    async def check_soroban_health(self) -> bool:
+        """Check Soroban RPC endpoint health."""
+        try:
+            if not self.config.soroban or not self.config.soroban.primary:
+                return False
+
+            # Use aiohttp to check Soroban health endpoint
+            async with aiohttp.ClientSession() as session:
+                health_url = f"{self.config.soroban.primary}/health"
+                async with session.get(health_url, timeout=10) as response:
+                    if response.status == 200:
+                        if self.observability:
+                            await self.observability.log_event("soroban_health_check_success", {"url": health_url})
+                        return True
+                    else:
+                        if self.observability:
+                            await self.observability.log_event("soroban_health_check_failed",
+                                {"url": health_url, "status": response.status})
+                        return False
+        except Exception as e:
+            if self.observability:
+                await self.observability.log_error("soroban_health_check_error", e, {"endpoint": self.config.soroban.primary if self.config.soroban else "none"})
+            return False
+
+    async def get_latest_ledger(self) -> Optional[Dict[str, Any]]:
+        """Get the latest ledger information."""
+        try:
+            if not self.current_horizon:
+                return None
+
+            # Use Stellar SDK to get ledgers
+            ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
+            response = await ledgers_call.call()
+
+            if response and 'records' in response and len(response['records']) > 0:
+                latest_ledger = response['records'][0]
+
+                if self.observability:
+                    await self.observability.log_event("latest_ledger_retrieved", {
+                        "sequence": latest_ledger.get("sequence"),
+                        "closed_at": latest_ledger.get("closed_at")
+                    })
+
+                return latest_ledger
+            else:
+                if self.observability:
+                    await self.observability.log_event("latest_ledger_empty_response", {"response": response})
+                return None
+
+        except Exception as e:
+            if self.observability:
+                await self.observability.log_error("latest_ledger_fetch_failed", e, {})
+
+            # Try failover if available
+            if len(self.horizon_servers) > 1:
+                await self._switch_to_next_horizon()
+                # Retry once with next server
+                try:
+                    if self.current_horizon:
+                        ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
+                        response = await ledgers_call.call()
+                        if response and 'records' in response and len(response['records']) > 0:
+                            return response['records'][0]
+                except Exception as retry_e:
+                    if self.observability:
+                        await self.observability.log_error("latest_ledger_retry_failed", retry_e, {})
+
+            return None
+
     def get_network_info(self) -> Dict[str, Any]:
         """Get current network information."""
         return {

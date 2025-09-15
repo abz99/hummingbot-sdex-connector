@@ -15,9 +15,13 @@ from prometheus_client import CollectorRegistry, REGISTRY
 # Import our connector components
 from hummingbot.connector.exchange.stellar.stellar_exchange import StellarExchange
 from hummingbot.connector.exchange.stellar.stellar_config_models import StellarNetworkConfig
-from hummingbot.connector.exchange.stellar.stellar_chain_interface import ModernStellarChainInterface
+from hummingbot.connector.exchange.stellar.stellar_chain_interface import (
+    ModernStellarChainInterface,
+)
 from hummingbot.connector.exchange.stellar.stellar_security import EnterpriseSecurityFramework
-from hummingbot.connector.exchange.stellar.stellar_observability import StellarObservabilityFramework
+from hummingbot.connector.exchange.stellar.stellar_observability import (
+    StellarObservabilityFramework,
+)
 
 # Test configuration
 pytestmark = pytest.mark.asyncio
@@ -46,14 +50,17 @@ def cleanup_prometheus_registry():
 @pytest_asyncio.fixture
 async def testnet_config():
     """Create testnet configuration for real-world testing."""
-    from hummingbot.connector.exchange.stellar.stellar_config_models import NetworkEndpointConfig, RateLimitConfig
+    from hummingbot.connector.exchange.stellar.stellar_config_models import (
+        NetworkEndpointConfig,
+        RateLimitConfig,
+    )
 
     return StellarNetworkConfig(
         name="testnet_integration",
         network_passphrase="Test SDF Network ; September 2015",
         horizon=NetworkEndpointConfig(primary="https://horizon-testnet.stellar.org"),
         soroban=NetworkEndpointConfig(primary="https://soroban-testnet.stellar.org"),
-        rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10)
+        rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10),
     )
 
 
@@ -89,7 +96,7 @@ async def stellar_connector(testnet_config):
     yield connector
 
     # Cleanup
-    if hasattr(connector, 'ready') and connector.ready:
+    if hasattr(connector, "ready") and connector.ready:
         await connector.stop_network()
 
 
@@ -99,7 +106,9 @@ class TestRealWorldNetworkValidation:
     async def test_testnet_horizon_connectivity(self, testnet_config):
         """Test direct connection to Stellar testnet Horizon."""
         chain_interface = ModernStellarChainInterface(
-            config=testnet_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=testnet_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -116,8 +125,10 @@ class TestRealWorldNetworkValidation:
             except Exception as e:
                 # Expected 404 for non-existent account means network connectivity is working
                 error_msg = str(e).lower()
-                assert any(keyword in error_msg for keyword in ["not found", "does not exist", "resource missing", "404"]), \
-                    f"Network connectivity failed with unexpected error: {e}"
+                assert any(
+                    keyword in error_msg
+                    for keyword in ["not found", "does not exist", "resource missing", "404"]
+                ), f"Network connectivity failed with unexpected error: {e}"
 
             # If we reach here, network connectivity test passed
             assert True, "Network connectivity verified"
@@ -128,7 +139,9 @@ class TestRealWorldNetworkValidation:
     async def test_soroban_rpc_connectivity(self, testnet_config):
         """Test Soroban RPC endpoint connectivity."""
         chain_interface = ModernStellarChainInterface(
-            config=testnet_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=testnet_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -144,21 +157,29 @@ class TestRealWorldNetworkValidation:
     async def test_network_failover_resilience(self, testnet_config):
         """Test network failover and resilience."""
         # Create config with multiple fallback endpoints
-        from hummingbot.connector.exchange.stellar.stellar_config_models import NetworkEndpointConfig, RateLimitConfig
+        from hummingbot.connector.exchange.stellar.stellar_config_models import (
+            NetworkEndpointConfig,
+            RateLimitConfig,
+        )
 
         failover_config = StellarNetworkConfig(
             name="testnet_failover",
             network_passphrase="Test SDF Network ; September 2015",
             horizon=NetworkEndpointConfig(
                 primary="https://horizon-testnet.stellar.org",
-                fallbacks=["https://horizon-testnet-1.stellar.org", "https://horizon-testnet-2.stellar.org"]
+                fallbacks=[
+                    "https://horizon-testnet-1.stellar.org",
+                    "https://horizon-testnet-2.stellar.org",
+                ],
             ),
             soroban=NetworkEndpointConfig(primary="https://soroban-testnet.stellar.org"),
-            rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10)
+            rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10),
         )
 
         chain_interface = ModernStellarChainInterface(
-            config=failover_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=failover_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -180,7 +201,9 @@ class TestRealWorldAccountOperations:
     async def test_account_creation_and_funding(self, funded_test_account, testnet_config):
         """Test account creation and funding via Friendbot."""
         chain_interface = ModernStellarChainInterface(
-            config=testnet_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=testnet_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -210,14 +233,18 @@ class TestRealWorldAccountOperations:
         observability = StellarObservabilityFramework()
         await observability.start()
 
-        security_framework = EnterpriseSecurityFramework(config=testnet_config, observability=observability)
+        security_framework = EnterpriseSecurityFramework(
+            config=testnet_config, observability=observability
+        )
         await security_framework.initialize()
 
         # Store keypair in security framework for testing
         security_framework._active_keypairs[funded_test_account.public_key] = funded_test_account
 
         chain_interface = ModernStellarChainInterface(
-            config=testnet_config, security_framework=security_framework, observability=observability
+            config=testnet_config,
+            security_framework=security_framework,
+            observability=observability,
         )
         await chain_interface.start()
 
@@ -249,7 +276,10 @@ class TestRealWorldAccountOperations:
 
             trustline_found = False
             for balance in balances:
-                if balance.get("asset_code") == test_asset.code and balance.get("asset_issuer") == test_asset.issuer:
+                if (
+                    balance.get("asset_code") == test_asset.code
+                    and balance.get("asset_issuer") == test_asset.issuer
+                ):
                     trustline_found = True
                     break
 
@@ -271,9 +301,9 @@ class TestRealWorldTradingOperations:
         try:
             # Configure account in security framework
             if stellar_connector._security_framework:
-                stellar_connector._security_framework._active_keypairs[funded_test_account.public_key] = (
-                    funded_test_account
-                )
+                stellar_connector._security_framework._active_keypairs[
+                    funded_test_account.public_key
+                ] = funded_test_account
 
             # Place a limit order (small amount for testing)
             order_id = "test_order_001"
@@ -316,7 +346,9 @@ class TestPerformanceBenchmarking:
     async def test_throughput_benchmarking(self, testnet_config):
         """Test request throughput against testnet."""
         chain_interface = ModernStellarChainInterface(
-            config=testnet_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=testnet_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -339,7 +371,9 @@ class TestPerformanceBenchmarking:
             total_time = end_time - start_time
             throughput = successful_requests / total_time
 
-            assert successful_requests >= 45, f"Too many failed requests: {50 - successful_requests}"
+            assert (
+                successful_requests >= 45
+            ), f"Too many failed requests: {50 - successful_requests}"
             assert throughput >= 10, f"Throughput too low: {throughput} requests/sec"
 
             # Log performance metrics
@@ -356,7 +390,9 @@ class TestPerformanceBenchmarking:
     async def test_latency_benchmarking(self, testnet_config):
         """Test request latency against testnet."""
         chain_interface = ModernStellarChainInterface(
-            config=testnet_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=testnet_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -403,17 +439,23 @@ class TestSecurityValidation:
         observability = StellarObservabilityFramework()
         await observability.start()
 
-        security_framework = EnterpriseSecurityFramework(config=testnet_config, observability=observability)
+        security_framework = EnterpriseSecurityFramework(
+            config=testnet_config, observability=observability
+        )
         await security_framework.initialize()
 
         try:
             # Store test keypair securely
-            security_framework._active_keypairs[funded_test_account.public_key] = funded_test_account
+            security_framework._active_keypairs[funded_test_account.public_key] = (
+                funded_test_account
+            )
 
             # Test keypair retrieval
             retrieved_keypair = await security_framework.get_keypair(funded_test_account.public_key)
             assert retrieved_keypair is not None, "Keypair retrieval failed"
-            assert retrieved_keypair.public_key == funded_test_account.public_key, "Keypair mismatch"
+            assert (
+                retrieved_keypair.public_key == funded_test_account.public_key
+            ), "Keypair mismatch"
 
             # Test signing capability
             test_message = "test_transaction_xdr"
@@ -432,7 +474,9 @@ class TestSecurityValidation:
         observability = StellarObservabilityFramework()
         await observability.start()
 
-        security_framework = EnterpriseSecurityFramework(config=testnet_config, observability=observability)
+        security_framework = EnterpriseSecurityFramework(
+            config=testnet_config, observability=observability
+        )
         await security_framework.initialize()
 
         try:
@@ -460,21 +504,26 @@ class TestErrorResilienceValidation:
     async def test_network_timeout_handling(self, testnet_config):
         """Test handling of network timeouts and retries."""
         # Create config with very short timeout to force errors
-        from hummingbot.connector.exchange.stellar.stellar_config_models import NetworkEndpointConfig, RateLimitConfig
+        from hummingbot.connector.exchange.stellar.stellar_config_models import (
+            NetworkEndpointConfig,
+            RateLimitConfig,
+        )
 
         timeout_config = StellarNetworkConfig(
             name="testnet_timeout",
             network_passphrase="Test SDF Network ; September 2015",
             horizon=NetworkEndpointConfig(
                 primary="https://horizon-testnet.stellar.org",
-                request_timeout=0.001  # 1ms timeout to force failures
+                request_timeout=0.001,  # 1ms timeout to force failures
             ),
             soroban=NetworkEndpointConfig(primary="https://soroban-testnet.stellar.org"),
-            rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10)
+            rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10),
         )
 
         chain_interface = ModernStellarChainInterface(
-            config=timeout_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=timeout_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -495,18 +544,24 @@ class TestErrorResilienceValidation:
         observability = StellarObservabilityFramework()
         await observability.start()
 
-        security_framework = EnterpriseSecurityFramework(config=testnet_config, observability=observability)
+        security_framework = EnterpriseSecurityFramework(
+            config=testnet_config, observability=observability
+        )
         await security_framework.initialize()
         security_framework._active_keypairs[funded_test_account.public_key] = funded_test_account
 
         chain_interface = ModernStellarChainInterface(
-            config=testnet_config, security_framework=security_framework, observability=observability
+            config=testnet_config,
+            security_framework=security_framework,
+            observability=observability,
         )
         await chain_interface.start()
 
         try:
             # Try to create transaction with invalid asset
-            invalid_asset = Asset("INVALID", "GINVALIDISSUER123456789012345678901234567890123456")
+            # Use a valid format but non-existent issuer address (random test keypair)
+            test_invalid_keypair = Keypair.random()
+            invalid_asset = Asset("INVALID", test_invalid_keypair.public_key)
 
             # This should handle invalid asset gracefully
             transaction_builder = await chain_interface.create_trustline_transaction(

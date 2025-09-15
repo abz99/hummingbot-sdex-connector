@@ -16,33 +16,48 @@ from stellar_sdk import Keypair, Asset
 
 # Import connector components
 from hummingbot.connector.exchange.stellar.stellar_security import EnterpriseSecurityFramework
-from hummingbot.connector.exchange.stellar.stellar_chain_interface import ModernStellarChainInterface
+from hummingbot.connector.exchange.stellar.stellar_chain_interface import (
+    ModernStellarChainInterface,
+)
 from hummingbot.connector.exchange.stellar.stellar_config_models import StellarNetworkConfig
-from hummingbot.connector.exchange.stellar.stellar_observability import StellarObservabilityFramework
+from hummingbot.connector.exchange.stellar.stellar_observability import (
+    StellarObservabilityFramework,
+)
 
 pytestmark = pytest.mark.asyncio
 
+# Skip entire module due to async fixture configuration issues
+# Phase 5: Security penetration testing enabled
 
-@pytest.fixture
+
+@pytest_asyncio.fixture
 async def security_test_config():
     """Configuration for security testing."""
+    from hummingbot.connector.exchange.stellar.stellar_config_models import (
+        NetworkEndpointConfig,
+        RateLimitConfig,
+    )
+
     return StellarNetworkConfig(
         name="security_testnet",
-        network="testnet",
-        horizon_url="https://horizon-testnet.stellar.org",
-        soroban_url="https://soroban-testnet.stellar.org",
-        passphrase="Test SDF Network ; September 2015",
-        request_timeout=15.0,
+        network_passphrase="Test SDF Network ; September 2015",
+        horizon=NetworkEndpointConfig(
+            primary="https://horizon-testnet.stellar.org", request_timeout=15.0
+        ),
+        soroban=NetworkEndpointConfig(primary="https://soroban-testnet.stellar.org"),
+        rate_limits=RateLimitConfig(requests_per_second=5, burst_limit=10),
     )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def security_framework(security_test_config):
     """Initialize security framework for testing."""
     observability = StellarObservabilityFramework()
     await observability.start()
 
-    framework = EnterpriseSecurityFramework(config=security_test_config, observability=observability)
+    framework = EnterpriseSecurityFramework(
+        config=security_test_config, observability=observability
+    )
     await framework.initialize()
 
     yield framework
@@ -78,7 +93,9 @@ class TestKeyManagementSecurity:
         # Test key retrieval consistency
         for account_id, original_keypair in test_accounts:
             retrieved_keypair = await security_framework.get_keypair(account_id)
-            assert retrieved_keypair.public_key == original_keypair.public_key, "Key retrieval inconsistent"
+            assert (
+                retrieved_keypair.public_key == original_keypair.public_key
+            ), "Key retrieval inconsistent"
 
         print("✅ Secure key generation tests passed")
 
@@ -97,16 +114,26 @@ class TestKeyManagementSecurity:
         cold_keypair = await security_framework.get_keypair(cold_account)
 
         # Verify isolation
-        assert trading_keypair.public_key != backup_keypair.public_key, "Trading and backup keys not isolated"
-        assert backup_keypair.public_key != cold_keypair.public_key, "Backup and cold keys not isolated"
-        assert cold_keypair.public_key != trading_keypair.public_key, "Cold and trading keys not isolated"
+        assert (
+            trading_keypair.public_key != backup_keypair.public_key
+        ), "Trading and backup keys not isolated"
+        assert (
+            backup_keypair.public_key != cold_keypair.public_key
+        ), "Backup and cold keys not isolated"
+        assert (
+            cold_keypair.public_key != trading_keypair.public_key
+        ), "Cold and trading keys not isolated"
 
         # Test that accessing one account's key doesn't affect others
         trading_keypair_2 = await security_framework.get_keypair(trading_account)
         backup_keypair_2 = await security_framework.get_keypair(backup_account)
 
-        assert trading_keypair.public_key == trading_keypair_2.public_key, "Trading key consistency failed"
-        assert backup_keypair.public_key == backup_keypair_2.public_key, "Backup key consistency failed"
+        assert (
+            trading_keypair.public_key == trading_keypair_2.public_key
+        ), "Trading key consistency failed"
+        assert (
+            backup_keypair.public_key == backup_keypair_2.public_key
+        ), "Backup key consistency failed"
 
         print("✅ Key isolation tests passed")
 
@@ -118,7 +145,11 @@ class TestKeyManagementSecurity:
         _keypair = await security_framework.get_keypair(test_account)
 
         # Test multiple transaction signing
-        test_transactions = ["test_transaction_xdr_1", "test_transaction_xdr_2", "test_transaction_xdr_3"]
+        test_transactions = [
+            "test_transaction_xdr_1",
+            "test_transaction_xdr_2",
+            "test_transaction_xdr_3",
+        ]
 
         signatures = []
         for txn_xdr in test_transactions:
@@ -179,7 +210,9 @@ class TestNetworkSecurity:
         print("\n🛡️ Testing rate limiting protection")
 
         chain_interface = ModernStellarChainInterface(
-            config=security_test_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=security_test_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -230,7 +263,9 @@ class TestNetworkSecurity:
         print("\n🔍 Testing input validation security")
 
         chain_interface = ModernStellarChainInterface(
-            config=security_test_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=security_test_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -390,7 +425,9 @@ class TestResilienceAndRecoverySecurity:
         print("\n🛡️ Testing error handling security")
 
         chain_interface = ModernStellarChainInterface(
-            config=security_test_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=security_test_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()
@@ -460,7 +497,9 @@ class TestResilienceAndRecoverySecurity:
         )
 
         chain_interface = ModernStellarChainInterface(
-            config=failover_config, security_framework=None, observability=StellarObservabilityFramework()
+            config=failover_config,
+            security_framework=None,
+            observability=StellarObservabilityFramework(),
         )
 
         await chain_interface.start()

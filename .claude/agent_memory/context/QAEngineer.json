@@ -1,0 +1,272 @@
+{
+  "agentName": "QAEngineer",
+  "createdAt": "2025-09-14T20:55:18.329Z",
+  "lastAccessed": "2025-09-14T21:21:20.871Z",
+  "personalContext": {},
+  "workflowState": {
+    "workflow-1757883375307": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T20:56:15.354Z",
+      "metadata": {
+        "phase": "Validation",
+        "result": {
+          "phase": "Validation",
+          "agent": "QAEngineer",
+          "sessionId": "QAEngineer-471ba72b",
+          "startTime": "2025-09-14T20:56:15.352Z",
+          "context": {
+            "totalExperience": 5,
+            "relevantLearnings": 1,
+            "activeRelationships": 1,
+            "previousPhases": 5
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T20:56:15.354Z"
+      }
+    },
+    "workflow-1757883637906": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:00:37.955Z",
+      "metadata": {
+        "phase": "Validation",
+        "result": {
+          "phase": "Validation",
+          "agent": "QAEngineer",
+          "sessionId": "QAEngineer-1a0538c8",
+          "startTime": "2025-09-14T21:00:37.953Z",
+          "context": {
+            "totalExperience": 11,
+            "relevantLearnings": 1,
+            "activeRelationships": 2,
+            "previousPhases": 5
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:00:37.955Z"
+      }
+    },
+    "workflow-1757883657254": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:00:57.305Z",
+      "metadata": {
+        "phase": "Validation",
+        "result": {
+          "phase": "Validation",
+          "agent": "QAEngineer",
+          "sessionId": "QAEngineer-8ed237ed",
+          "startTime": "2025-09-14T21:00:57.303Z",
+          "context": {
+            "totalExperience": 17,
+            "relevantLearnings": 1,
+            "activeRelationships": 2,
+            "previousPhases": 5
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:00:57.305Z"
+      }
+    },
+    "workflow-1757884469334": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:14:29.423Z",
+      "metadata": {
+        "phase": "Validation",
+        "result": {
+          "phase": "Validation",
+          "agent": "QAEngineer",
+          "sessionId": "QAEngineer-b914726d",
+          "startTime": "2025-09-14T21:14:29.421Z",
+          "context": {
+            "totalExperience": 23,
+            "relevantLearnings": 1,
+            "activeRelationships": 2,
+            "previousPhases": 5
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:14:29.423Z"
+      }
+    },
+    "workflow-1757884880853": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:21:20.913Z",
+      "metadata": {
+        "phase": "Validation",
+        "result": {
+          "phase": "Validation",
+          "agent": "QAEngineer",
+          "sessionId": "QAEngineer-7ecdd724",
+          "startTime": "2025-09-14T21:21:20.911Z",
+          "context": {
+            "totalExperience": 29,
+            "relevantLearnings": 1,
+            "activeRelationships": 2,
+            "previousPhases": 5
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:21:20.913Z"
+      }
+    }
+  },
+  "learnings": [
+    {
+      "id": "125401d0-8358-42a6-9c92-fc98fce3836f",
+      "timestamp": "2025-09-14T20:55:18.329Z",
+      "type": "role_specialization",
+      "content": "QAEngineer specializes in their domain-specific responsibilities",
+      "context": {
+        "role": "QAEngineer",
+        "domain": "qaengineer"
+      },
+      "confidence": 0.9,
+      "tags": [
+        "qaengineer",
+        "specialization",
+        "role"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 31,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {
+    "SecurityEngineer": {
+      "totalInteractions": 5,
+      "lastInteraction": "2025-09-14T21:21:20.903Z",
+      "interactionTypes": {
+        "workflow_handoff": 5
+      },
+      "collaborationHistory": [
+        {
+          "timestamp": "2025-09-14T20:56:15.345Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883375307",
+            "fromPhase": "Security",
+            "toPhase": "QA",
+            "handoffTime": "2025-09-14T20:56:15.345Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:00:37.946Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883637906",
+            "fromPhase": "Security",
+            "toPhase": "QA",
+            "handoffTime": "2025-09-14T21:00:37.946Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:00:57.294Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883657254",
+            "fromPhase": "Security",
+            "toPhase": "QA",
+            "handoffTime": "2025-09-14T21:00:57.294Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:14:29.413Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757884469334",
+            "fromPhase": "Security",
+            "toPhase": "QA",
+            "handoffTime": "2025-09-14T21:14:29.413Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:21:20.903Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757884880853",
+            "fromPhase": "Security",
+            "toPhase": "QA",
+            "handoffTime": "2025-09-14T21:21:20.903Z"
+          }
+        }
+      ]
+    },
+    "Implementer": {
+      "totalInteractions": 5,
+      "lastInteraction": "2025-09-14T21:21:20.912Z",
+      "interactionTypes": {
+        "workflow_handoff": 5
+      },
+      "collaborationHistory": [
+        {
+          "timestamp": "2025-09-14T20:56:15.353Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883375307",
+            "fromPhase": "Implementation",
+            "toPhase": "Validation",
+            "handoffTime": "2025-09-14T20:56:15.353Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:00:37.955Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883637906",
+            "fromPhase": "Implementation",
+            "toPhase": "Validation",
+            "handoffTime": "2025-09-14T21:00:37.954Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:00:57.304Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883657254",
+            "fromPhase": "Implementation",
+            "toPhase": "Validation",
+            "handoffTime": "2025-09-14T21:00:57.303Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:14:29.422Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757884469334",
+            "fromPhase": "Implementation",
+            "toPhase": "Validation",
+            "handoffTime": "2025-09-14T21:14:29.422Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:21:20.912Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757884880853",
+            "fromPhase": "Implementation",
+            "toPhase": "Validation",
+            "handoffTime": "2025-09-14T21:21:20.912Z"
+          }
+        }
+      ]
+    }
+  },
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-14T21:21:20.913Z"
+}

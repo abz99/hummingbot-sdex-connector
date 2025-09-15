@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "stellar-agents": {
+      "command": "node",
+      "args": ["/home/abz/projects/stellar-hummingbot-connector-v3/.claude/mcp-agent-server.js"],
+      "description": "Stellar Hummingbot Connector Team Agents",
+      "env": {
+        "PROJECT_ROOT": "/home/abz/projects/stellar-hummingbot-connector-v3",
+        "AGENTS_DIR": "/home/abz/projects/stellar-hummingbot-connector-v3/.claude/agents"
+      }
+    }
+  }
+}

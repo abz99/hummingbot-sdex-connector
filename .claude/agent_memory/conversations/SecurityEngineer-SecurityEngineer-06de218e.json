@@ -1,0 +1,20 @@
+{
+  "sessionId": "SecurityEngineer-06de218e",
+  "agentName": "SecurityEngineer",
+  "startTime": "2025-09-14T20:55:18.328Z",
+  "lastActivity": "2025-09-14T20:55:18.328Z",
+  "messages": [],
+  "context": {
+    "taskType": "context_isolation_test",
+    "priority": "normal",
+    "workflowPhase": "testing",
+    "agentRole": "SecurityEngineer"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "context_isolation_test",
+    "priority": "normal",
+    "relatedAgents": [],
+    "workflowPhase": "testing"
+  }
+}

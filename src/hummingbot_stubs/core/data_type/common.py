@@ -38,6 +38,15 @@ class PositionMode(Enum):
     ONEWAY = "ONEWAY"
 
 
+class ConnectorStatus(Enum):
+    """Connector status enumeration."""
+    NOT_CONNECTED = "NOT_CONNECTED"
+    CONNECTING = "CONNECTING"
+    CONNECTED = "CONNECTED"
+    DISCONNECTED = "DISCONNECTED"
+    ERROR = "ERROR"
+
+
 class TradeFee(NamedTuple):
     """Represents trading fees."""
     percent: Decimal

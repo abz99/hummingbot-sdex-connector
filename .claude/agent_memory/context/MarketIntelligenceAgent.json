@@ -1,0 +1,49 @@
+{
+  "agentName": "MarketIntelligenceAgent",
+  "createdAt": "2025-09-15T06:14:44.089Z",
+  "lastAccessed": "2025-09-15T06:14:44.089Z",
+  "personalContext": {},
+  "workflowState": {},
+  "learnings": [
+    {
+      "id": "3bfc4008-c404-4d7f-aad0-631b26d9846f",
+      "timestamp": "2025-09-15T06:14:44.089Z",
+      "type": "ai_specialization",
+      "content": "MarketIntelligenceAgent specializes in AI-powered real-time market analysis and prediction",
+      "context": {
+        "capabilities": [
+          "sentiment_analysis",
+          "opportunity_detection",
+          "price_prediction"
+        ],
+        "models": [
+          "sentiment_classifier",
+          "price_predictor",
+          "volatility_forecaster"
+        ],
+        "baseAgent": "SecurityEngineer"
+      },
+      "confidence": 1,
+      "tags": [
+        "ai",
+        "specialization",
+        "marketintelligenceagent",
+        "sentiment_analysis",
+        "opportunity_detection",
+        "price_prediction"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 1,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {},
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-15T06:14:44.089Z"
+}

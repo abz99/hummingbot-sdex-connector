@@ -1,0 +1,49 @@
+{
+  "agentName": "ExecutionOptimizer",
+  "createdAt": "2025-09-15T06:14:44.092Z",
+  "lastAccessed": "2025-09-15T06:14:44.092Z",
+  "personalContext": {},
+  "workflowState": {},
+  "learnings": [
+    {
+      "id": "3ea08431-6cab-4b7e-94e0-f9f033ebd6a7",
+      "timestamp": "2025-09-15T06:14:44.092Z",
+      "type": "ai_specialization",
+      "content": "ExecutionOptimizer specializes in AI-powered ai-powered order execution optimization",
+      "context": {
+        "capabilities": [
+          "execution_timing",
+          "slippage_reduction",
+          "market_impact"
+        ],
+        "models": [
+          "execution_optimizer",
+          "market_microstructure",
+          "liquidity_predictor"
+        ],
+        "baseAgent": "Implementer"
+      },
+      "confidence": 1,
+      "tags": [
+        "ai",
+        "specialization",
+        "executionoptimizer",
+        "execution_timing",
+        "slippage_reduction",
+        "market_impact"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 1,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {},
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-15T06:14:44.092Z"
+}

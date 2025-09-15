@@ -1,0 +1,132 @@
+# Team Workflow Configuration for Stellar Hummingbot Connector
+# Based on team_startup.yaml agent definitions
+
+metadata:
+  version: "1.0"
+  created: "2025-09-14"
+  project: "stellar-hummingbot-connector-v3"
+  description: "Multi-agent workflow orchestration for production-ready development"
+
+# Agent Role Hierarchy
+agent_roles:
+  coordinator: ["ProjectManager"]
+  reviewers: ["Architect", "SecurityEngineer", "QAEngineer"]  
+  implementers: ["Implementer", "DevOpsEngineer"]
+  specialists: ["PerformanceEngineer", "DocumentationEngineer"]
+
+# Workflow Phase Gates
+phase_gates:
+  requirements_intake:
+    owner: "ProjectManager"
+    description: "Task intake, scoping, and prioritization"
+    deliverable: "Task specification with success criteria"
+    
+  architecture_review:
+    owner: "Architect"
+    dependencies: ["requirements_intake"]
+    description: "Technical design and system architecture approval"
+    deliverable: "Architectural decision with implementation guidance"
+    timeout: "1h"
+    
+  security_review:
+    owner: "SecurityEngineer"
+    dependencies: ["architecture_review"]
+    description: "Security threat modeling and mitigation strategy"
+    deliverable: "Security analysis report with approval/rejection"
+    timeout: "2h"
+    
+  qa_criteria:
+    owner: "QAEngineer"
+    dependencies: ["security_review"]
+    description: "Quality acceptance criteria and test strategy definition"
+    deliverable: "Test plan with qa_ids and coverage requirements"
+    timeout: "1h"
+    
+  implementation:
+    owner: "Implementer"
+    supporters: ["DevOpsEngineer", "PerformanceEngineer", "DocumentationEngineer"]
+    dependencies: ["qa_criteria"]
+    description: "Code implementation with quality compliance"
+    deliverable: "Production-ready code with tests and documentation"
+    timeout: "8h"
+    
+  final_validation:
+    owners: ["Architect", "SecurityEngineer", "QAEngineer"]
+    dependencies: ["implementation"]
+    description: "Multi-reviewer validation and approval"
+    deliverable: "Final approval for task completion"
+    timeout: "2h"
+
+# Quality Gates
+quality_requirements:
+  code_quality:
+    - "Code passes flake8 linting"
+    - "Code passes mypy type checking"
+    - "Code formatted with black"
+    - "All functions have docstrings"
+  
+  testing:
+    - "Tests achieve 85%+ coverage"
+    - "All integration tests pass"
+    - "Security tests pass"
+    - "Performance benchmarks meet SLA"
+  
+  security:
+    - "Security requirements addressed"
+    - "No critical vulnerabilities found"
+    - "Cryptographic implementations validated"
+  
+  documentation:
+    - "API documentation complete"
+    - "Usage examples provided"
+    - "Configuration documented"
+
+# Escalation Matrix
+escalations:
+  blocking_issues:
+    level_1: "Engage appropriate specialist"
+    level_2: "ProjectManager coordination"
+    level_3: "Multi-agent review session"
+  
+  scope_creep:
+    action: "Return to requirements_intake phase"
+    owner: "ProjectManager"
+  
+  quality_issues:
+    action: "Loop back to implementer with specific feedback"
+    reviewers: ["Architect", "SecurityEngineer", "QAEngineer"]
+  
+  timeline_concerns:
+    action: "Re-prioritize and communicate to stakeholders"
+    owner: "ProjectManager"
+
+# Current Project Context
+project_status:
+  phase: "Phase 5 Production Launch"
+  progress: "87% complete"
+  quality_score: "96/100"
+  staging_success_rate: "83.3%"
+  status: "Production Launch Ready"
+  
+key_files:
+  - "stellar_sdex_checklist_v3.md"    # Master implementation roadmap
+  - "stellar_sdex_tdd_v3.md"          # Technical design blueprint
+  - "PROJECT_STATUS.md"               # Current project state
+  - "qa/quality_catalogue.yml"        # Quality requirements
+  
+# Workflow Automation
+automation:
+  status_updates:
+    frequency: "After each phase completion"
+    target_file: "PROJECT_STATUS.md"
+    responsible: "ProjectManager"
+  
+  quality_tracking:
+    source: "qa/quality_catalogue.yml"
+    validation: "Continuous"
+    responsible: "QAEngineer"
+  
+  progress_reporting:
+    format: "Task Status Report"
+    frequency: "On demand and milestones"
+    responsible: "ProjectManager"

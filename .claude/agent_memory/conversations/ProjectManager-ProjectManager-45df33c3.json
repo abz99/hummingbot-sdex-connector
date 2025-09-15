@@ -1,0 +1,41 @@
+{
+  "sessionId": "ProjectManager-45df33c3",
+  "agentName": "ProjectManager",
+  "startTime": "2025-09-14T20:53:42.248Z",
+  "lastActivity": "2025-09-14T20:53:42.253Z",
+  "messages": [
+    {
+      "id": "3a609c64-970e-48a7-a281-0d977ed1fedb",
+      "timestamp": "2025-09-14T20:53:42.253Z",
+      "type": "task_request",
+      "content": "Test the new memory system implementation",
+      "metadata": {
+        "taskId": "memory_test_001"
+      },
+      "agentResponse": null
+    },
+    {
+      "id": "8516693f-d001-4db2-a788-6749b58f3aca",
+      "timestamp": "2025-09-14T20:53:42.253Z",
+      "type": "agent_response",
+      "content": "Memory system testing initiated. Creating persistent storage and validating conversation continuity.",
+      "metadata": {},
+      "agentResponse": {
+        "status": "in_progress",
+        "confidence": 0.95
+      }
+    }
+  ],
+  "context": {
+    "taskType": "memory_system_testing",
+    "priority": "high",
+    "workflowPhase": "implementation"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "memory_system_testing",
+    "priority": "high",
+    "relatedAgents": [],
+    "workflowPhase": "implementation"
+  }
+}

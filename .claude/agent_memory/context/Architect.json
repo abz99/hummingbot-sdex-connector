@@ -1,0 +1,196 @@
+{
+  "agentName": "Architect",
+  "createdAt": "2025-09-14T20:56:15.318Z",
+  "lastAccessed": "2025-09-14T21:21:20.865Z",
+  "personalContext": {},
+  "workflowState": {
+    "workflow-1757883375307": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T20:56:15.338Z",
+      "metadata": {
+        "phase": "Architecture",
+        "result": {
+          "phase": "Architecture",
+          "agent": "Architect",
+          "sessionId": "Architect-6b76c3a9",
+          "startTime": "2025-09-14T20:56:15.335Z",
+          "context": {
+            "totalExperience": 1,
+            "relevantLearnings": 0,
+            "activeRelationships": 0,
+            "previousPhases": 1
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T20:56:15.338Z"
+      }
+    },
+    "workflow-1757883637906": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:00:37.938Z",
+      "metadata": {
+        "phase": "Architecture",
+        "result": {
+          "phase": "Architecture",
+          "agent": "Architect",
+          "sessionId": "Architect-0b56776f",
+          "startTime": "2025-09-14T21:00:37.935Z",
+          "context": {
+            "totalExperience": 4,
+            "relevantLearnings": 0,
+            "activeRelationships": 1,
+            "previousPhases": 1
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:00:37.938Z"
+      }
+    },
+    "workflow-1757883657254": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:00:57.288Z",
+      "metadata": {
+        "phase": "Architecture",
+        "result": {
+          "phase": "Architecture",
+          "agent": "Architect",
+          "sessionId": "Architect-da3b3a7e",
+          "startTime": "2025-09-14T21:00:57.285Z",
+          "context": {
+            "totalExperience": 7,
+            "relevantLearnings": 0,
+            "activeRelationships": 1,
+            "previousPhases": 1
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:00:57.288Z"
+      }
+    },
+    "workflow-1757884469334": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:14:29.406Z",
+      "metadata": {
+        "phase": "Architecture",
+        "result": {
+          "phase": "Architecture",
+          "agent": "Architect",
+          "sessionId": "Architect-912c16a3",
+          "startTime": "2025-09-14T21:14:29.403Z",
+          "context": {
+            "totalExperience": 10,
+            "relevantLearnings": 0,
+            "activeRelationships": 1,
+            "previousPhases": 1
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:14:29.406Z"
+      }
+    },
+    "workflow-1757884880853": {
+      "state": "phase_completed",
+      "timestamp": "2025-09-14T21:21:20.894Z",
+      "metadata": {
+        "phase": "Architecture",
+        "result": {
+          "phase": "Architecture",
+          "agent": "Architect",
+          "sessionId": "Architect-ebdd3e19",
+          "startTime": "2025-09-14T21:21:20.889Z",
+          "context": {
+            "totalExperience": 13,
+            "relevantLearnings": 0,
+            "activeRelationships": 1,
+            "previousPhases": 1
+          },
+          "status": "completed",
+          "recommendations": [],
+          "blockers": []
+        },
+        "completedAt": "2025-09-14T21:21:20.894Z"
+      }
+    }
+  },
+  "learnings": [],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 15,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {
+    "ProjectManager": {
+      "totalInteractions": 5,
+      "lastInteraction": "2025-09-14T21:21:20.892Z",
+      "interactionTypes": {
+        "workflow_handoff": 5
+      },
+      "collaborationHistory": [
+        {
+          "timestamp": "2025-09-14T20:56:15.337Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883375307",
+            "fromPhase": "Requirements",
+            "toPhase": "Architecture",
+            "handoffTime": "2025-09-14T20:56:15.336Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:00:37.937Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883637906",
+            "fromPhase": "Requirements",
+            "toPhase": "Architecture",
+            "handoffTime": "2025-09-14T21:00:37.937Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:00:57.287Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757883657254",
+            "fromPhase": "Requirements",
+            "toPhase": "Architecture",
+            "handoffTime": "2025-09-14T21:00:57.286Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:14:29.405Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757884469334",
+            "fromPhase": "Requirements",
+            "toPhase": "Architecture",
+            "handoffTime": "2025-09-14T21:14:29.404Z"
+          }
+        },
+        {
+          "timestamp": "2025-09-14T21:21:20.892Z",
+          "type": "workflow_handoff",
+          "details": {
+            "workflowId": "workflow-1757884880853",
+            "fromPhase": "Requirements",
+            "toPhase": "Architecture",
+            "handoffTime": "2025-09-14T21:21:20.891Z"
+          }
+        }
+      ]
+    }
+  },
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-14T21:21:20.894Z"
+}

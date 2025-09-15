@@ -1,0 +1,40 @@
+{
+  "sessionId": "ProjectManager-369e04c3",
+  "agentName": "ProjectManager",
+  "startTime": "2025-09-14T21:00:37.910Z",
+  "lastActivity": "2025-09-14T21:00:37.933Z",
+  "messages": [
+    {
+      "id": "04dda22b-1a6e-4e74-b190-4f1f66664f76",
+      "timestamp": "2025-09-14T21:00:37.933Z",
+      "type": "phase_execution",
+      "content": "Executing Requirements phase for: Test memory-aware multi-agent workflow coordination",
+      "metadata": {
+        "workflowId": "workflow-1757883637906",
+        "phase": "Requirements",
+        "phaseIndex": 0,
+        "context": {
+          "totalExperience": 8,
+          "relevantLearnings": 3,
+          "activeRelationships": 2,
+          "previousPhases": 0
+        }
+      },
+      "agentResponse": null
+    }
+  ],
+  "context": {
+    "taskType": "workflow_coordination",
+    "priority": "high",
+    "workflowPhase": "Requirements",
+    "workflowId": "workflow-1757883637906",
+    "taskDescription": "Test memory-aware multi-agent workflow coordination"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "workflow_coordination",
+    "priority": "high",
+    "relatedAgents": [],
+    "workflowPhase": "Requirements"
+  }
+}

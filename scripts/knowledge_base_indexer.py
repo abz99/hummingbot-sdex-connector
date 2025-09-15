@@ -390,6 +390,30 @@ class KnowledgeBaseIndexer:
         self._save_metadata()
         return results
     
+    def index_local_knowledge_bases_only(self, force: bool = False) -> Dict[str, bool]:
+        """Index only local knowledge bases (skip web sources for performance)."""
+        knowledge_bases = self.config.get('knowledge_base', [])
+        results = {}
+        
+        local_kbs = [kb for kb in knowledge_bases if kb.get('type') != 'web']
+        logger.info(f"Indexing {len(local_kbs)} local knowledge bases (skipping web sources)...")
+        
+        if force:
+            logger.info("Force mode enabled - rebuilding local indexes")
+            # Only clear local KB metadata, keep web KB data
+            for kb_config in local_kbs:
+                kb_id = kb_config.get('id', 'unknown')
+                if kb_id in self.metadata['knowledge_bases']:
+                    del self.metadata['knowledge_bases'][kb_id]
+        
+        for kb_config in local_kbs:
+            kb_id = kb_config.get('id', 'unknown')
+            logger.debug(f"Processing local knowledge base: {kb_id}")
+            results[kb_id] = self.index_knowledge_base(kb_config)
+        
+        self._save_metadata()
+        return results
+    
     def get_changed_files(self) -> Set[Path]:
         """Get list of files that have changed since last indexing."""
         changed_files = set()

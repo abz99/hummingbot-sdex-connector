@@ -1,0 +1,350 @@
+name: Production Deployment Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      force_deploy:
+        description: 'Force deployment even if tests fail'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: stellar-hummingbot-connector
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "18"
+
+jobs:
+  # Quality Gates - Security, Linting, Testing
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for security scanning
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Cache Python Dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        
+    - name: Security Scan - Bandit
+      run: |
+        bandit -r hummingbot/connector/exchange/stellar/ -f json -o bandit-report.json || true
+        
+    - name: Security Scan - Safety
+      run: |
+        safety check --json --output safety-report.json || true
+        
+    - name: Code Quality - Flake8
+      run: |
+        flake8 hummingbot/connector/exchange/stellar/ --output-file=flake8-report.txt --format=default || true
+        
+    - name: Code Quality - MyPy
+      run: |
+        mypy hummingbot/connector/exchange/stellar/ --ignore-missing-imports --json-report mypy-report || true
+        
+    - name: Unit Tests
+      run: |
+        python -m pytest tests/unit/ -v --tb=short --junitxml=unit-test-results.xml --cov=hummingbot.connector.exchange.stellar --cov-report=xml
+        
+    - name: Integration Tests
+      run: |
+        python -m pytest tests/integration/ -v --tb=short --junitxml=integration-test-results.xml
+        
+    - name: Performance Tests
+      run: |
+        python -m pytest tests/performance/ -v --tb=short --junitxml=performance-test-results.xml || true
+        
+    - name: Security Tests
+      run: |
+        python -m pytest tests/security/ -v --tb=short --junitxml=security-test-results.xml
+        
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: |
+          *-test-results.xml
+          *-report.*
+          coverage.xml
+          
+    - name: Quality Gate Decision
+      if: ${{ !inputs.force_deploy }}
+      run: |
+        # Check if critical tests passed
+        if [ -f unit-test-results.xml ] && [ -f integration-test-results.xml ] && [ -f security-test-results.xml ]; then
+          echo "✅ All critical test suites completed"
+        else
+          echo "❌ Critical test suites failed"
+          exit 1
+        fi
+        
+        # Check security scan results
+        if grep -q '"severity": "HIGH"' bandit-report.json 2>/dev/null; then
+          echo "❌ High severity security issues found"
+          exit 1
+        fi
+        
+        echo "✅ Quality gates passed"
+
+  # Container Build and Security Scan
+  build-and-scan:
+    name: Build & Security Scan
+    runs-on: ubuntu-latest
+    needs: quality-gates
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Extract Metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+          
+    - name: Build Container Image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./deployment/docker/Dockerfile.production
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Container Security Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Security Scan Results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Staging Deployment
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-and-scan]
+    if: github.ref == 'refs/heads/main' || inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://stellar-hummingbot-staging.example.com
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+        
+    - name: Configure kubectl
+      run: |
+        aws eks update-kubeconfig --region us-east-1 --name stellar-hummingbot-staging
+        
+    - name: Deploy to Staging
+      run: |
+        # Update image tags in deployment manifests
+        sed -i "s|stellar-hummingbot-connector:3.0|${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" deployment/kubernetes/deployment-production.yaml
+        
+        # Apply staging configuration
+        kubectl apply -f deployment/kubernetes/namespace.yaml
+        kubectl apply -f deployment/kubernetes/configmap.yaml
+        kubectl apply -f deployment/kubernetes/deployment-production.yaml
+        kubectl apply -f deployment/monitoring/
+        
+        # Wait for deployment to be ready
+        kubectl rollout status deployment/stellar-hummingbot-connector -n stellar-hummingbot --timeout=600s
+        
+    - name: Run Smoke Tests
+      run: |
+        # Wait for service to be available
+        kubectl wait --for=condition=available --timeout=300s deployment/stellar-hummingbot-connector -n stellar-hummingbot
+        
+        # Get service endpoint
+        SERVICE_IP=$(kubectl get service stellar-hummingbot-service -n stellar-hummingbot -o jsonpath='{.spec.clusterIP}')
+        
+        # Run smoke tests
+        curl -f http://$SERVICE_IP:8080/health || exit 1
+        curl -f http://$SERVICE_IP:8080/metrics || exit 1
+        curl -f http://$SERVICE_IP:8080/ready || exit 1
+        
+        echo "✅ Staging deployment successful and healthy"
+
+  # Production Deployment
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-and-scan, deploy-staging]
+    if: startsWith(github.ref, 'refs/tags/') || inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://stellar-hummingbot.example.com
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+        aws-region: us-east-1
+        
+    - name: Configure kubectl
+      run: |
+        aws eks update-kubeconfig --region us-east-1 --name stellar-hummingbot-production
+        
+    - name: Pre-deployment Security Check
+      run: |
+        # Verify HSM integration
+        kubectl get secret stellar-hummingbot-secrets -n stellar-hummingbot
+        
+        # Check cluster security policies
+        kubectl get networkpolicies -n stellar-hummingbot
+        
+    - name: Blue-Green Deployment
+      run: |
+        # Create new deployment version
+        export NEW_VERSION="v$(date +%Y%m%d-%H%M%S)"
+        
+        # Update image tags
+        sed -i "s|stellar-hummingbot-connector:3.0|${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" deployment/kubernetes/deployment-production.yaml
+        sed -i "s|stellar-hummingbot-connector|stellar-hummingbot-connector-${NEW_VERSION}|g" deployment/kubernetes/deployment-production.yaml
+        
+        # Deploy new version (blue-green)
+        kubectl apply -f deployment/kubernetes/deployment-production.yaml
+        
+        # Wait for new version to be ready
+        kubectl rollout status deployment/stellar-hummingbot-connector-${NEW_VERSION} -n stellar-hummingbot --timeout=600s
+        
+        # Run production health checks
+        NEW_SERVICE_IP=$(kubectl get service stellar-hummingbot-service-${NEW_VERSION} -n stellar-hummingbot -o jsonpath='{.spec.clusterIP}')
+        
+        # Comprehensive health checks
+        curl -f http://$NEW_SERVICE_IP:8080/health || exit 1
+        curl -f http://$NEW_SERVICE_IP:8080/ready || exit 1
+        curl -f http://$NEW_SERVICE_IP:8080/metrics || exit 1
+        
+        # Switch traffic to new version
+        kubectl patch service stellar-hummingbot-service -n stellar-hummingbot -p '{"spec":{"selector":{"app.kubernetes.io/version":"'${NEW_VERSION}'"}}}'
+        
+        # Wait and verify
+        sleep 30
+        kubectl get pods -n stellar-hummingbot -l app.kubernetes.io/name=stellar-hummingbot-connector
+        
+        echo "✅ Production deployment successful"
+        
+    - name: Post-deployment Monitoring
+      run: |
+        # Send deployment notification to monitoring
+        curl -X POST "${{ secrets.WEBHOOK_URL }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"text\":\"🚀 Stellar Hummingbot Connector v${{ github.sha }} deployed to production successfully\"}"
+        
+        # Start monitoring new deployment
+        echo "Monitoring deployment for 5 minutes..."
+        sleep 300
+        
+        # Check for any alerts
+        ALERT_COUNT=$(kubectl get events -n stellar-hummingbot --field-selector type=Warning | wc -l)
+        if [ $ALERT_COUNT -gt 0 ]; then
+          echo "⚠️ Warning events detected in production deployment"
+          kubectl get events -n stellar-hummingbot --field-selector type=Warning
+        fi
+
+  # Rollback Job (Manual Trigger)
+  rollback:
+    name: Emergency Rollback
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'rollback'
+    environment:
+      name: production
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+        aws-region: us-east-1
+        
+    - name: Configure kubectl
+      run: |
+        aws eks update-kubeconfig --region us-east-1 --name stellar-hummingbot-production
+        
+    - name: Rollback Deployment
+      run: |
+        kubectl rollout undo deployment/stellar-hummingbot-connector -n stellar-hummingbot
+        kubectl rollout status deployment/stellar-hummingbot-connector -n stellar-hummingbot --timeout=300s
+        
+        echo "✅ Emergency rollback completed"
+        
+        # Notify team
+        curl -X POST "${{ secrets.WEBHOOK_URL }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"text\":\"🔄 Emergency rollback of Stellar Hummingbot Connector completed\"}"
