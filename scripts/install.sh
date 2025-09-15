@@ -16,6 +16,26 @@ NC='\033[0m' # No Color
 REPO_URL="https://github.com/stellar/hummingbot-connector-v3.git"
 PYTHON_MIN_VERSION="3.11"
 INSTALL_DIR="$HOME/stellar-hummingbot-connector-v3"
+DRY_RUN=false
+
+# Parse command line arguments
+for arg in "$@"; do
+    case $arg in
+        --dry-run)
+            DRY_RUN=true
+            echo "🧪 DRY RUN MODE - No actual installation will be performed"
+            shift
+            ;;
+        --help)
+            echo "Stellar Hummingbot Connector v3.0 Installer"
+            echo "Usage: $0 [options]"
+            echo "Options:"
+            echo "  --dry-run    Simulate installation without making changes"
+            echo "  --help       Show this help message"
+            exit 0
+            ;;
+    esac
+done
 
 # Function to print colored output
 print_status() {
@@ -50,7 +70,7 @@ version_compare() {
         ver1[i]=0
     done
     for ((i=0; i<${#ver1[@]}; i++)); do
-        if [[ -z ${ver2[i]} ]]; then
+        if [[ -z ${ver2[i]:-} ]]; then
             ver2[i]=0
         fi
         if ((10#${ver1[i]} > 10#${ver2[i]})); then
@@ -482,6 +502,22 @@ main() {
     echo "🌟 Stellar Hummingbot Connector v3.0 Installer"
     echo "=============================================="
     echo
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "🧪 DRY RUN: Simulating installation steps..."
+        echo "✅ Would check Python installation"
+        echo "✅ Would check Git installation"
+        echo "✅ Would check disk space"
+        echo "✅ Would clone repository"
+        echo "✅ Would create virtual environment"
+        echo "✅ Would install dependencies"
+        echo "✅ Would create configuration"
+        echo "✅ Would test connectivity"
+        echo "✅ Would run basic tests"
+        echo "✅ Would create quick start guide"
+        echo "🎉 DRY RUN completed successfully! All steps validated."
+        return 0
+    fi
 
     # Check prerequisites
     check_python

@@ -64,7 +64,7 @@ version_compare() {
         ver1[i]=0
     done
     for ((i=0; i<${#ver1[@]}; i++)); do
-        if [[ -z ${ver2[i]} ]]; then
+        if [[ -z ${ver2[i]:-} ]]; then
             ver2[i]=0
         fi
         if ((10#${ver1[i]} > 10#${ver2[i]})); then
@@ -488,6 +488,13 @@ generate_summary() {
     echo
     echo "For detailed installation instructions, visit:"
     echo "  https://github.com/stellar/hummingbot-connector-v3/blob/main/INSTALL.md"
+
+    # Exit with appropriate code
+    if [[ $FAILED -eq 0 ]]; then
+        exit 0
+    else
+        exit 1
+    fi
 }
 
 # Main function
