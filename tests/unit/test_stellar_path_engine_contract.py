@@ -13,36 +13,39 @@ import time
 from stellar_sdk import Asset
 
 
+# Module-level fixtures for shared use across all test classes
+@pytest.fixture
+def mock_path_engine():
+    """Mock EnhancedPathPaymentEngine."""
+    from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+    with patch.object(EnhancedPathPaymentEngine, "__init__", return_value=None):
+        engine = EnhancedPathPaymentEngine.__new__(EnhancedPathPaymentEngine)
+        engine.chain_interface = AsyncMock()
+        engine.soroban_manager = AsyncMock()
+        engine.observability = AsyncMock()
+        engine._route_cache = {}
+        engine._dex_endpoints = {"stellar_dex": "horizon", "soroswap": "soroban"}
+        engine._max_path_length = 4
+        return engine
+
+
+@pytest.fixture
+def sample_assets():
+    """Sample assets for path finding."""
+    # Use valid Stellar public keys for testing
+    return {
+        "XLM": Asset.native(),
+        "USDC": Asset("USDC", "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"),
+        "AQUA": Asset("AQUA", "GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA"),
+    }
+
+
 class TestOptimalPathFinding:
     """Test optimal path finding functionality.
 
     QA_ID: REQ-PATH-001 - Optimal path finding
     """
-
-    @pytest.fixture
-    def mock_path_engine(self):
-        """Mock EnhancedPathPaymentEngine."""
-        from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
-
-        with patch.object(EnhancedPathPaymentEngine, "__init__", return_value=None):
-            engine = EnhancedPathPaymentEngine.__new__(EnhancedPathPaymentEngine)
-            engine.chain_interface = AsyncMock()
-            engine.soroban_manager = AsyncMock()
-            engine.observability = AsyncMock()
-            engine._route_cache = {}
-            engine._dex_endpoints = {"stellar_dex": "horizon", "soroswap": "soroban"}
-            engine._max_path_length = 4
-            return engine
-
-    @pytest.fixture
-    def sample_assets(self):
-        """Sample assets for path finding."""
-        # Use valid Stellar public keys for testing
-        return {
-            "XLM": Asset.native(),
-            "USDC": Asset("USDC", "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"),
-            "AQUA": Asset("AQUA", "GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA"),
-        }
 
     @pytest.mark.asyncio
     async def test_optimal_path_finding_direct(self, mock_path_engine, sample_assets):
@@ -121,7 +124,7 @@ class TestOptimalPathFinding:
                 path=[source_asset, sample_assets["XLM"], dest_asset],
                 source_amount=amount,
                 destination_amount=amount * Decimal("0.997"),
-                path_type=PathType.SINGLE_HOP,
+                path_type=PathType.MULTI_HOP,
                 estimated_cost=amount * Decimal("0.003"),  # 0.3% cost
                 estimated_time_seconds=10,
                 liquidity_available=Decimal("8000"),
@@ -141,11 +144,12 @@ class TestOptimalPathFinding:
         mock_path_engine.find_optimal_path = mock_find_optimal_path
 
         # Test cost optimization
+        from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import RouteOptimization
         routes = await mock_path_engine.find_optimal_path(
             source_asset=sample_assets["USDC"],
             dest_asset=sample_assets["AQUA"],
             amount=Decimal("1000"),
-            optimization="LOWEST_COST",
+            optimization=RouteOptimization.LOWEST_COST,
         )
 
         # Should return multi-hop as optimal (lowest cost)
@@ -320,8 +324,8 @@ class TestArbitrageDetection:
             }
 
             # Assess each risk factor (0.0 = no risk, 1.0 = high risk)
-            volatility_risk = min(opportunity.buy_route.price_impact + opportunity.sell_route.price_impact, 1.0)
-            liquidity_risk = max(0, 1.0 - (opportunity.buy_route.liquidity_available / opportunity.required_capital))
+            volatility_risk = float(min(opportunity.buy_route.price_impact + opportunity.sell_route.price_impact, Decimal("1.0")))
+            liquidity_risk = max(0, 1.0 - float(opportunity.buy_route.liquidity_available / opportunity.required_capital))
             time_risk = min(opportunity.execution_time_window / 3600, 1.0)  # Risk increases with time
             market_risk = 0.2  # Assume moderate market risk
 
@@ -458,7 +462,7 @@ class TestMEVProtection:
 
         # Test MEV protection for medium-value transaction
         test_route = PathPaymentRoute(
-            path=[Asset.native(), Asset("USDC", "GCKFBEIYTKP5RNAHAEUFLMIDKN5YFIF53MWKQK6VUD5XHAVTVL7LFLBV")],
+            path=[Asset.native(), Asset("USDC", "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ")],
             source_amount=Decimal("5000"),  # Medium value transaction
             destination_amount=Decimal("500"),
             path_type=PathType.DIRECT,

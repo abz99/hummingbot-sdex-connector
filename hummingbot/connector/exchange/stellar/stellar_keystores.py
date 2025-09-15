@@ -250,17 +250,40 @@ class HSMKeyStore:
         self.logger.warning("HSM integration is not yet implemented", category=LogCategory.SECURITY)
 
     async def store_key(self, key_id: str, key_data: bytes, metadata: KeyMetadata) -> bool:
-        """Store a key in HSM (not implemented)."""
-        raise NotImplementedError("HSM integration not yet implemented")
+        """Store a key in HSM (placeholder implementation)."""
+        self.logger.warning(
+            f"HSM store_key called for {key_id} - using placeholder",
+            category=LogCategory.SECURITY,
+            key_id=key_id
+        )
+        # Placeholder: Return False to indicate HSM unavailable
+        return False
 
     async def retrieve_key(self, key_id: str) -> Optional[Tuple[bytes, KeyMetadata]]:
-        """Retrieve a key from HSM (not implemented)."""
-        raise NotImplementedError("HSM integration not yet implemented")
+        """Retrieve a key from HSM (placeholder implementation)."""
+        self.logger.warning(
+            f"HSM retrieve_key called for {key_id} - using placeholder",
+            category=LogCategory.SECURITY,
+            key_id=key_id
+        )
+        # Placeholder: Return None to indicate key not found in HSM
+        return None
 
     async def delete_key(self, key_id: str) -> bool:
-        """Delete a key from HSM (not implemented)."""
-        raise NotImplementedError("HSM integration not yet implemented")
+        """Delete a key from HSM (placeholder implementation)."""
+        self.logger.warning(
+            f"HSM delete_key called for {key_id} - using placeholder",
+            category=LogCategory.SECURITY,
+            key_id=key_id
+        )
+        # Placeholder: Return False to indicate deletion not performed
+        return False
 
     async def list_keys(self) -> List[KeyMetadata]:
-        """List all keys in HSM (not implemented)."""
-        raise NotImplementedError("HSM integration not yet implemented")
+        """List all keys in HSM (placeholder implementation)."""
+        self.logger.warning(
+            "HSM list_keys called - using placeholder",
+            category=LogCategory.SECURITY
+        )
+        # Placeholder: Return empty list since no HSM is configured
+        return []

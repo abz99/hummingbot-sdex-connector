@@ -2,7 +2,7 @@
   "name": "Architect",
   "role": "Senior Software Architect",
   "category": "reviewer",
-  "status": "initializing",
+  "status": "idle",
   "priority": 2,
   "capabilities": [
     "system_design",
@@ -17,7 +17,7 @@
     "performance_optimization"
   ],
   "current_task": null,
-  "last_activity": "2025-09-10T15:40:33.395997+00:00",
+  "last_activity": "2025-09-15T15:01:42.809879+00:00",
   "message_queue_size": 0,
   "knowledge_base_sources": [
     "knowledge/sdk_docs",
