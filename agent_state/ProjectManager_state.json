@@ -2,7 +2,7 @@
   "name": "ProjectManager",
   "role": "Project Manager Agent",
   "category": "coordinator",
-  "status": "initializing",
+  "status": "idle",
   "priority": 1,
   "capabilities": [
     "task_orchestration",
@@ -12,7 +12,7 @@
   ],
   "specializations": [],
   "current_task": null,
-  "last_activity": "2025-09-16T08:18:02.209028+00:00",
+  "last_activity": "2025-09-16T15:46:08.175944+00:00",
   "message_queue_size": 0,
   "knowledge_base_sources": [
     "knowledge/project_documentation",

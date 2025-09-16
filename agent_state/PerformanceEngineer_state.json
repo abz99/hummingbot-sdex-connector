@@ -2,7 +2,7 @@
   "name": "PerformanceEngineer",
   "role": "Performance Engineering Specialist",
   "category": "specialist",
-  "status": "initializing",
+  "status": "idle",
   "priority": 4,
   "capabilities": [
     "performance_analysis",
@@ -17,7 +17,7 @@
     "distributed_system_optimization"
   ],
   "current_task": null,
-  "last_activity": "2025-09-16T08:18:02.278353+00:00",
+  "last_activity": "2025-09-16T15:46:08.195208+00:00",
   "message_queue_size": 0,
   "knowledge_base_sources": [
     "knowledge/performance_guides",
