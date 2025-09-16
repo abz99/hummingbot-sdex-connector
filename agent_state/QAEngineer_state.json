@@ -2,7 +2,7 @@
   "name": "QAEngineer",
   "role": "Quality Assurance Lead",
   "category": "reviewer",
-  "status": "idle",
+  "status": "initializing",
   "priority": 2,
   "capabilities": [
     "test_strategy_design",

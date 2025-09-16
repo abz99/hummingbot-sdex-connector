@@ -14121,3 +14121,12 @@
 2025-09-16 08:21:12,320 - __main__ - WARNING - Task 910445af-bd3c-4693-9815-b9d1b6a907de stalled in requirements phase
 2025-09-16 08:21:12,323 - __main__ - WARNING - Task c3e0daae-42ab-43b0-b039-274add9814ea stalled in requirements phase
 2025-09-16 08:21:12,327 - __main__ - WARNING - Task 8180fc3d-a311-4218-910c-34f91e60d0aa stalled in requirements phase
+2025-09-16 14:22:32,326 - __main__ - INFO - Initialized agent: ProjectManager (coordinator)
+2025-09-16 14:22:32,328 - __main__ - INFO - Initialized agent: Architect (reviewer)
+2025-09-16 14:22:32,330 - __main__ - INFO - Initialized agent: SecurityEngineer (reviewer)
+2025-09-16 14:22:32,332 - __main__ - INFO - Initialized agent: QAEngineer (reviewer)
+2025-09-16 14:22:32,334 - __main__ - INFO - Initialized agent: Implementer (implementer)
+2025-09-16 14:22:32,335 - __main__ - INFO - Initialized agent: DevOpsEngineer (implementer)
+2025-09-16 14:22:32,337 - __main__ - INFO - Initialized agent: PerformanceEngineer (specialist)
+2025-09-16 14:22:32,339 - __main__ - INFO - Initialized agent: DocumentationEngineer (specialist)
+2025-09-16 14:22:32,340 - __main__ - INFO - Initialized 8 agents and 0 tasks

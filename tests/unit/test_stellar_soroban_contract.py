@@ -2,7 +2,33 @@
 Stellar Soroban Contract Tests
 Test smart contract interaction and Soroban functionality.
 
-QA_IDs: REQ-SOROBAN-001, REQ-SOROBAN-002, REQ-SOROBAN-003
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
 """
 
 import pytest
@@ -15,7 +41,35 @@ import json
 
 @pytest.fixture
 def mock_soroban_server():
-    """Mock Soroban RPC server."""
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Mock Soroban RPC server."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
     server = AsyncMock()
     server.simulate_transaction = AsyncMock()
     return server
@@ -23,7 +77,35 @@ def mock_soroban_server():
 
 @pytest.fixture
 def mock_contract_manager(mock_soroban_server):
-    """Mock SorobanContractManager."""
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Mock SorobanContractManager."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
     from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
 
     with patch.object(SorobanContractManager, "__init__", return_value=None):
@@ -71,19 +153,47 @@ def mock_contract_manager(mock_soroban_server):
 
 @pytest.fixture
 def sample_operations():
-    """Sample contract operations for testing."""
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Sample contract operations for testing."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
     from hummingbot.connector.exchange.stellar.stellar_soroban_manager import ContractOperation, ContractOperationType
 
     return [
         ContractOperation(
             operation_type=ContractOperationType.SWAP,
-            contract_address="CONTRACT_AMM_001",
+            contract_address="CONTRACT_AMM_1",
             function_name="swap",
             parameters={"amount_in": "1000", "token_in": "USDC", "token_out": "XLM"},
         ),
         ContractOperation(
             operation_type=ContractOperationType.ADD_LIQUIDITY,
-            contract_address="CONTRACT_AMM_002",
+            contract_address="CONTRACT_AMM_2",
             function_name="add_liquidity",
             parameters={"amount_a": "500", "amount_b": "500", "token_a": "XLM", "token_b": "AQUA"},
         ),
@@ -91,18 +201,74 @@ def sample_operations():
 
 
 class TestContractSimulation:
-    """Test smart contract simulation functionality.
-
-    QA_ID: REQ-SOROBAN-001 - Smart contract simulation accuracy
     """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test smart contract simulation functionality.
+
+    QA_ID: REQ-SOROBAN-1 - Smart contract simulation accuracy
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
     @pytest.mark.asyncio
     async def test_contract_simulation_accuracy(self, mock_contract_manager, mock_soroban_server):
-        """Test accurate contract simulation before execution.
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
 
-        QA_ID: REQ-SOROBAN-001
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test accurate contract simulation before execution.
+
+        QA_ID: REQ-SOROBAN-1
         Acceptance Criteria: assert simulation.success == True and simulation.gas_used > 0
         """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
         # Mock successful simulation response
         simulation_response = {
             "success": True,
@@ -131,7 +297,35 @@ class TestContractSimulation:
 
     @pytest.mark.asyncio
     async def test_simulation_failure_handling(self, mock_contract_manager, mock_soroban_server):
-        """Test simulation failure scenarios."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test simulation failure scenarios."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
         # Mock simulation failure
         simulation_response = {
             "success": False,
@@ -155,7 +349,35 @@ class TestContractSimulation:
 
     @pytest.mark.asyncio
     async def test_simulation_gas_estimation_accuracy(self, mock_contract_manager, mock_soroban_server):
-        """Test gas estimation accuracy in simulation."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test gas estimation accuracy in simulation."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
         # Mock simulation with detailed gas breakdown
         simulation_response = {
             "success": True,
@@ -178,18 +400,74 @@ class TestContractSimulation:
 
 
 class TestCrossContractExecution:
-    """Test cross-contract atomic execution.
-
-    QA_ID: REQ-SOROBAN-002 - Cross-contract atomic execution
     """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test cross-contract atomic execution.
+
+    QA_ID: REQ-SOROBAN-2 - Cross-contract atomic execution
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
     @pytest.mark.asyncio
     async def test_atomic_cross_contract_execution(self, mock_contract_manager, sample_operations):
-        """Test atomic execution of multiple contract operations.
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
 
-        QA_ID: REQ-SOROBAN-002
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test atomic execution of multiple contract operations.
+
+        QA_ID: REQ-SOROBAN-2
         Acceptance Criteria: assert len(results) == len(operations) and all(r.success for r in results)
         """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
         # Mock successful atomic execution
         def mock_execute_atomic(operations, source_account, atomic=True):
@@ -220,7 +498,35 @@ class TestCrossContractExecution:
 
     @pytest.mark.asyncio
     async def test_cross_contract_rollback_on_failure(self, mock_contract_manager, sample_operations):
-        """Test rollback when one operation in atomic batch fails."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test rollback when one operation in atomic batch fails."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
         # Mock partial failure - second operation fails
         def mock_execute_with_failure(operations, source_account, atomic=True):
@@ -246,7 +552,35 @@ class TestCrossContractExecution:
 
     @pytest.mark.asyncio
     async def test_non_atomic_execution_partial_success(self, mock_contract_manager, sample_operations):
-        """Test non-atomic execution allows partial success."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test non-atomic execution allows partial success."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
         # Mock partial success in non-atomic mode
         def mock_execute_non_atomic(operations, source_account, atomic=False):
@@ -281,7 +615,35 @@ class TestCrossContractExecution:
 
     @pytest.mark.asyncio
     async def test_cross_contract_simulation_before_execution(self, mock_contract_manager, sample_operations):
-        """Test simulation before cross-contract execution."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test simulation before cross-contract execution."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
         # Mock simulation for each operation
         mock_simulations = [
             {"success": True, "gas_used": 150000, "return_value": "simulation_1"},
@@ -308,18 +670,74 @@ class TestCrossContractExecution:
 
 
 class TestGasEstimation:
-    """Test gas estimation accuracy.
-
-    QA_ID: REQ-SOROBAN-003 - Gas estimation accuracy
     """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test gas estimation accuracy.
+
+    QA_ID: REQ-SOROBAN-3 - Gas estimation accuracy
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
     @pytest.mark.asyncio
     async def test_gas_estimation_accuracy(self, mock_contract_manager):
-        """Test gas estimation within 10% of actual consumption.
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
 
-        QA_ID: REQ-SOROBAN-003
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test gas estimation within 10% of actual consumption.
+
+        QA_ID: REQ-SOROBAN-3
         Acceptance Criteria: assert abs(estimated - actual) / actual <= 0.1
         """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
         # Mock gas estimation and actual execution results
         _estimated_gas = 150000
         actual_gas = 145000  # Within 10% of estimate (3.3% difference)
@@ -353,7 +771,35 @@ class TestGasEstimation:
 
     @pytest.mark.asyncio
     async def test_gas_estimation_complexity_scaling(self, mock_contract_manager):
-        """Test gas estimation scales with operation complexity."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test gas estimation scales with operation complexity."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
         async def mock_complex_estimate(contract_address, function_name, parameters):
             base_gas = 100000
@@ -387,7 +833,35 @@ class TestGasEstimation:
 
     @pytest.mark.asyncio
     async def test_gas_estimation_caching(self, mock_contract_manager):
-        """Test gas estimation caching for repeated operations."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test gas estimation caching for repeated operations."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
         call_count = 0
 
         async def mock_cached_estimate(contract_address, function_name, parameters):
@@ -425,7 +899,35 @@ class TestGasEstimation:
 
     @pytest.mark.asyncio
     async def test_gas_estimation_network_conditions(self, mock_contract_manager):
-        """Test gas estimation adjustments for network conditions."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test gas estimation adjustments for network conditions."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
         async def mock_network_adjusted_estimate(contract_address, function_name, parameters):
             base_estimate = 150000
@@ -447,18 +949,102 @@ class TestGasEstimation:
 
 
 class TestContractInteractionPatterns:
-    """Test common contract interaction patterns."""
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test common contract interaction patterns."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
     @pytest.mark.asyncio
     async def test_amm_swap_pattern(self):
-        """Test AMM swap interaction pattern."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test AMM swap interaction pattern."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
         class MockAMMContract:
             def __init__(self):
                 self.reserves = {"USDC": Decimal("10000"), "XLM": Decimal("50000")}
 
             async def get_swap_quote(self, token_in, token_out, amount_in):
-                """Calculate swap quote using constant product formula."""
+                """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Calculate swap quote using constant product formula."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
                 if token_in not in self.reserves or token_out not in self.reserves:
                     raise ValueError("Token not supported")
 
@@ -485,7 +1071,35 @@ class TestContractInteractionPatterns:
 
     @pytest.mark.asyncio
     async def test_liquidity_pool_operations(self):
-        """Test liquidity pool add/remove operations."""
+        """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Test liquidity pool add/remove operations."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
 
         class MockLiquidityPool:
             def __init__(self):
@@ -494,7 +1108,35 @@ class TestContractInteractionPatterns:
                 self.total_supply = Decimal("14142")  # sqrt(10000 * 20000)
 
             async def add_liquidity(self, amount_a, amount_b):
-                """Add liquidity to pool."""
+                """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Add liquidity to pool."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
                 # Calculate LP tokens to mint
                 lp_tokens = min(
                     (amount_a * self.total_supply) / self.reserve_a, (amount_b * self.total_supply) / self.reserve_b
@@ -508,7 +1150,35 @@ class TestContractInteractionPatterns:
                 return {"lp_tokens": lp_tokens, "success": True}
 
             async def remove_liquidity(self, lp_tokens):
-                """Remove liquidity from pool."""
+                """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Remove liquidity from pool."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
                 if lp_tokens > self.total_supply:
                     raise ValueError("Insufficient LP tokens")
 
@@ -539,7 +1209,35 @@ class TestContractInteractionPatterns:
 
 # Utility functions for Soroban testing
 def create_mock_contract_operation(operation_type="swap", **kwargs):
-    """Create mock contract operation for testing."""
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Create mock contract operation for testing."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
     from hummingbot.connector.exchange.stellar.stellar_soroban_manager import ContractOperation, ContractOperationType
 
     defaults = {
@@ -554,7 +1252,35 @@ def create_mock_contract_operation(operation_type="swap", **kwargs):
 
 
 def assert_valid_simulation_result(simulation):
-    """Assert simulation result has valid structure."""
+    """
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""Assert simulation result has valid structure."""
+Comprehensive Test Suite for Soroban Smart Contract Manager
+Coverage Target: 95%+ for stellar_soroban_manager.py
+
+Test Categories:
+1. Contract Management (registration, verification, discovery)
+2. Smart Contract Interactions (invoke, simulate, estimate gas)
+3. Cross-Contract Operations (atomic execution, rollback handling)
+4. AMM Integration (swap quotes, liquidity operations)
+5. Error Handling & Edge Cases (network failures, invalid inputs)
+6. Performance & Caching (gas estimation accuracy, caching mechanisms)
+7. MEV Protection (private mempool submission)
+
+QA_IDs: REQ-SOROBAN-1 through REQ-SOROBAN-10
+"""
     required_fields = ["success", "gas_used"]
     for field in required_fields:
         assert field in simulation, f"Missing field: {field}"

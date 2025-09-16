@@ -2,7 +2,7 @@
   "name": "PerformanceEngineer",
   "role": "Performance Engineering Specialist",
   "category": "specialist",
-  "status": "idle",
+  "status": "initializing",
   "priority": 4,
   "capabilities": [
     "performance_analysis",

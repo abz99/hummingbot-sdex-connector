@@ -2,7 +2,7 @@
   "name": "ProjectManager",
   "role": "Project Manager Agent",
   "category": "coordinator",
-  "status": "idle",
+  "status": "initializing",
   "priority": 1,
   "capabilities": [
     "task_orchestration",

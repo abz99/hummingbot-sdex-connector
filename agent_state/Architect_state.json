@@ -2,7 +2,7 @@
   "name": "Architect",
   "role": "Senior Software Architect",
   "category": "reviewer",
-  "status": "idle",
+  "status": "initializing",
   "priority": 2,
   "capabilities": [
     "system_design",

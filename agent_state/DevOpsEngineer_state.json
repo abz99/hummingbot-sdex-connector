@@ -2,7 +2,7 @@
   "name": "DevOpsEngineer",
   "role": "DevOps & Infrastructure Engineer",
   "category": "implementer",
-  "status": "idle",
+  "status": "initializing",
   "priority": 3,
   "capabilities": [
     "ci_cd_pipeline_management",

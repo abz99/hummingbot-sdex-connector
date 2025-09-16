@@ -2,7 +2,7 @@
   "name": "SecurityEngineer",
   "role": "Security Engineering Specialist",
   "category": "reviewer",
-  "status": "idle",
+  "status": "initializing",
   "priority": 2,
   "capabilities": [
     "threat_modeling",

@@ -2,7 +2,7 @@
   "name": "Implementer",
   "role": "Senior Software Engineer",
   "category": "implementer",
-  "status": "idle",
+  "status": "initializing",
   "priority": 3,
   "capabilities": [
     "code_implementation",

@@ -516,7 +516,38 @@ def main():
     manager = AgentManager(Path(args.config))
     
     if args.status:
+        # Initialize agents first to load their states
+        if not manager.initialize_agents():
+            print("❌ Failed to initialize agents for status report")
+            sys.exit(1)
+
         report = manager.generate_status_report()
+
+        # Format output for better readability
+        print(f"🚀 Agent Management System Status")
+        print(f"{'='*50}")
+        print(f"System Status: {report['system_status']}")
+        print(f"Agents: {report['agent_count']}")
+        print(f"Tasks: {report['task_count']}")
+        print(f"Timestamp: {report['timestamp']}")
+
+        if report['agents']:
+            print(f"\n📋 Agents:")
+            for name, agent in report['agents'].items():
+                status_icon = "✅" if agent['status'] == 'idle' else "🔄" if agent['status'] == 'busy' else "❌"
+                print(f"  {status_icon} {name}: {agent['status']} ({agent['role']})")
+
+        if report['tasks']:
+            print(f"\n📝 Tasks:")
+            for task_id, task in report['tasks'].items():
+                phase_icon = "🔄" if task.get('assigned_agent') else "⏳"
+                print(f"  {phase_icon} {task_id[:8]}: {task['current_phase']} -> {task.get('assigned_agent', 'unassigned')}")
+
+        print(f"\n🔧 Health: {report['workflow_health']['overall_health']}")
+
+        # Also output raw JSON for programmatic use
+        print(f"\n{'='*50}")
+        print("Raw JSON Status:")
         print(json.dumps(report, indent=2, ensure_ascii=False))
         return
     
