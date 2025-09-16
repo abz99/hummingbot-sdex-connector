@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
 
-from stellar_sdk import Keypair
+from stellar_sdk import Keypair, Network
 
 if TYPE_CHECKING:
     from .stellar_config_models import StellarNetworkConfig
@@ -191,20 +191,29 @@ class EnterpriseSecurityFramework:
             Signed transaction XDR
         """
         try:
-            # keypair = await self.get_signing_keypair(account_id)  # Unused
+            # Get the appropriate signing keypair
+            keypair = await self.get_signing_keypair(account_id)
 
-            # Actual signing implementation would depend on security provider
-            # This is a simplified stub
+            # Parse the transaction XDR
+            from stellar_sdk import TransactionEnvelope
+            envelope = TransactionEnvelope.from_xdr(transaction_xdr, network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE)
+
+            # Sign the transaction with the keypair
+            signed_envelope = keypair.sign(envelope)
+
+            # Return the signed transaction XDR
+            signed_xdr = signed_envelope.to_xdr()
 
             await self.observability.log_event(
                 "transaction_signed",
                 {
                     "account_id": account_id,
                     "provider": self._primary_provider.value if self._primary_provider else "local",
+                    "signature_count": len(signed_envelope.signatures)
                 },
             )
 
-            return transaction_xdr  # Placeholder
+            return signed_xdr
 
         except Exception as e:
             await self.observability.log_error(

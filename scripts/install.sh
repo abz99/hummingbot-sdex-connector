@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="https://github.com/stellar/hummingbot-connector-v3.git"
+REPO_URL="https://github.com/abz99/hummingbot-sdex-connector.git"
 PYTHON_MIN_VERSION="3.11"
 INSTALL_DIR="$HOME/stellar-hummingbot-connector-v3"
 DRY_RUN=false
@@ -490,7 +490,7 @@ display_completion() {
     echo "  🆘 Troubleshooting: Check INSTALL.md for common issues"
     echo
     echo "💬 Support:"
-    echo "  🌐 GitHub: https://github.com/stellar/hummingbot-connector-v3"
+    echo "  🌐 GitHub: https://github.com/abz99/hummingbot-sdex-connector"
     echo "  💬 Discord: https://discord.gg/stellar"
     echo "  📧 Email: support@stellar.org"
     echo

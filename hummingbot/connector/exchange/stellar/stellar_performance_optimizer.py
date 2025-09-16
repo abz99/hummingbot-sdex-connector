@@ -79,7 +79,7 @@ class RequestCache:
         self.max_entries = max_entries
         self.default_ttl = default_ttl
         self._cache: Dict[str, CacheEntry] = {}
-        self._access_order: deque[Any] = deque()  # LRU tracking
+        self._access_order: deque[str] = deque()  # LRU tracking
 
     def _generate_key(self, endpoint: str, params: Dict[str, Any]) -> str:
         """Generate cache key from endpoint and parameters."""
@@ -131,6 +131,21 @@ class RequestCache:
         """Clear all cached entries."""
         self._cache.clear()
         self._access_order.clear()
+
+    def cleanup_expired(self) -> int:
+        """Remove expired entries in batch. Returns number of entries removed."""
+        now = time.time()
+        expired_keys = [
+            key for key, entry in self._cache.items()
+            if now >= entry.expires_at
+        ]
+
+        for key in expired_keys:
+            del self._cache[key]
+            if key in self._access_order:
+                self._access_order.remove(key)
+
+        return len(expired_keys)
 
     def get_stats(self) -> Dict[str, Any]:
         """Get cache statistics."""

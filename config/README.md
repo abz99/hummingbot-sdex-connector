@@ -1,7 +1,7 @@
 # Configuration Guide
 **Stellar Hummingbot Connector v3.0**
 
-**Last Updated:** 2025-09-15 18:53 UTC
+**Last Updated:** 2025-09-16 06:46 UTC
 
 ## 📁 Configuration Overview
 

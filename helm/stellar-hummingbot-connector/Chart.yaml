@@ -15,9 +15,9 @@ keywords:
   - defi
   - arbitrage
 
-home: https://github.com/stellar/hummingbot-connector-v3
+home: https://github.com/abz99/hummingbot-sdex-connector
 sources:
-  - https://github.com/stellar/hummingbot-connector-v3
+  - https://github.com/abz99/hummingbot-sdex-connector
 
 maintainers:
   - name: Stellar Trading Team

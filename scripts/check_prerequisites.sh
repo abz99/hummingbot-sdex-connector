@@ -487,7 +487,7 @@ generate_summary() {
 
     echo
     echo "For detailed installation instructions, visit:"
-    echo "  https://github.com/stellar/hummingbot-connector-v3/blob/main/INSTALL.md"
+    echo "  https://github.com/abz99/hummingbot-sdex-connector/blob/main/INSTALL.md"
 
     # Exit with appropriate code
     if [[ $FAILED -eq 0 ]]; then

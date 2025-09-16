@@ -430,9 +430,9 @@
     {
       "path": ".claude/settings.local.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/.claude/settings.local.json",
-      "hash": "dc082dcf19065436ca023635ded174857e2f8bb1b0a1f17207032e0719211e6d",
-      "size": 7701,
-      "modified": "2025-09-15T14:34:32.301672+00:00"
+      "hash": "735eb212fdbbcc5c4c0de4d83ef17d818ea044ae95eaa01ef1d178399f8de638",
+      "size": 9336,
+      "modified": "2025-09-16T07:29:41.593330+00:00"
     },
     {
       "path": ".claude/team_workflow.yaml",
@@ -451,9 +451,9 @@
     {
       "path": ".claude_session_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/.claude_session_state.json",
-      "hash": "e6909bbc56c406692891b9def119530e0f3d1f90412c9a08dfbf6eff82065ea9",
-      "size": 448,
-      "modified": "2025-09-15T18:06:22.081497+00:00"
+      "hash": "780bfae937ae2ff1c1397665c6fcbc81fa48f45dd42132ae02ba2c3a7aa206f1",
+      "size": 1390,
+      "modified": "2025-09-16T06:21:06.652839+00:00"
     },
     {
       "path": ".github/workflows/ci.yml",
@@ -17027,9 +17027,9 @@
     {
       "path": "INSTALL.md",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/INSTALL.md",
-      "hash": "9ddab88d1769ed5511ab27909a5a36fb73dcdb7d8ccf912d5ba5432affafd6e1",
+      "hash": "0635dd1060aa12ce2d0f6583ebc7afda4df3b8de928fa65e75b6104d96ab7773",
       "size": 9355,
-      "modified": "2025-09-15T18:52:11.089186+00:00"
+      "modified": "2025-09-16T06:42:44.867204+00:00"
     },
     {
       "path": "LAST_SESSION.md",
@@ -17118,9 +17118,9 @@
     {
       "path": "PROJECT_STATUS.md",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/PROJECT_STATUS.md",
-      "hash": "0c420d1bb173a761c42b4f91487730359f2ab3bdd68747304cf9f23f496bf521",
-      "size": 26659,
-      "modified": "2025-09-15T18:53:47.365426+00:00"
+      "hash": "10083bacc860ec74b9a5b484605d585521924f8cc4aff9548ae1dff70eab8b7d",
+      "size": 29299,
+      "modified": "2025-09-16T08:07:20.617419+00:00"
     },
     {
       "path": "PR_CHECKLIST.md",
@@ -17202,58 +17202,58 @@
     {
       "path": "agent_state/Architect_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/agent_state/Architect_state.json",
-      "hash": "4575d9cf9f20b34c5f93e19044cb6cf1c8c9fd173c49d1d7617b3d044cb988f3",
+      "hash": "73a52fd003f46163eb0363cb351e85caa23f97c3165f6f7ab312c90a618a16fd",
       "size": 751,
-      "modified": "2025-09-15T18:06:12.613452+00:00"
+      "modified": "2025-09-16T08:04:02.375075+00:00"
     },
     {
       "path": "agent_state/DevOpsEngineer_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/agent_state/DevOpsEngineer_state.json",
-      "hash": "b4aeac55193fc42bfff7446e33e007e9cd1fa5f0dbc419e6abd71542fb35100c",
+      "hash": "4b3d24bbff745a7c2fa17c3f755c63b7473b881354e540b7fc3a6eca3ae00c55",
       "size": 700,
-      "modified": "2025-09-15T18:06:12.621452+00:00"
+      "modified": "2025-09-16T08:04:02.379075+00:00"
     },
     {
       "path": "agent_state/DocumentationEngineer_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/agent_state/DocumentationEngineer_state.json",
-      "hash": "e01bc0dec92d7272161e59ca7a2dcdffe23729bc9e87115aaf8bb98c05a8f62c",
+      "hash": "b207d97450d44c33cbc3150d970f8ec8e271c8dca83f5ceb25a52a14f4b36650",
       "size": 764,
-      "modified": "2025-09-15T18:06:12.621452+00:00"
+      "modified": "2025-09-16T08:04:02.395074+00:00"
     },
     {
       "path": "agent_state/Implementer_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/agent_state/Implementer_state.json",
-      "hash": "ec44fa30eb1dbb9ef453bfcccb5e0f611bf485c006580063fd81d41e74b77a42",
+      "hash": "9c25353e27534cb96274e4afe390afbaa207c41a8d0222fc9485df71590c4be4",
       "size": 693,
-      "modified": "2025-09-15T18:06:12.617452+00:00"
+      "modified": "2025-09-16T08:04:02.379075+00:00"
     },
     {
       "path": "agent_state/PerformanceEngineer_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/agent_state/PerformanceEngineer_state.json",
-      "hash": "8e5a52a528c07ac812e4643af66789e323ca9e736c5dee7a389260b8e4581b72",
+      "hash": "5707ac737697883953972052d926ca5888df63f57407b2588edef531d8db45d1",
       "size": 818,
-      "modified": "2025-09-15T18:06:12.621452+00:00"
+      "modified": "2025-09-16T08:04:02.383074+00:00"
     },
     {
       "path": "agent_state/ProjectManager_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/agent_state/ProjectManager_state.json",
-      "hash": "1a8c31fa0e45c6db2f2d396ade67d2af00492ccef17551c690aeee14d3dda346",
+      "hash": "8621459809fe61ca8bbb4743e1ae7e51cc005be74ebe5f3d57e9150ac7c5efac",
       "size": 623,
-      "modified": "2025-09-15T18:06:12.609452+00:00"
+      "modified": "2025-09-16T08:04:02.371075+00:00"
     },
     {
       "path": "agent_state/QAEngineer_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/agent_state/QAEngineer_state.json",
-      "hash": "7d37eecae8e86e5d01abc6c8abdfc65f4f9a3fcdeabd17a73ed0932970d99cfe",
+      "hash": "6c6cfecf14f1012f9c29cdaf317cbb59253ad36821a923a2d2b45e354c3fe023",
       "size": 725,
-      "modified": "2025-09-15T18:06:12.617452+00:00"
+      "modified": "2025-09-16T08:04:02.375075+00:00"
     },
     {
       "path": "agent_state/SecurityEngineer_state.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/agent_state/SecurityEngineer_state.json",
-      "hash": "ddc6f9d676c5f5b95486d57b1b14c22240bb6f037733705bc3b50e34870efe9b",
+      "hash": "aa66726c79f7f87c813e1ca3d2a9df0c538562fcb2695abe39261bde5ab9a1c1",
       "size": 750,
-      "modified": "2025-09-15T18:06:12.613452+00:00"
+      "modified": "2025-09-16T08:04:02.375075+00:00"
     },
     {
       "path": "agent_state/task_8180fc3d-a311-4218-910c-34f91e60d0aa.json",
@@ -17286,9 +17286,9 @@
     {
       "path": "config/README.md",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/config/README.md",
-      "hash": "d14205c85260ebf7c5bddc7618e936cd4861537ce2deaf77bf820373cb767b45",
+      "hash": "9fdc3908a2a28c3e66b31a76bb690d7400bdc84059a84b948b4b2f16ed2514b4",
       "size": 2505,
-      "modified": "2025-09-15T18:53:47.357426+00:00"
+      "modified": "2025-09-16T06:46:31.012433+00:00"
     },
     {
       "path": "config/README_networks.md",
@@ -17510,9 +17510,9 @@
     {
       "path": "docs/RISK_MANAGEMENT.md",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/RISK_MANAGEMENT.md",
-      "hash": "4c0740d45b79c95fd7a6f4b243b7afd4675e2507f8b2b39aca433a5924e4b738",
+      "hash": "2a15008b5e5b281ae921c9665ac5a77be84f6cc11e9fc4fa050d62414ccb1c19",
       "size": 3448,
-      "modified": "2025-09-15T18:53:47.357426+00:00"
+      "modified": "2025-09-16T06:46:31.016433+00:00"
     },
     {
       "path": "docs/TEAM_WORKFLOW_GUIDE.md",
@@ -17524,16 +17524,16 @@
     {
       "path": "docs/TESTNET_GUIDE.md",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/TESTNET_GUIDE.md",
-      "hash": "8fd0782c3fde95bddcebd1535c01a6dd86370f36b8dfffa06bcd4594025238bc",
+      "hash": "29c231db913098379a4668f06dcb9ea4680c81c30a90a31a127a07676a78c8d1",
       "size": 5287,
-      "modified": "2025-09-15T18:53:47.357426+00:00"
+      "modified": "2025-09-16T06:46:31.016433+00:00"
     },
     {
       "path": "docs/USER_ONBOARDING_GUIDE.md",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/docs/USER_ONBOARDING_GUIDE.md",
-      "hash": "15756b720a2cb6a7cfa55a7de46f9018d38442275dc03973ff1af9234a6762aa",
+      "hash": "c3bfc0f9d65da0e077a82abf43e4ceb8652a83f5d6a71560bbd5d32e2fb2836f",
       "size": 2141,
-      "modified": "2025-09-15T18:53:47.357426+00:00"
+      "modified": "2025-09-16T06:46:31.016433+00:00"
     },
     {
       "path": "docs/daily_development_workflow.md",
@@ -17580,9 +17580,9 @@
     {
       "path": "helm/stellar-hummingbot-connector/Chart.yaml",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/helm/stellar-hummingbot-connector/Chart.yaml",
-      "hash": "a0d4ae66d4443ebb773a4508ba6661cd9a6e54cbe392b76e7c7a8ab79331b21a",
+      "hash": "31c162a07c594bdf8f8b48dc82399a9eed34bafbc5922408b250f5dd6d08cb1c",
       "size": 1343,
-      "modified": "2025-09-09T10:29:02.013524+00:00"
+      "modified": "2025-09-16T06:42:34.515148+00:00"
     },
     {
       "path": "helm/stellar-hummingbot-connector/values.yaml",
@@ -17699,9 +17699,9 @@
     {
       "path": "hummingbot/connector/exchange/stellar/stellar_hardware_wallets.py",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/hummingbot/connector/exchange/stellar/stellar_hardware_wallets.py",
-      "hash": "0f9b393d83685919512c6f077b7bb6435f0339277a1db987932a11bddea8cd75",
-      "size": 20165,
-      "modified": "2025-09-10T05:55:40.553214+00:00"
+      "hash": "a5bf243d405471740162818d9e7811828273a118bd9c30ab239d84247699aff9",
+      "size": 24295,
+      "modified": "2025-09-16T07:35:13.415925+00:00"
     },
     {
       "path": "hummingbot/connector/exchange/stellar/stellar_health_monitor.py",
@@ -17818,9 +17818,9 @@
     {
       "path": "hummingbot/connector/exchange/stellar/stellar_performance_optimizer.py",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/hummingbot/connector/exchange/stellar/stellar_performance_optimizer.py",
-      "hash": "ef51b6a6f6cf4743cd5a113ebbdc6f3d649d61fbfad5edf2fdc8b0c431bbf1f3",
-      "size": 14064,
-      "modified": "2025-09-10T05:58:00.114096+00:00"
+      "hash": "a4b6c76ca7070fc256df534224164951f3a95eacea38c1b44eb2336e42042cc9",
+      "size": 14529,
+      "modified": "2025-09-16T07:39:29.653877+00:00"
     },
     {
       "path": "hummingbot/connector/exchange/stellar/stellar_production_metrics.py",
@@ -17853,9 +17853,9 @@
     {
       "path": "hummingbot/connector/exchange/stellar/stellar_security.py",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/hummingbot/connector/exchange/stellar/stellar_security.py",
-      "hash": "5d914c68661dd44bcb971fa70dd858529dac516b19bd5d751c495508df37b478",
-      "size": 7274,
-      "modified": "2025-09-10T10:49:23.188685+00:00"
+      "hash": "351d306056ebf0e8a1600dc8a9e5bb8755d798c8f8263369a229858af010b4dd",
+      "size": 7679,
+      "modified": "2025-09-16T07:36:57.468483+00:00"
     },
     {
       "path": "hummingbot/connector/exchange/stellar/stellar_security_hardening.py",
@@ -18070,9 +18070,9 @@
     {
       "path": "knowledge/index/metadata.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/knowledge/index/metadata.json",
-      "hash": "1b93d232adeb9b8bbc43162106495d2beba2d4552812948db21a12088769e2f9",
-      "size": 3973387,
-      "modified": "2025-09-15T15:07:32.364753+00:00"
+      "hash": "b2d6c64781f27270280d4f7e27c2e62ecf2582c2aa1233987e24982393aaebe6",
+      "size": 3975799,
+      "modified": "2025-09-16T07:40:46.402790+00:00"
     },
     {
       "path": "knowledge/index/performance_guides.json",
@@ -18084,23 +18084,23 @@
     {
       "path": "knowledge/index/project_documentation.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/knowledge/index/project_documentation.json",
-      "hash": "23d5bab6bc6280ce3745999eed423667b6b77a5ed9fa1b152145d8b173d6f1b3",
+      "hash": "a52bcb4ce057df1b40ee0168ef4074dc783218bb6bbf9254fcec0fe25a17de9d",
       "size": 1670,
-      "modified": "2025-09-15T15:07:31.864750+00:00"
+      "modified": "2025-09-16T06:47:35.672786+00:00"
     },
     {
       "path": "knowledge/index/qa_framework.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/knowledge/index/qa_framework.json",
-      "hash": "543054601bba6cb42d64d453ee6f937e93c1ac88a6152134ac4a5edecbdc803a",
+      "hash": "9bc42c307448279e3f54da08e5b0e1b58b600c07a43fc702864b29b35e2d6363",
       "size": 1643,
-      "modified": "2025-09-10T15:54:53.587157+00:00"
+      "modified": "2025-09-16T06:47:35.680787+00:00"
     },
     {
       "path": "knowledge/index/repo_index.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/knowledge/index/repo_index.json",
-      "hash": "04bccaa98c082ac27a03f511f37ed1cae005499144c9e3f076b264914e9aadce",
-      "size": 3698446,
-      "modified": "2025-09-15T15:07:31.832750+00:00"
+      "hash": "ad0e2457e850a88f1aae90da96031ca60c014cfc6d195185e1cafa1daebfd40d",
+      "size": 3700662,
+      "modified": "2025-09-16T07:40:46.002785+00:00"
     },
     {
       "path": "knowledge/index/sdk_docs.json",
@@ -18161,9 +18161,9 @@
     {
       "path": "monitoring/data/agent_commitments.json",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/monitoring/data/agent_commitments.json",
-      "hash": "65893be651c3fd71b92eccd7a6d6f078feeb2f0cb1396e9487077fb977a7fcdb",
-      "size": 3408,
-      "modified": "2025-09-11T10:51:29.268669+00:00"
+      "hash": "8a973b422869600d7713d6bb97954110b56b8134a0aefa6a343302a9671896b0",
+      "size": 4575,
+      "modified": "2025-09-16T08:06:20.618822+00:00"
     },
     {
       "path": "monitoring/integration_test_report.json",
@@ -18266,9 +18266,9 @@
     {
       "path": "qa/quality_catalogue.yml",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/qa/quality_catalogue.yml",
-      "hash": "af0a13d3320a9d0d56d3dab488640942ab1083f5cf860f53d13fc28964f817f7",
+      "hash": "8ba5c74d75279f4148ac2e1727f005c754f67af91bae3e5a5f507e4cf5b6e57c",
       "size": 19629,
-      "modified": "2025-09-15T18:53:47.357426+00:00"
+      "modified": "2025-09-16T06:25:10.017845+00:00"
     },
     {
       "path": "reports/production_readiness_assessment_1757396251.json",
@@ -18595,9 +18595,9 @@
     {
       "path": "team_startup.yaml",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/team_startup.yaml",
-      "hash": "8f03c93524c15014c74fe1ce8425cf33c667934c9a4a3717d233e0d1ee7f6baf",
+      "hash": "398561c2beec394e632e564ebbb4f4ac8c4cbed2e8a7c4d81f0963067eab8236",
       "size": 40760,
-      "modified": "2025-09-15T18:53:47.361426+00:00"
+      "modified": "2025-09-16T06:25:10.017845+00:00"
     },
     {
       "path": "team_startup_backup.yaml",
@@ -18805,9 +18805,9 @@
     {
       "path": "tests/unit/test_stellar_soroban_contract.py",
       "absolute_path": "/home/abz/projects/stellar-hummingbot-connector-v3/tests/unit/test_stellar_soroban_contract.py",
-      "hash": "920946fde924c433ce3ba1e65f22d925105cff4633c81e3b17dc76ae8c823879",
-      "size": 21813,
-      "modified": "2025-09-11T05:47:43.138315+00:00"
+      "hash": "0c4db543b2b2d51fd53ff9ba48acafb8fe8ba28a47047795317996175b86a0dd",
+      "size": 22800,
+      "modified": "2025-09-16T07:29:27.937526+00:00"
     },
     {
       "path": "update_security_tracking.py",
@@ -66257,6 +66257,6 @@
     }
   ],
   "file_count": 9461,
-  "last_indexed": "2025-09-15T18:55:08.930073+00:00",
-  "hash": "f98f22b1458877f0677a257b1891921ff8bb95728ad1ad29259a65d01c12a7d5"
+  "last_indexed": "2025-09-16T08:08:33.140852+00:00",
+  "hash": "b5b6fea4714c422e72d7ea7c78c3457de97284eedb6b55de0dcf21f2e28dd274"
 }

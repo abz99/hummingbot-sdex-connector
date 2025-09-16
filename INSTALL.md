@@ -36,7 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/stellar/hummingbot-connector-v3/mai
 ### Option 2: Manual Installation
 ```bash
 # 1. Clone the repository
-git clone https://github.com/stellar/hummingbot-connector-v3.git
+git clone https://github.com/abz99/hummingbot-sdex-connector.git
 cd hummingbot-connector-v3
 
 # 2. Run the setup script
@@ -62,7 +62,7 @@ python -c "from hummingbot.connector.exchange.stellar import StellarExchange; pr
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 # Then run the installation:
-git clone https://github.com/stellar/hummingbot-connector-v3.git
+git clone https://github.com/abz99/hummingbot-sdex-connector.git
 cd hummingbot-connector-v3
 .\scripts\setup.ps1
 ```
@@ -192,7 +192,7 @@ docker run -it --rm \
 ### Development Installation
 ```bash
 # Clone with development dependencies
-git clone https://github.com/stellar/hummingbot-connector-v3.git
+git clone https://github.com/abz99/hummingbot-sdex-connector.git
 cd hummingbot-connector-v3
 
 # Install in development mode
@@ -273,7 +273,7 @@ pip install -r requirements.txt --force-reinstall
 ### Get Help
 - **Quick Help**: Run `python scripts/diagnostics.py` for automated troubleshooting
 - **Documentation**: See [CONFIGURATION.md](./CONFIGURATION.md) for detailed setup
-- **GitHub Issues**: [Create an issue](https://github.com/stellar/hummingbot-connector-v3/issues) for bugs
+- **GitHub Issues**: [Create an issue](https://github.com/abz99/hummingbot-sdex-connector/issues) for bugs
 - **Community Discord**: Join our [Discord server](https://discord.gg/stellar) for support
 
 ---
@@ -356,9 +356,9 @@ python scripts/test_config.py
 - Scale with [production deployment](./docs/KUBERNETES_DEPLOYMENT_GUIDE.md)
 
 ### 4. **Join the Community**
-- [GitHub Discussions](https://github.com/stellar/hummingbot-connector-v3/discussions)
+- [GitHub Discussions](https://github.com/abz99/hummingbot-sdex-connector/discussions)
 - [Discord Community](https://discord.gg/stellar)
-- [Documentation Wiki](https://github.com/stellar/hummingbot-connector-v3/wiki)
+- [Documentation Wiki](https://github.com/abz99/hummingbot-sdex-connector/wiki)
 
 ---
 

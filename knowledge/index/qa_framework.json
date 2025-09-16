@@ -5,7 +5,7 @@
   "files": [
     {
       "path": "/home/abz/projects/stellar-hummingbot-connector-v3/qa/quality_catalogue.yml",
-      "hash": "af0a13d3320a9d0d56d3dab488640942ab1083f5cf860f53d13fc28964f817f7",
+      "hash": "8ba5c74d75279f4148ac2e1727f005c754f67af91bae3e5a5f507e4cf5b6e57c",
       "exists": true
     },
     {
@@ -39,6 +39,6 @@
       "exists": false
     }
   ],
-  "last_indexed": "2025-09-15T18:55:09.487009+00:00",
-  "hash": "6a6085c73dba9e1c091a80917ab8cd3ce8cc75900109038081f6dab19112178f"
+  "last_indexed": "2025-09-16T06:47:35.685250+00:00",
+  "hash": "325f17d4003580c2188d83239b2d41825ba691ec10cd5d0366f52589ea68d6cc"
 }
