@@ -29,7 +29,7 @@ This guide provides comprehensive instructions for deploying the Stellar Humming
 
 ```bash
 # Clone the repository
-git clone https://github.com/stellar/hummingbot-connector-v3
+git clone https://github.com/abz99/hummingbot-sdex-connector
 cd hummingbot-connector-v3
 
 # Deploy to production
@@ -413,9 +413,9 @@ kubectl describe node <node-name>
 ## 🤝 Support
 
 For deployment support and troubleshooting:
-- **Issues**: [GitHub Issues](https://github.com/stellar/hummingbot-connector-v3/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/stellar/hummingbot-connector-v3/discussions)
-- **Documentation**: [Project Wiki](https://github.com/stellar/hummingbot-connector-v3/wiki)
+- **Issues**: [GitHub Issues](https://github.com/abz99/hummingbot-sdex-connector/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/abz99/hummingbot-sdex-connector/discussions)
+- **Documentation**: [Project Wiki](https://github.com/abz99/hummingbot-sdex-connector/wiki)
 
 ---
 

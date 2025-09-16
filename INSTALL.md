@@ -367,11 +367,11 @@ python scripts/test_config.py
 ### **Installation Support**
 - **Email**: support@stellar.org
 - **Discord**: [#hummingbot-connector](https://discord.gg/stellar)
-- **GitHub**: [Issues & Discussions](https://github.com/stellar/hummingbot-connector-v3)
+- **GitHub**: [Issues & Discussions](https://github.com/abz99/hummingbot-sdex-connector)
 
 ### **Emergency Support**
 - **Security Issues**: security@stellar.org
-- **Critical Bugs**: Create a [high-priority issue](https://github.com/stellar/hummingbot-connector-v3/issues/new?template=bug-critical.md)
+- **Critical Bugs**: Create a [high-priority issue](https://github.com/abz99/hummingbot-sdex-connector/issues/new?template=bug-critical.md)
 
 ---
 
