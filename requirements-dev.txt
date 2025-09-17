@@ -2,7 +2,7 @@
 # For Stellar Hummingbot Connector v3.0
 
 # Security Tools
-safety==3.2.7
+safety==3.2.8
 bandit==1.7.9
 semgrep==1.87.0
 
@@ -36,5 +36,5 @@ coverage[toml]==7.6.1
 pytest-cov==6.2.1
 
 # CI/CD Support
-tox==4.18.0
+tox==4.15.1
 setuptools-scm==8.1.0
