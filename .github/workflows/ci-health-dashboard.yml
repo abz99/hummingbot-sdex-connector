@@ -92,7 +92,7 @@ jobs:
         EOF
 
     - name: Upload CI Health Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ci-health-dashboard-${{ github.sha }}
         path: |
