@@ -54,7 +54,7 @@ psutil==5.9.6
 resource==0.2.1
 
 # Hardware Security Module (HSM) Support
-pkcs11==0.7.0
+pkcs11==1.0.4
 python-pkcs11==0.7.0
 
 # Enterprise Authentication
