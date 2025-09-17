@@ -44,7 +44,7 @@ class TestSecurityCompliance:
         scan_extensions = {".py", ".yml", ".yaml", ".json", ".env", ".sh", ".md"}
 
         # Directories to skip
-        skip_dirs = {"venv", ".git", "__pycache__", "node_modules", ".pytest_cache"}
+        skip_dirs = {"venv", ".git", "__pycache__", "node_modules", ".pytest_cache", ".claude"}
 
         # Allowlisted patterns (safe to ignore)
         allowlist_patterns = [
