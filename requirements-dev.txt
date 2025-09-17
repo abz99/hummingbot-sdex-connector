@@ -2,7 +2,7 @@
 # For Stellar Hummingbot Connector v3.0
 
 # Security Tools
-safety==3.2.8
+safety==3.1.0
 bandit==1.7.9
 semgrep==1.87.0
 

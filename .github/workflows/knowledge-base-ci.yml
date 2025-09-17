@@ -83,7 +83,7 @@ jobs:
           python scripts/knowledge_base_indexer.py --report > knowledge-base-report.json
       
       - name: Upload index report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: knowledge-base-report
           path: knowledge-base-report.json
@@ -261,7 +261,7 @@ jobs:
           " duration=$duration
       
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: knowledge-base-benchmark
           path: benchmark-report.json
