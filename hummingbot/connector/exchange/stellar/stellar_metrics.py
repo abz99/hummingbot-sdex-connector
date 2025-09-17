@@ -379,19 +379,25 @@ class StellarMetrics:
         self.active_connections.labels(network=network).set(count)
 
     # Trading metrics methods
-    def record_order_placement(self, network: str, trading_pair: str, side: str, status: str) -> None:
+    def record_order_placement(
+        self, network: str, trading_pair: str, side: str, status: str
+    ) -> None:
         """Record an order placement."""
         self.orders_placed_total.labels(
             network=network, trading_pair=trading_pair, side=side, status=status
         ).inc()
 
-    def record_order_fill(self, network: str, trading_pair: str, side: str, duration: float) -> None:
+    def record_order_fill(
+        self, network: str, trading_pair: str, side: str, duration: float
+    ) -> None:
         """Record an order fill."""
         self.order_fill_duration.labels(
             network=network, trading_pair=trading_pair, side=side
         ).observe(duration)
 
-    def record_trading_volume(self, network: str, trading_pair: str, side: str, volume_xlm: float) -> None:
+    def record_trading_volume(
+        self, network: str, trading_pair: str, side: str, volume_xlm: float
+    ) -> None:
         """Record trading volume."""
         self.trading_volume.labels(network=network, trading_pair=trading_pair, side=side).inc(
             volume_xlm
@@ -421,7 +427,9 @@ class StellarMetrics:
         """Record a health check."""
         self.health_check_duration.labels(network=network, check_type=check_type).observe(duration)
 
-    def set_endpoint_health(self, network: str, endpoint_type: str, url: str, is_healthy: bool) -> None:
+    def set_endpoint_health(
+        self, network: str, endpoint_type: str, url: str, is_healthy: bool
+    ) -> None:
         """Set endpoint health status."""
         self.endpoint_health_status.labels(
             network=network, endpoint_type=endpoint_type, url=url
@@ -463,7 +471,9 @@ class StellarMetrics:
         self.cpu_usage_percent.labels(component=component).set(percent)
 
     # Business metrics methods
-    def set_profit_loss(self, network: str, trading_pair: str, strategy: str, pnl_xlm: float) -> None:
+    def set_profit_loss(
+        self, network: str, trading_pair: str, strategy: str, pnl_xlm: float
+    ) -> None:
         """Set profit/loss."""
         self.profit_loss_xlm.labels(
             network=network, trading_pair=trading_pair, strategy=strategy
@@ -516,13 +526,17 @@ class StellarMetrics:
             test_suite=test_suite, test_category=test_category
         ).observe(duration_seconds)
 
-    def record_test_failure(self, test_suite: str, failure_type: str, module: str = "unknown") -> None:
+    def record_test_failure(
+        self, test_suite: str, failure_type: str, module: str = "unknown"
+    ) -> None:
         """Record a test failure."""
         self.qa_test_failures_total.labels(
             test_suite=test_suite, failure_type=failure_type, module=module
         ).inc()
 
-    def update_code_quality_score(self, module: str, score: float, metric_type: str = "complexity") -> None:
+    def update_code_quality_score(
+        self, module: str, score: float, metric_type: str = "complexity"
+    ) -> None:
         """Update code quality score for a module."""
         self.qa_code_quality_score.labels(module=module, metric_type=metric_type).set(score)
 
@@ -595,7 +609,7 @@ class StellarMetrics:
             for p in range(start_port, start_port + 100):
                 try:
                     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                        s.bind(('', p))
+                        s.bind(("", p))
                         return p
                 except OSError:
                     continue
@@ -608,13 +622,13 @@ class StellarMetrics:
                 self.logger.info(
                     f"Metrics server started on port {actual_port}",
                     category=LogCategory.METRICS,
-                    port=actual_port
+                    port=actual_port,
                 )
             except Exception as e:
                 self.logger.error(
                     f"Failed to start metrics server: {e}",
                     category=LogCategory.METRICS,
-                    error=str(e)
+                    error=str(e),
                 )
 
         thread = threading.Thread(target=run_server, daemon=True)

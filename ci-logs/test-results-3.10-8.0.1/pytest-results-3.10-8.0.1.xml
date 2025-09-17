@@ -1,0 +1,1287 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="25" failures="4" skipped="5" tests="81" time="4.202" timestamp="2025-09-16T08:25:33.159137+00:00" hostname="runnervmf4ws1"><testcase classname="tests.unit.test_order_lifecycle.TestOrderPlacement" name="test_order_placement_success" time="0.010"><failure message="ModuleNotFoundError: No module named 'tenacity'">self = &lt;test_order_lifecycle.TestOrderPlacement object at 0x7fa712ccd660&gt;
+mock_order_manager = &lt;AsyncMock id='140355547950304'&gt;
+sample_order_candidate = OrderCandidate(trading_pair='XLM-USDC', is_maker=True, order_type=&lt;OrderType.LIMIT: 'LIMIT'&gt;, order_side=&lt;TradeType.BUY: 'BUY'&gt;, amount=Decimal('1000'), price=Decimal('0.1'))
+
+    @pytest.mark.asyncio
+    async def test_order_placement_success(self, mock_order_manager, sample_order_candidate):
+        """Test successful order placement returns proper ExchangeOrder.
+    
+        QA_ID: REQ-ORD-001
+        Acceptance Criteria: assert order.status == OrderStatus.NEW and order.order_id is not None
+        """
+        # Mock successful order placement
+        expected_order_id = "stellar_order_123"
+        mock_stellar_order = MockStellarOrder(
+            order_id=expected_order_id,
+            symbol="XLM-USDC",
+            amount=Decimal("1000"),
+            price=Decimal("0.1"),
+            side=TradeType.BUY,
+            status="NEW",
+        )
+    
+        mock_order_manager.place_order.return_value = mock_stellar_order
+    
+        # Import after mocking
+&gt;       from hummingbot.connector.exchange.stellar.stellar_order_manager import OrderStatus
+
+tests/unit/test_order_lifecycle.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</failure></testcase><testcase classname="tests.unit.test_order_lifecycle.TestOrderPlacement" name="test_order_placement_validation_failure" time="0.004" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderPlacement" name="test_order_placement_network_failure" time="0.004" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderStatusTransitions" name="test_order_partial_fill_transition" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderStatusTransitions" name="test_order_full_fill_transition" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderStatusTransitions" name="test_order_cancellation_transition" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderStatusTransitions" name="test_invalid_status_transition" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderCancellation" name="test_order_cancellation_idempotency" time="0.003" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderCancellation" name="test_external_order_cancellation_protection" time="0.003" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderCancellation" name="test_cancellation_of_already_filled_order" time="0.003" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderCancellation" name="test_cancellation_network_failure_retry" time="0.003" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderCorrelationTracking" name="test_order_correlation_tracking" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderCorrelationTracking" name="test_correlation_id_propagation" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderCorrelationTracking" name="test_order_history_completeness" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderValidation" name="test_order_amount_validation" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderValidation" name="test_order_price_validation" time="0.001" /><testcase classname="tests.unit.test_order_lifecycle.TestOrderValidation" name="test_order_symbol_validation" time="0.001" /><testcase classname="tests.unit.test_stellar_chain_contract.TestTransactionBuilding" name="test_transaction_building_accuracy" time="0.006" /><testcase classname="tests.unit.test_stellar_chain_contract.TestTransactionBuilding" name="test_transaction_building_with_custom_fee" time="0.006" /><testcase classname="tests.unit.test_stellar_chain_contract.TestTransactionBuilding" name="test_transaction_building_validation_failure" time="0.004" /><testcase classname="tests.unit.test_stellar_chain_contract.TestSequenceNumberHandling" name="test_sequence_conflict_resolution" time="0.006" /><testcase classname="tests.unit.test_stellar_chain_contract.TestSequenceNumberHandling" name="test_sequence_number_refresh" time="0.006" /><testcase classname="tests.unit.test_stellar_chain_contract.TestSequenceNumberHandling" name="test_max_retry_limit_exceeded" time="0.006" /><testcase classname="tests.unit.test_stellar_chain_contract.TestFeeBumping" name="test_automatic_fee_bumping" time="0.002" /><testcase classname="tests.unit.test_stellar_chain_contract.TestFeeBumping" name="test_progressive_fee_bumping" time="0.002" /><testcase classname="tests.unit.test_stellar_chain_contract.TestFeeBumping" name="test_fee_bumping_limits" time="0.001" /><testcase classname="tests.unit.test_stellar_chain_contract.TestNetworkFailover" name="test_horizon_failover" time="0.002" /><testcase classname="tests.unit.test_stellar_chain_contract.TestNetworkFailover" name="test_connection_health_monitoring" time="0.001" /><testcase classname="tests.unit.test_stellar_chain_contract.TestErrorClassification" name="test_error_classification_accuracy" time="0.001" /><testcase classname="tests.unit.test_stellar_chain_contract.TestExponentialBackoff" name="test_exponential_backoff_timing" time="0.001" /><testcase classname="tests.unit.test_stellar_chain_contract.TestExponentialBackoff" name="test_backoff_with_maximum_delay" time="0.001" /><testcase classname="tests.unit.test_stellar_chain_contract.TestExponentialBackoff" name="test_retry_with_backoff_integration" time="0.022" /><testcase classname="tests.unit.test_stellar_exchange_contract.TestStellarExchangeInitialization" name="test_exchange_initialization_success" time="0.003"><failure message="ModuleNotFoundError: No module named 'tenacity'">thing = &lt;module 'hummingbot.connector.exchange' from '/home/runner/work/hummingbot-sdex-connector/hummingbot-sdex-connector/hummingbot/connector/exchange/__init__.py'&gt;
+comp = 'stellar', import_path = 'hummingbot.connector.exchange.stellar'
+
+    def _dot_lookup(thing, comp, import_path):
+        try:
+&gt;           return getattr(thing, comp)
+E           AttributeError: module 'hummingbot.connector.exchange' has no attribute 'stellar'
+
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1248: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;Coroutine test_exchange_initialization_success&gt;
+
+    def runtest(self) -&gt; None:
+        synchronized_obj = wrap_in_sync(self.obj)
+        with MonkeyPatch.context() as c:
+            c.setattr(self, "obj", synchronized_obj)
+&gt;           super().runtest()
+
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/pytest_asyncio/plugin.py:426: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/pytest_asyncio/plugin.py:642: in inner
+    _loop.run_until_complete(task)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1393: in patched
+    with self.decoration_helper(patched,
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1358: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1431: in __enter__
+    self.target = self.getter()
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1618: in &lt;lambda&gt;
+    getter = lambda: _importer(target)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1261: in _importer
+    thing = _dot_lookup(thing, comp, import_path)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1250: in _dot_lookup
+    __import__(import_path)
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</failure></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestStellarExchangeInitialization" name="test_exchange_initialization_network_failure" time="0.003"><failure message="ModuleNotFoundError: No module named 'tenacity'">thing = &lt;module 'hummingbot.connector.exchange' from '/home/runner/work/hummingbot-sdex-connector/hummingbot-sdex-connector/hummingbot/connector/exchange/__init__.py'&gt;
+comp = 'stellar', import_path = 'hummingbot.connector.exchange.stellar'
+
+    def _dot_lookup(thing, comp, import_path):
+        try:
+&gt;           return getattr(thing, comp)
+E           AttributeError: module 'hummingbot.connector.exchange' has no attribute 'stellar'
+
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1248: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;Coroutine test_exchange_initialization_network_failure&gt;
+
+    def runtest(self) -&gt; None:
+        synchronized_obj = wrap_in_sync(self.obj)
+        with MonkeyPatch.context() as c:
+            c.setattr(self, "obj", synchronized_obj)
+&gt;           super().runtest()
+
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/pytest_asyncio/plugin.py:426: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/pytest_asyncio/plugin.py:642: in inner
+    _loop.run_until_complete(task)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1393: in patched
+    with self.decoration_helper(patched,
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1358: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1431: in __enter__
+    self.target = self.getter()
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1618: in &lt;lambda&gt;
+    getter = lambda: _importer(target)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1261: in _importer
+    thing = _dot_lookup(thing, comp, import_path)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1250: in _dot_lookup
+    __import__(import_path)
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</failure></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestTradingPairValidation" name="test_trading_pair_validation_success" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">self = &lt;test_stellar_exchange_contract.TestTradingPairValidation object at 0x7fa712b9b130&gt;
+
+    @pytest.fixture
+    def exchange_instance(self):
+        """Create mock exchange instance."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_exchange import StellarExchange
+
+tests/unit/test_stellar_exchange_contract.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestTradingPairValidation" name="test_trading_pair_validation_invalid_format" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">self = &lt;test_stellar_exchange_contract.TestTradingPairValidation object at 0x7fa712b9bfd0&gt;
+
+    @pytest.fixture
+    def exchange_instance(self):
+        """Create mock exchange instance."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_exchange import StellarExchange
+
+tests/unit/test_stellar_exchange_contract.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestTradingPairValidation" name="test_trading_pair_normalization" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">self = &lt;test_stellar_exchange_contract.TestTradingPairValidation object at 0x7fa712b9a1d0&gt;
+
+    @pytest.fixture
+    def exchange_instance(self):
+        """Create mock exchange instance."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_exchange import StellarExchange
+
+tests/unit/test_stellar_exchange_contract.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestBalanceQuerying" name="test_balance_query_accuracy" time="0.001"><skipped type="pytest.skip" message="Test requires StellarExchange API integration - skipping for infrastructure commit">/home/runner/work/hummingbot-sdex-connector/hummingbot-sdex-connector/tests/unit/test_stellar_exchange_contract.py:246: Test requires StellarExchange API integration - skipping for infrastructure commit</skipped></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestBalanceQuerying" name="test_balance_query_network_error_handling" time="0.000"><skipped type="pytest.skip" message="Test requires StellarExchange API integration - skipping for infrastructure commit">/home/runner/work/hummingbot-sdex-connector/hummingbot-sdex-connector/tests/unit/test_stellar_exchange_contract.py:283: Test requires StellarExchange API integration - skipping for infrastructure commit</skipped></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestBalanceQuerying" name="test_balance_caching_mechanism" time="0.000"><skipped type="pytest.skip" message="Test requires StellarExchange API integration - skipping for infrastructure commit">/home/runner/work/hummingbot-sdex-connector/hummingbot-sdex-connector/tests/unit/test_stellar_exchange_contract.py:314: Test requires StellarExchange API integration - skipping for infrastructure commit</skipped></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestPerformanceBenchmarks" name="test_order_placement_latency_sla" time="0.000"><skipped type="pytest.skip" message="Test requires StellarExchange API integration - skipping for infrastructure commit">/home/runner/work/hummingbot-sdex-connector/hummingbot-sdex-connector/tests/unit/test_stellar_exchange_contract.py:373: Test requires StellarExchange API integration - skipping for infrastructure commit</skipped></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestPerformanceBenchmarks" name="test_concurrent_operations_throughput" time="0.000"><skipped type="pytest.skip" message="Test requires StellarExchange API integration - skipping for infrastructure commit">/home/runner/work/hummingbot-sdex-connector/hummingbot-sdex-connector/tests/unit/test_stellar_exchange_contract.py:411: Test requires StellarExchange API integration - skipping for infrastructure commit</skipped></testcase><testcase classname="tests.unit.test_stellar_exchange_contract.TestExchangeLifecycle" name="test_exchange_graceful_shutdown" time="0.003"><failure message="ModuleNotFoundError: No module named 'tenacity'">thing = &lt;module 'hummingbot.connector.exchange' from '/home/runner/work/hummingbot-sdex-connector/hummingbot-sdex-connector/hummingbot/connector/exchange/__init__.py'&gt;
+comp = 'stellar', import_path = 'hummingbot.connector.exchange.stellar'
+
+    def _dot_lookup(thing, comp, import_path):
+        try:
+&gt;           return getattr(thing, comp)
+E           AttributeError: module 'hummingbot.connector.exchange' has no attribute 'stellar'
+
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1248: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;Coroutine test_exchange_graceful_shutdown&gt;
+
+    def runtest(self) -&gt; None:
+        synchronized_obj = wrap_in_sync(self.obj)
+        with MonkeyPatch.context() as c:
+            c.setattr(self, "obj", synchronized_obj)
+&gt;           super().runtest()
+
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/pytest_asyncio/plugin.py:426: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/pytest_asyncio/plugin.py:642: in inner
+    _loop.run_until_complete(task)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1393: in patched
+    with self.decoration_helper(patched,
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1358: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1431: in __enter__
+    self.target = self.getter()
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1618: in &lt;lambda&gt;
+    getter = lambda: _importer(target)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1261: in _importer
+    thing = _dot_lookup(thing, comp, import_path)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/unittest/mock.py:1250: in _dot_lookup
+    __import__(import_path)
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</failure></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestOptimalPathFinding" name="test_optimal_path_finding_direct" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestOptimalPathFinding" name="test_multi_hop_path_optimization" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestOptimalPathFinding" name="test_path_finding_with_liquidity_constraints" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestArbitrageDetection" name="test_arbitrage_opportunity_detection" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestArbitrageDetection" name="test_arbitrage_risk_assessment" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestArbitrageDetection" name="test_arbitrage_filtering_by_profitability" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestArbitrageDetection" name="test_cross_dex_arbitrage_detection" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestMEVProtection" name="test_mev_protection_private_mempool" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestMEVProtection" name="test_mev_protection_cost_benefit_analysis" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestMEVProtection" name="test_mev_protection_timing_considerations" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_path_engine_contract.TestMEVProtection" name="test_mev_protection_failure_handling" time="0.002"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">@pytest.fixture
+    def mock_path_engine():
+        """Mock EnhancedPathPaymentEngine."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_path_payment_engine import EnhancedPathPaymentEngine
+
+tests/unit/test_stellar_path_engine_contract.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_security_contract.TestSecurityCompliance" name="test_no_hardcoded_secrets_in_codebase" time="0.003" /><testcase classname="tests.unit.test_stellar_security_contract.TestSecurityCompliance" name="test_environment_variable_usage" time="0.002" /><testcase classname="tests.unit.test_stellar_security_contract.TestSecurityCompliance" name="test_secret_scanning_in_logs" time="0.001" /><testcase classname="tests.unit.test_stellar_security_contract.TestDeterministicSigning" name="test_deterministic_signing_consistency" time="0.002" /><testcase classname="tests.unit.test_stellar_security_contract.TestDeterministicSigning" name="test_different_transactions_different_signatures" time="0.002" /><testcase classname="tests.unit.test_stellar_security_contract.TestDeterministicSigning" name="test_signature_verification" time="0.002" /><testcase classname="tests.unit.test_stellar_security_contract.TestDeterministicSigning" name="test_signature_with_malformed_transaction" time="0.002" /><testcase classname="tests.unit.test_stellar_security_contract.TestHSMFailureHandling" name="test_hsm_failure_fallback_to_software" time="0.004" /><testcase classname="tests.unit.test_stellar_security_contract.TestHSMFailureHandling" name="test_hsm_partial_failure_retry" time="0.004" /><testcase classname="tests.unit.test_stellar_security_contract.TestHSMFailureHandling" name="test_hsm_configuration_validation" time="0.001" /><testcase classname="tests.unit.test_stellar_security_contract.TestHSMFailureHandling" name="test_hsm_connection_health_monitoring" time="0.001" /><testcase classname="tests.unit.test_stellar_security_contract.TestKeyRotationSupport" name="test_key_rotation_seamless_transition" time="0.004" /><testcase classname="tests.unit.test_stellar_security_contract.TestKeyRotationSupport" name="test_key_rotation_rollback_on_failure" time="0.003" /><testcase classname="tests.unit.test_stellar_security_contract.TestKeyRotationSupport" name="test_key_rotation_scheduling" time="0.001" /><testcase classname="tests.unit.test_stellar_soroban_contract.TestContractSimulation" name="test_contract_simulation_accuracy" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355551229264'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestContractSimulation" name="test_simulation_failure_handling" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355543570880'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestContractSimulation" name="test_simulation_gas_estimation_accuracy" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355551109008'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestCrossContractExecution" name="test_atomic_cross_contract_execution" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355541912016'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestCrossContractExecution" name="test_cross_contract_rollback_on_failure" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355550720976'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestCrossContractExecution" name="test_non_atomic_execution_partial_success" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355545307440'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestCrossContractExecution" name="test_cross_contract_simulation_before_execution" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355549334064'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestGasEstimation" name="test_gas_estimation_accuracy" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355551529616'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestGasEstimation" name="test_gas_estimation_complexity_scaling" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355550416896'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestGasEstimation" name="test_gas_estimation_caching" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355545409200'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestGasEstimation" name="test_gas_estimation_network_conditions" time="0.004"><error message="failed on setup with &quot;ModuleNotFoundError: No module named 'tenacity'&quot;">mock_soroban_server = &lt;AsyncMock id='140355541869152'&gt;
+
+    @pytest.fixture
+    def mock_contract_manager(mock_soroban_server):
+        """Mock SorobanContractManager."""
+&gt;       from hummingbot.connector.exchange.stellar.stellar_soroban_manager import SorobanContractManager
+
+tests/unit/test_stellar_soroban_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+hummingbot/connector/exchange/stellar/__init__.py:8: in &lt;module&gt;
+    from .stellar_exchange import StellarExchange
+hummingbot/connector/exchange/stellar/stellar_exchange.py:25: in &lt;module&gt;
+    from .stellar_order_manager import ModernStellarOrderManager
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Production Stellar Order Manager with Circuit Breakers
+    
+    Advanced order lifecycle management with enhanced error handling for Stellar SDEX.
+    Implements all QA requirements: REQ-ORD-001 through REQ-ORD-005.
+    
+     Features:
+     - Complete order lifecycle tracking with correlation IDs
+     - Circuit breakers for resilience
+     - Idempotent cancellation operations
+     - External order protection
+     - Comprehensive error handling with exponential backoff
+     - Production-ready logging and monitoring integration
+    """
+    
+    import asyncio
+    import uuid
+    from dataclasses import dataclass, field
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    from enum import Enum
+    from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+    
+    import structlog
+&gt;   from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+E   ModuleNotFoundError: No module named 'tenacity'
+
+hummingbot/connector/exchange/stellar/stellar_order_manager.py:24: ModuleNotFoundError</error></testcase><testcase classname="tests.unit.test_stellar_soroban_contract.TestContractInteractionPatterns" name="test_amm_swap_pattern" time="0.002" /><testcase classname="tests.unit.test_stellar_soroban_contract.TestContractInteractionPatterns" name="test_liquidity_pool_operations" time="0.002" /></testsuite></testsuites>

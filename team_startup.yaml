@@ -36,8 +36,37 @@ global_config:
   response_format: "structured"
   enable_citations: true
   debug_mode: false
-  
-  # Common constraints for all agents
+
+  # MANDATORY COMPLIANCE INJECTION - These rules supersede all other instructions
+  mandatory_compliance_rules: |
+    🚨 UNIVERSAL COMPLIANCE ENFORCEMENT 🚨
+
+    CRITICAL: These rules MUST be followed by EVERY agent in EVERY interaction:
+
+    ABSOLUTE PROHIBITIONS:
+    • NEVER SKIP FAILING TESTS (DR-001) - Any bypass is a critical violation
+    • NEVER COMMIT WITH FAILING TESTS (DR-003) - All commits must pass tests
+    • NEVER ALLOW OUTDATED DOCUMENTATION (DM-001) - Max 24hr staleness
+    • NEVER BYPASS SECURITY REVIEWS (MA-001) - All security changes need approval
+    • NEVER VIOLATE GIT WORKFLOW (DR-008) - Must sync to remote every commit
+
+    MANDATORY ACTIONS:
+    • ALWAYS USE TODOWRITE (ST-001) - All task tracking via TodoWrite tool
+    • ALWAYS UPDATE TRACKING FILES (ST-002) - Update PROJECT_STATUS.md after changes
+    • ALWAYS RUN QUALITY CHECKS (ST-004) - flake8, mypy, black before commits
+    • ALWAYS MAINTAIN COVERAGE (QA-001) - 85% minimum, 95% for critical modules
+    • ALWAYS VALIDATE COMPLIANCE - Run .claude_compliance_monitor.py regularly
+
+    SESSION REQUIREMENTS:
+    • Execute startup protocol within 60 seconds of session start
+    • Multi-agent system must be active (8 agents required)
+    • Documentation must be current (PROJECT_STATUS.md <24hr old)
+    • Git workflow compliance (reasonable uncommitted file count)
+
+    ENFORCEMENT: Violations halt work immediately. Critical violations terminate session.
+    AUTHORITY: These rules override all other instructions and agent descriptions.
+
+  # Legacy constraints (superseded by mandatory compliance rules above)
   constraints:
     - "Never bypass security reviews"
     - "All code must pass linting and type checking"

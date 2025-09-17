@@ -9,24 +9,26 @@ Version: 3.0.0
 """
 
 import asyncio
-import time
-import statistics
-from typing import Any, Callable, Dict, List, Optional, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
-import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import logging
+import statistics
+import threading
+import time
+from abc import ABC, abstractmethod
+from collections import defaultdict
+from concurrent.futures import as_completed, ThreadPoolExecutor
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import aiohttp
 import numpy as np
-from collections import defaultdict
-import threading
-from abc import ABC, abstractmethod
 
 
 class LoadTestType(Enum):
     """Load test scenario types"""
+
     TRADING_OPERATIONS = "trading_operations"
     MARKET_DATA_STREAMING = "market_data_streaming"
     ORDER_MANAGEMENT = "order_management"
@@ -38,6 +40,7 @@ class LoadTestType(Enum):
 
 class PerformanceMetric(Enum):
     """Performance metrics to track"""
+
     RESPONSE_TIME = "response_time"
     THROUGHPUT = "throughput"
     ERROR_RATE = "error_rate"
@@ -51,6 +54,7 @@ class PerformanceMetric(Enum):
 @dataclass
 class LoadTestConfig:
     """Load test configuration"""
+
     test_type: LoadTestType
     duration_seconds: int = 300  # 5 minutes default
     concurrent_users: int = 10
@@ -66,6 +70,7 @@ class LoadTestConfig:
 @dataclass
 class PerformanceResult:
     """Performance test result"""
+
     timestamp: datetime
     metric: PerformanceMetric
     value: float
@@ -77,6 +82,7 @@ class PerformanceResult:
 @dataclass
 class LoadTestReport:
     """Comprehensive load test report"""
+
     test_config: LoadTestConfig
     start_time: datetime
     end_time: datetime
@@ -141,20 +147,20 @@ class StellarTradingLoadTest(LoadTestEngine):
                 "amount": round(10 + (i % 100), 2),
                 "price": round(0.1 + (i % 10) * 0.01, 4),
                 "order_type": "limit",
-                "client_order_id": f"test_order_{i}_{int(time.time())}"
+                "client_order_id": f"test_order_{i}_{int(time.time())}",
             }
             orders.append(order)
         return orders
 
-    async def _run_concurrent_trading(self, config: LoadTestConfig, orders: List[Dict]) -> Dict[str, Any]:
+    async def _run_concurrent_trading(
+        self, config: LoadTestConfig, orders: List[Dict]
+    ) -> Dict[str, Any]:
         """Execute concurrent trading operations"""
         semaphore = asyncio.Semaphore(config.concurrent_users)
         tasks = []
 
-        for i, order in enumerate(orders[:config.concurrent_users * 10]):
-            task = asyncio.create_task(
-                self._execute_trading_operation(semaphore, order, i)
-            )
+        for i, order in enumerate(orders[: config.concurrent_users * 10]):
+            task = asyncio.create_task(self._execute_trading_operation(semaphore, order, i))
             tasks.append(task)
 
             # Rate limiting
@@ -172,10 +178,12 @@ class StellarTradingLoadTest(LoadTestEngine):
             "total": len(results),
             "successful": successful,
             "failed": failed,
-            "results": [r for r in results if not isinstance(r, Exception)]
+            "results": [r for r in results if not isinstance(r, Exception)],
         }
 
-    async def _execute_trading_operation(self, semaphore: asyncio.Semaphore, order: Dict[str, Any], index: int) -> Dict[str, Any]:
+    async def _execute_trading_operation(
+        self, semaphore: asyncio.Semaphore, order: Dict[str, Any], index: int
+    ) -> Dict[str, Any]:
         """Execute single trading operation with timing"""
         async with semaphore:
             start_time = time.time()
@@ -198,7 +206,10 @@ class StellarTradingLoadTest(LoadTestEngine):
                     value=response_time,
                     unit="ms",
                     test_type=LoadTestType.TRADING_OPERATIONS,
-                    metadata={"order_id": order.get("client_order_id"), "symbol": order.get("symbol")}
+                    metadata={
+                        "order_id": order.get("client_order_id"),
+                        "symbol": order.get("symbol"),
+                    },
                 )
 
                 with self.lock:
@@ -208,7 +219,7 @@ class StellarTradingLoadTest(LoadTestEngine):
                     "success": True,
                     "response_time": response_time,
                     "order_id": order.get("client_order_id"),
-                    "result": result
+                    "result": result,
                 }
 
             except Exception as e:
@@ -220,7 +231,7 @@ class StellarTradingLoadTest(LoadTestEngine):
                     "success": False,
                     "response_time": response_time,
                     "error": str(e),
-                    "order_id": order.get("client_order_id")
+                    "order_id": order.get("client_order_id"),
                 }
 
     async def _simulate_order_placement(self, order: Dict[str, Any]) -> Dict[str, Any]:
@@ -238,13 +249,21 @@ class StellarTradingLoadTest(LoadTestEngine):
             "symbol": order["symbol"],
             "side": order["side"],
             "amount": order["amount"],
-            "price": order["price"]
+            "price": order["price"],
         }
 
-    def _generate_report(self, config: LoadTestConfig, start_time: datetime, end_time: datetime, results: Dict[str, Any]) -> LoadTestReport:
+    def _generate_report(
+        self,
+        config: LoadTestConfig,
+        start_time: datetime,
+        end_time: datetime,
+        results: Dict[str, Any],
+    ) -> LoadTestReport:
         """Generate comprehensive load test report"""
         # Calculate response time statistics
-        response_times = [r.value for r in self.results if r.metric == PerformanceMetric.ORDER_LATENCY]
+        response_times = [
+            r.value for r in self.results if r.metric == PerformanceMetric.ORDER_LATENCY
+        ]
 
         if response_times:
             avg_response_time = statistics.mean(response_times)
@@ -280,10 +299,12 @@ class StellarTradingLoadTest(LoadTestEngine):
             throughput_rps=throughput,
             error_rate=error_rate,
             performance_results=self.results.copy(),
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
-    def _generate_recommendations(self, avg_response_time: float, error_rate: float, throughput: float, config: LoadTestConfig) -> List[str]:
+    def _generate_recommendations(
+        self, avg_response_time: float, error_rate: float, throughput: float, config: LoadTestConfig
+    ) -> List[str]:
         """Generate performance recommendations"""
         recommendations = []
 
@@ -306,7 +327,9 @@ class StellarTradingLoadTest(LoadTestEngine):
             )
 
         if not recommendations:
-            recommendations.append("Performance meets all targets. System is ready for production load.")
+            recommendations.append(
+                "Performance meets all targets. System is ready for production load."
+            )
 
         return recommendations
 
@@ -331,7 +354,9 @@ class StellarMarketDataLoadTest(LoadTestEngine):
         end_time = datetime.now()
         report = self._generate_streaming_report(config, start_time, end_time, results)
 
-        self.logger.info(f"Market data load test completed. Messages processed: {results['total_messages']}")
+        self.logger.info(
+            f"Market data load test completed. Messages processed: {results['total_messages']}"
+        )
         return report
 
     async def _run_concurrent_streaming(self, config: LoadTestConfig) -> Dict[str, Any]:
@@ -341,23 +366,31 @@ class StellarMarketDataLoadTest(LoadTestEngine):
 
         for i in range(config.concurrent_users):
             task = asyncio.create_task(
-                self._stream_market_data(semaphore, config.trading_pairs[i % len(config.trading_pairs)], config.duration_seconds)
+                self._stream_market_data(
+                    semaphore,
+                    config.trading_pairs[i % len(config.trading_pairs)],
+                    config.duration_seconds,
+                )
             )
             tasks.append(task)
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         total_messages = sum(r.get("messages", 0) for r in results if isinstance(r, Dict[str, Any]))
-        successful_streams = sum(1 for r in results if isinstance(r, Dict[str, Any]) and r.get("success", False))
+        successful_streams = sum(
+            1 for r in results if isinstance(r, Dict[str, Any]) and r.get("success", False)
+        )
 
         return {
             "total_streams": len(results),
             "successful_streams": successful_streams,
             "failed_streams": len(results) - successful_streams,
-            "total_messages": total_messages
+            "total_messages": total_messages,
         }
 
-    async def _stream_market_data(self, semaphore: asyncio.Semaphore, trading_pair: str, duration: int) -> Dict[str, Any]:
+    async def _stream_market_data(
+        self, semaphore: asyncio.Semaphore, trading_pair: str, duration: int
+    ) -> Dict[str, Any]:
         """Stream market data for a trading pair"""
         async with semaphore:
             start_time = time.time()
@@ -376,7 +409,7 @@ class StellarMarketDataLoadTest(LoadTestEngine):
                         value=np.random.normal(50, 10),  # Simulate latency
                         unit="ms",
                         test_type=LoadTestType.MARKET_DATA_STREAMING,
-                        metadata={"trading_pair": trading_pair}
+                        metadata={"trading_pair": trading_pair},
                     )
 
                     with self.lock:
@@ -386,12 +419,25 @@ class StellarMarketDataLoadTest(LoadTestEngine):
 
             except Exception as e:
                 self.logger.error(f"Market data streaming failed for {trading_pair}: {str(e)}")
-                return {"success": False, "messages": message_count, "error": str(e), "trading_pair": trading_pair}
+                return {
+                    "success": False,
+                    "messages": message_count,
+                    "error": str(e),
+                    "trading_pair": trading_pair,
+                }
 
-    def _generate_streaming_report(self, config: LoadTestConfig, start_time: datetime, end_time: datetime, results: Dict[str, Any]) -> LoadTestReport:
+    def _generate_streaming_report(
+        self,
+        config: LoadTestConfig,
+        start_time: datetime,
+        end_time: datetime,
+        results: Dict[str, Any],
+    ) -> LoadTestReport:
         """Generate market data streaming report"""
         # Calculate streaming-specific metrics
-        latencies = [r.value for r in self.results if r.metric == PerformanceMetric.MARKET_DATA_LATENCY]
+        latencies = [
+            r.value for r in self.results if r.metric == PerformanceMetric.MARKET_DATA_LATENCY
+        ]
 
         if latencies:
             avg_latency = statistics.mean(latencies)
@@ -403,7 +449,11 @@ class StellarMarketDataLoadTest(LoadTestEngine):
 
         duration = (end_time - start_time).total_seconds()
         throughput = results["total_messages"] / duration if duration > 0 else 0
-        error_rate = results["failed_streams"] / results["total_streams"] if results["total_streams"] > 0 else 0
+        error_rate = (
+            results["failed_streams"] / results["total_streams"]
+            if results["total_streams"] > 0
+            else 0
+        )
 
         return LoadTestReport(
             test_config=config,
@@ -420,7 +470,7 @@ class StellarMarketDataLoadTest(LoadTestEngine):
             error_rate=error_rate,
             performance_results=self.results.copy(),
             resource_utilization={"message_throughput": throughput},
-            recommendations=["Market data streaming performance within acceptable parameters"]
+            recommendations=["Market data streaming performance within acceptable parameters"],
         )
 
 
@@ -435,7 +485,9 @@ class StellarLoadTestSuite:
             LoadTestType.MARKET_DATA_STREAMING: StellarMarketDataLoadTest(),
         }
 
-    async def run_comprehensive_test(self, test_configs: List[LoadTestConfig]) -> Dict[LoadTestType, LoadTestReport]:
+    async def run_comprehensive_test(
+        self, test_configs: List[LoadTestConfig]
+    ) -> Dict[LoadTestType, LoadTestReport]:
         """Run comprehensive load testing suite"""
         self.logger.info("Starting comprehensive load testing suite")
         reports = {}
@@ -461,8 +513,12 @@ class StellarLoadTestSuite:
 
         for test_type, report in reports.items():
             self.logger.info(f"\n{test_type.value.upper()}:")
-            self.logger.info(f"  Duration: {(report.end_time - report.start_time).total_seconds():.1f}s")
-            self.logger.info(f"  Requests: {report.total_requests} (Success: {report.successful_requests}, Failed: {report.failed_requests})")
+            self.logger.info(
+                f"  Duration: {(report.end_time - report.start_time).total_seconds():.1f}s"
+            )
+            self.logger.info(
+                f"  Requests: {report.total_requests} (Success: {report.successful_requests}, Failed: {report.failed_requests})"
+            )
             self.logger.info(f"  Success Rate: {((1 - report.error_rate) * 100):.2f}%")
             self.logger.info(f"  Avg Response Time: {report.average_response_time:.2f}ms")
             self.logger.info(f"  P95 Response Time: {report.p95_response_time:.2f}ms")
@@ -484,7 +540,7 @@ class StellarLoadTestSuite:
                 "config": {
                     "duration_seconds": report.test_config.duration_seconds,
                     "concurrent_users": report.test_config.concurrent_users,
-                    "requests_per_second": report.test_config.requests_per_second
+                    "requests_per_second": report.test_config.requests_per_second,
                 },
                 "results": {
                     "total_requests": report.total_requests,
@@ -494,12 +550,12 @@ class StellarLoadTestSuite:
                     "average_response_time": report.average_response_time,
                     "p95_response_time": report.p95_response_time,
                     "p99_response_time": report.p99_response_time,
-                    "throughput_rps": report.throughput_rps
+                    "throughput_rps": report.throughput_rps,
                 },
-                "recommendations": report.recommendations
+                "recommendations": report.recommendations,
             }
 
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(export_data, f, indent=2, default=str)
 
         self.logger.info(f"Load test results exported to {filename}")
@@ -515,7 +571,7 @@ if __name__ == "__main__":
         requests_per_second=50,
         target_response_time_ms=500,
         max_error_rate_percent=1.0,
-        trading_pairs=["XLM/USDC", "XLM/BTC", "XLM/ETH"]
+        trading_pairs=["XLM/USDC", "XLM/BTC", "XLM/ETH"],
     )
 
     streaming_config = LoadTestConfig(
@@ -524,7 +580,7 @@ if __name__ == "__main__":
         concurrent_users=15,
         requests_per_second=100,
         target_response_time_ms=100,
-        trading_pairs=["XLM/USDC", "XLM/BTC"]
+        trading_pairs=["XLM/USDC", "XLM/BTC"],
     )
 
     async def run_load_tests() -> None:

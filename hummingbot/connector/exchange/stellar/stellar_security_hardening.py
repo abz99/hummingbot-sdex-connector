@@ -21,7 +21,7 @@ import bcrypt
 import cryptography.fernet
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from .stellar_logging import get_stellar_logger, LogCategory
@@ -273,8 +273,12 @@ class StellarSecurityHardening:
         ]
 
         # Filter policies based on security level
-        security_level_order = [SecurityLevel.MINIMAL, SecurityLevel.STANDARD,
-                                SecurityLevel.ENHANCED, SecurityLevel.MAXIMUM]
+        security_level_order = [
+            SecurityLevel.MINIMAL,
+            SecurityLevel.STANDARD,
+            SecurityLevel.ENHANCED,
+            SecurityLevel.MAXIMUM,
+        ]
         current_level_index = security_level_order.index(self.security_level)
 
         for policy in base_policies:
@@ -351,13 +355,15 @@ class StellarSecurityHardening:
         self._running = True
 
         # Start background security tasks
-        self._background_tasks.extend([
-            asyncio.create_task(self._monitor_security_events()),
-            asyncio.create_task(self._check_system_integrity()),
-            asyncio.create_task(self._update_threat_intelligence()),
-            asyncio.create_task(self._cleanup_expired_sessions()),
-            asyncio.create_task(self._rotate_security_keys()),
-        ])
+        self._background_tasks.extend(
+            [
+                asyncio.create_task(self._monitor_security_events()),
+                asyncio.create_task(self._check_system_integrity()),
+                asyncio.create_task(self._update_threat_intelligence()),
+                asyncio.create_task(self._cleanup_expired_sessions()),
+                asyncio.create_task(self._rotate_security_keys()),
+            ]
+        )
 
         self.logger.info(
             "Security hardening framework started",
@@ -391,9 +397,7 @@ class StellarSecurityHardening:
             encrypted = fernet.encrypt(data.encode())
             return encrypted.decode()
         except Exception as e:
-            self.logger.error(
-                "Data encryption failed", category=LogCategory.SECURITY, error=str(e)
-            )
+            self.logger.error("Data encryption failed", category=LogCategory.SECURITY, error=str(e))
             raise
 
     def decrypt_sensitive_data(self, encrypted_data: str) -> str:
@@ -406,9 +410,7 @@ class StellarSecurityHardening:
             decrypted = fernet.decrypt(encrypted_data.encode())
             return decrypted.decode()
         except Exception as e:
-            self.logger.error(
-                "Data decryption failed", category=LogCategory.SECURITY, error=str(e)
-            )
+            self.logger.error("Data decryption failed", category=LogCategory.SECURITY, error=str(e))
             raise
 
     def validate_input(self, input_data: Any, validation_type: str = "general") -> bool:
@@ -554,14 +556,20 @@ class StellarSecurityHardening:
             return False
 
         # Remove old attempts
-        threshold_time = current_time - self.threat_signatures["brute_force"]["conditions"]["time_window"]
+        threshold_time = (
+            current_time - self.threat_signatures["brute_force"]["conditions"]["time_window"]
+        )
         self.failed_attempts[key] = [
-            attempt_time for attempt_time in self.failed_attempts[key]
+            attempt_time
+            for attempt_time in self.failed_attempts[key]
             if attempt_time > threshold_time
         ]
 
         # Check if threshold exceeded
-        return len(self.failed_attempts[key]) >= self.threat_signatures["brute_force"]["conditions"]["failed_attempts_threshold"]
+        return (
+            len(self.failed_attempts[key])
+            >= self.threat_signatures["brute_force"]["conditions"]["failed_attempts_threshold"]
+        )
 
     def _validate_credentials(self, username: str, password: str) -> bool:
         """Validate user credentials (mock implementation)."""
@@ -609,10 +617,7 @@ class StellarSecurityHardening:
         return "*" in user_permissions or required_permission in user_permissions
 
     def _record_security_event(
-        self,
-        event_type: str,
-        threat_level: ThreatLevel,
-        details: Dict[str, Any] = None
+        self, event_type: str, threat_level: ThreatLevel, details: Dict[str, Any] = None
     ) -> None:
         """Record security event."""
         event = SecurityEvent(
@@ -643,13 +648,13 @@ class StellarSecurityHardening:
             try:
                 # Check for high-priority events
                 recent_events = [
-                    event for event in self.security_events[-100:]
+                    event
+                    for event in self.security_events[-100:]
                     if time.time() - event.timestamp < 300  # Last 5 minutes
                 ]
 
                 critical_events = [
-                    event for event in recent_events
-                    if event.threat_level == ThreatLevel.CRITICAL
+                    event for event in recent_events if event.threat_level == ThreatLevel.CRITICAL
                 ]
 
                 if critical_events:
@@ -726,7 +731,8 @@ class StellarSecurityHardening:
             try:
                 current_time = time.time()
                 expired_tokens = [
-                    token for token, info in self.session_tokens.items()
+                    token
+                    for token, info in self.session_tokens.items()
                     if current_time > info["expires_at"]
                 ]
 
@@ -759,23 +765,26 @@ class StellarSecurityHardening:
                 await asyncio.sleep(86400)  # Rotate daily
 
             except Exception as e:
-                self.logger.error(
-                    "Key rotation error", category=LogCategory.SECURITY, error=str(e)
-                )
+                self.logger.error("Key rotation error", category=LogCategory.SECURITY, error=str(e))
                 await asyncio.sleep(86400)
 
     def get_security_status(self) -> Dict[str, Any]:
         """Get comprehensive security status."""
         recent_events = [
-            event for event in self.security_events[-100:]
+            event
+            for event in self.security_events[-100:]
             if time.time() - event.timestamp < 3600  # Last hour
         ]
 
         threat_counts = {
             ThreatLevel.LOW: len([e for e in recent_events if e.threat_level == ThreatLevel.LOW]),
-            ThreatLevel.MEDIUM: len([e for e in recent_events if e.threat_level == ThreatLevel.MEDIUM]),
+            ThreatLevel.MEDIUM: len(
+                [e for e in recent_events if e.threat_level == ThreatLevel.MEDIUM]
+            ),
             ThreatLevel.HIGH: len([e for e in recent_events if e.threat_level == ThreatLevel.HIGH]),
-            ThreatLevel.CRITICAL: len([e for e in recent_events if e.threat_level == ThreatLevel.CRITICAL]),
+            ThreatLevel.CRITICAL: len(
+                [e for e in recent_events if e.threat_level == ThreatLevel.CRITICAL]
+            ),
         }
 
         return {
@@ -796,7 +805,7 @@ _security_hardening_instance: Optional[StellarSecurityHardening] = None
 
 
 def get_stellar_security_hardening(
-    security_level: SecurityLevel = SecurityLevel.ENHANCED
+    security_level: SecurityLevel = SecurityLevel.ENHANCED,
 ) -> StellarSecurityHardening:
     """Get or create global security hardening instance."""
     global _security_hardening_instance

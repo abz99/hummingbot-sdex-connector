@@ -2,7 +2,7 @@
   "name": "QAEngineer",
   "role": "Quality Assurance Lead",
   "category": "reviewer",
-  "status": "idle",
+  "status": "initializing",
   "priority": 2,
   "capabilities": [
     "test_strategy_design",
@@ -17,7 +17,7 @@
     "performance_testing"
   ],
   "current_task": null,
-  "last_activity": "2025-09-16T15:46:08.186355+00:00",
+  "last_activity": "2025-09-16T20:13:41.256016+00:00",
   "message_queue_size": 0,
   "knowledge_base_sources": [
     "knowledge/qa_framework",

@@ -1,0 +1,58 @@
+[2025-09-16 19:10:46,366] COMPLIANCE: 🔍 Running full compliance check...
+[2025-09-16 19:10:55,531] COMPLIANCE: has_committed_failing_tests check not fully implemented
+[2025-09-16 19:11:41,528] COMPLIANCE: Auto-fixing violation SC-002: python .claude_code_startup.py
+[2025-09-16 19:11:45,518] COMPLIANCE: ❌ 5 compliance violations found
+[2025-09-16 19:11:45,518] COMPLIANCE:   MAJOR: SC-003 - Too many uncommitted files: 28
+[2025-09-16 19:11:45,518] COMPLIANCE:   CRITICAL: DR-001 - ABSOLUTE PROHIBITION VIOLATED: Failing tests detected
+[2025-09-16 19:11:45,519] COMPLIANCE:   MAJOR: DR-004-FLAKE8 - flake8 violations detected
+[2025-09-16 19:11:45,519] COMPLIANCE:   MAJOR: DM-003 - Session documentation not updated
+[2025-09-16 19:11:45,519] COMPLIANCE:   MAJOR: QA-001 - Test coverage 0.0% below required 85%
+[2025-09-16 19:11:45,519] COMPLIANCE: 📊 Compliance Score: 35.0/100
+[2025-09-16 19:11:45,519] COMPLIANCE: 🚨 CRITICAL COMPLIANCE VIOLATIONS DETECTED - SESSION MUST BE HALTED
+[2025-09-16 19:11:45,519] COMPLIANCE:   CRITICAL: DR-001 - ABSOLUTE PROHIBITION VIOLATED: Failing tests detected
+[2025-09-16 19:11:45,520] COMPLIANCE: 💥 COMPLIANCE ENFORCEMENT: Critical compliance violations detected: 1
+[2025-09-16 19:11:45,846] COMPLIANCE: Loaded 5 historical violations
+[2025-09-16 19:11:45,846] COMPLIANCE: 🔍 Running full compliance check...
+[2025-09-16 19:11:54,114] COMPLIANCE: has_committed_failing_tests check not fully implemented
+[2025-09-16 19:12:28,223] COMPLIANCE: Auto-fixing violation SC-002: python .claude_code_startup.py
+[2025-09-16 19:12:32,213] COMPLIANCE: ❌ 6 compliance violations found
+[2025-09-16 19:12:32,213] COMPLIANCE:   MAJOR: SC-003 - Too many uncommitted files: 35
+[2025-09-16 19:12:32,213] COMPLIANCE:   CRITICAL: DR-001 - ABSOLUTE PROHIBITION VIOLATED: Failing tests detected
+[2025-09-16 19:12:32,213] COMPLIANCE:   MAJOR: DR-004-FLAKE8 - flake8 violations detected
+[2025-09-16 19:12:32,213] COMPLIANCE:   MAJOR: DR-004-MYPY - mypy violations detected
+[2025-09-16 19:12:32,214] COMPLIANCE:   MAJOR: DM-003 - Session documentation not updated
+[2025-09-16 19:12:32,214] COMPLIANCE:   MAJOR: QA-001 - Test coverage 0.0% below required 85%
+[2025-09-16 19:12:32,214] COMPLIANCE: 📊 Compliance Score: 25.0/100
+[2025-09-16 19:12:32,214] COMPLIANCE: 🚨 CRITICAL COMPLIANCE VIOLATIONS DETECTED - SESSION MUST BE HALTED
+[2025-09-16 19:12:32,214] COMPLIANCE:   CRITICAL: DR-001 - ABSOLUTE PROHIBITION VIOLATED: Failing tests detected
+[2025-09-16 19:12:32,215] COMPLIANCE: 💥 COMPLIANCE ENFORCEMENT: Critical compliance violations detected: 1
+[2025-09-16 19:12:39,621] COMPLIANCE: Loaded 6 historical violations
+[2025-09-16 19:12:39,621] COMPLIANCE: 🔍 Running full compliance check...
+[2025-09-16 19:12:47,611] COMPLIANCE: has_committed_failing_tests check not fully implemented
+[2025-09-16 19:13:21,550] COMPLIANCE: Auto-fixing violation SC-002: python .claude_code_startup.py
+[2025-09-16 19:13:25,592] COMPLIANCE: ❌ 6 compliance violations found
+[2025-09-16 19:13:25,592] COMPLIANCE:   MAJOR: SC-003 - Too many uncommitted files: 35
+[2025-09-16 19:13:25,592] COMPLIANCE:   CRITICAL: DR-001 - ABSOLUTE PROHIBITION VIOLATED: Failing tests detected
+[2025-09-16 19:13:25,592] COMPLIANCE:   MAJOR: DR-004-FLAKE8 - flake8 violations detected
+[2025-09-16 19:13:25,593] COMPLIANCE:   MAJOR: DR-004-MYPY - mypy violations detected
+[2025-09-16 19:13:25,593] COMPLIANCE:   MAJOR: DM-003 - Session documentation not updated
+[2025-09-16 19:13:25,593] COMPLIANCE:   MAJOR: QA-001 - Test coverage 0.0% below required 85%
+[2025-09-16 19:13:25,593] COMPLIANCE: 📊 Compliance Score: 25.0/100
+[2025-09-16 19:13:25,593] COMPLIANCE: 🚨 CRITICAL COMPLIANCE VIOLATIONS DETECTED - SESSION MUST BE HALTED
+[2025-09-16 19:13:25,593] COMPLIANCE:   CRITICAL: DR-001 - ABSOLUTE PROHIBITION VIOLATED: Failing tests detected
+[2025-09-16 19:13:25,594] COMPLIANCE: 💥 COMPLIANCE ENFORCEMENT: Critical compliance violations detected: 1
+[2025-09-16 20:12:47,197] COMPLIANCE: Loaded 6 historical violations
+[2025-09-16 20:12:47,197] COMPLIANCE: 🔍 Running full compliance check...
+[2025-09-16 20:12:58,300] COMPLIANCE: has_committed_failing_tests check not fully implemented
+[2025-09-16 20:13:39,341] COMPLIANCE: Auto-fixing violation SC-002: python .claude_code_startup.py
+[2025-09-16 20:13:43,331] COMPLIANCE: ❌ 6 compliance violations found
+[2025-09-16 20:13:43,331] COMPLIANCE:   MAJOR: SC-003 - Too many uncommitted files: 3960
+[2025-09-16 20:13:43,332] COMPLIANCE:   CRITICAL: DR-001 - ABSOLUTE PROHIBITION VIOLATED: Failing tests detected
+[2025-09-16 20:13:43,332] COMPLIANCE:   MAJOR: DR-004-FLAKE8 - flake8 violations detected
+[2025-09-16 20:13:43,332] COMPLIANCE:   MAJOR: DR-004-MYPY - mypy violations detected
+[2025-09-16 20:13:43,332] COMPLIANCE:   MAJOR: DM-003 - Session documentation not updated
+[2025-09-16 20:13:43,332] COMPLIANCE:   MAJOR: QA-001 - Test coverage 0.0% below required 85%
+[2025-09-16 20:13:43,333] COMPLIANCE: 📊 Compliance Score: 25.0/100
+[2025-09-16 20:13:43,333] COMPLIANCE: 🚨 CRITICAL COMPLIANCE VIOLATIONS DETECTED - SESSION MUST BE HALTED
+[2025-09-16 20:13:43,333] COMPLIANCE:   CRITICAL: DR-001 - ABSOLUTE PROHIBITION VIOLATED: Failing tests detected
+[2025-09-16 20:13:43,333] COMPLIANCE: 💥 COMPLIANCE ENFORCEMENT: Critical compliance violations detected: 1

@@ -333,7 +333,9 @@ class StellarAMMIntegration:
         except Exception as e:
             self.logger().warning(f"Failed to load positions: {e}")
 
-    async def _create_position_from_balance(self, balance: Dict[str, Any]) -> Optional[LiquidityPosition]:
+    async def _create_position_from_balance(
+        self, balance: Dict[str, Any]
+    ) -> Optional[LiquidityPosition]:
         """Create position object from account balance"""
         # Implementation would parse balance and create position
         # This is a placeholder

@@ -142,7 +142,7 @@ class LedgerWallet(HardwareWalletInterface):
                 # Ledger libraries not available - create simulation mode
                 self.logger.warning(
                     "Ledger libraries not available, creating simulation device",
-                    category=LogCategory.SECURITY
+                    category=LogCategory.SECURITY,
                 )
 
                 self.device_info = HardwareWalletInfo(
@@ -173,7 +173,7 @@ class LedgerWallet(HardwareWalletInterface):
             return {
                 "device_id": f"ledger_sim_{int(time.time())}",
                 "firmware_version": "sim-2.1.0",
-                "stellar_app_version": "sim-1.0.0"
+                "stellar_app_version": "sim-1.0.0",
             }
 
         # In real implementation, query actual device
@@ -182,7 +182,7 @@ class LedgerWallet(HardwareWalletInterface):
             return {
                 "device_id": f"ledger_{int(time.time())}",
                 "firmware_version": "2.1.0",
-                "stellar_app_version": "1.0.0"
+                "stellar_app_version": "1.0.0",
             }
         except Exception:
             # Fallback to simulation
@@ -190,7 +190,7 @@ class LedgerWallet(HardwareWalletInterface):
             return {
                 "device_id": f"ledger_fallback_{int(time.time())}",
                 "firmware_version": "fallback-2.1.0",
-                "stellar_app_version": "fallback-1.0.0"
+                "stellar_app_version": "fallback-1.0.0",
             }
 
     async def disconnect(self) -> bool:
@@ -199,14 +199,18 @@ class LedgerWallet(HardwareWalletInterface):
             if self._connection:
                 # Properly close connection based on mode
                 if self._simulation_mode:
-                    self.logger.info("Closing simulation Ledger connection", category=LogCategory.SECURITY)
+                    self.logger.info(
+                        "Closing simulation Ledger connection", category=LogCategory.SECURITY
+                    )
                 else:
                     # In real implementation, properly close Ledger connection
                     try:
                         # self._connection.close() or similar
                         pass
                     except Exception as e:
-                        self.logger.warning(f"Error closing Ledger connection: {e}", category=LogCategory.SECURITY)
+                        self.logger.warning(
+                            f"Error closing Ledger connection: {e}", category=LogCategory.SECURITY
+                        )
 
                 self._connection = None
 
@@ -235,6 +239,7 @@ class LedgerWallet(HardwareWalletInterface):
             if self._simulation_mode:
                 # Generate a deterministic test key based on path
                 from stellar_sdk import Keypair
+
                 test_keypair = Keypair.random()
                 self.logger.info(
                     f"Simulation mode: generated test public key for path {derivation_path}",
@@ -273,6 +278,7 @@ class LedgerWallet(HardwareWalletInterface):
             if self._simulation_mode:
                 # Generate a test signature for simulation
                 from stellar_sdk import Keypair
+
                 test_keypair = Keypair.random()
                 signed_envelope = test_keypair.sign(transaction_envelope)
 

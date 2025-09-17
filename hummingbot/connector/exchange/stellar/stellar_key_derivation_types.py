@@ -6,7 +6,7 @@ Types, enums, and data classes for key derivation system.
 import time
 from dataclasses import dataclass, field
 from enum import auto, Enum
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from stellar_sdk import Keypair

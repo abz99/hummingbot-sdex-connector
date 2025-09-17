@@ -1,0 +1,266 @@
+name: CI Health Dashboard
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run every 4 hours to monitor CI health
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+    inputs:
+      generate_report:
+        description: 'Generate comprehensive health report'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  ci-health-monitoring:
+    name: CI Health Monitoring
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for comprehensive analysis
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests python-dateutil
+
+    - name: Run CI Health Analysis
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🔍 Running CI health analysis..."
+        python .github/ci-monitor.py --output ci-health-report.md
+
+    - name: Run Post-Push Monitoring Test
+      if: github.event_name == 'push'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🚀 Testing post-push monitoring for current commit..."
+        python .github/post-push-ci-monitor.py --commit ${{ github.sha }} --save-results
+
+    - name: Generate Comprehensive Dashboard
+      if: github.event.inputs.generate_report == 'true' || github.event_name == 'schedule'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "📊 Generating comprehensive CI health dashboard..."
+
+        # Create dashboard directory
+        mkdir -p dashboard
+
+        # Generate main health report
+        python .github/ci-monitor.py --output dashboard/ci-health-report.md
+
+        # Generate workflow-specific diagnostics
+        for workflow in ci.yml knowledge-base-ci.yml production-deploy.yml; do
+          echo "🔬 Analyzing $workflow..."
+          python .github/ci-monitor.py --workflow $workflow > "dashboard/${workflow}-diagnostics.json"
+        done
+
+        # Create dashboard index
+        cat > dashboard/README.md << 'EOF'
+        # CI Health Dashboard
+
+        **Generated**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        **Commit**: ${{ github.sha }}
+
+        ## Reports
+        - [Main Health Report](ci-health-report.md)
+        - [CI Workflow Diagnostics](ci.yml-diagnostics.json)
+        - [Knowledge Base CI Diagnostics](knowledge-base-ci.yml-diagnostics.json)
+        - [Production Deploy Diagnostics](production-deploy.yml-diagnostics.json)
+
+        ## Monitoring Tools
+        - **Post-Push Monitor**: `.github/post-push-ci-monitor.py`
+        - **CI Health Monitor**: `.github/ci-monitor.py`
+        - **Push Wrapper**: `scripts/ci-push-wrapper.sh`
+        EOF
+
+    - name: Upload CI Health Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: ci-health-dashboard-${{ github.sha }}
+        path: |
+          dashboard/
+          ci-health-report.md
+          logs/
+        retention-days: 30
+
+    - name: Comment on PR with Health Status
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+
+          let healthReport = '';
+          try {
+            healthReport = fs.readFileSync('ci-health-report.md', 'utf8');
+          } catch (error) {
+            healthReport = '❌ Could not generate health report';
+          }
+
+          const comment = `## 🔍 CI Health Check Results
+
+          **Commit**: ${{ github.sha }}
+          **Generated**: ${new Date().toISOString()}
+
+          ### Health Summary
+          \`\`\`
+          ${healthReport.substring(0, 500)}${healthReport.length > 500 ? '...' : ''}
+          \`\`\`
+
+          📊 **Full Report**: Download the \`ci-health-dashboard\` artifact for complete analysis.
+
+          💡 **Need help?** Check the [CI troubleshooting guide](../docs/ci-troubleshooting.md)
+          `;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+    - name: Update CI Health Badge
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "🏷️ Updating CI health badge..."
+
+        # Determine health status
+        if grep -q "Overall Status: HEALTHY" ci-health-report.md; then
+          HEALTH_STATUS="healthy"
+          BADGE_COLOR="brightgreen"
+        elif grep -q "Overall Status: DEGRADED" ci-health-report.md; then
+          HEALTH_STATUS="degraded"
+          BADGE_COLOR="yellow"
+        else
+          HEALTH_STATUS="failing"
+          BADGE_COLOR="red"
+        fi
+
+        # Create badge URL
+        BADGE_URL="https://img.shields.io/badge/CI%20Health-$HEALTH_STATUS-$BADGE_COLOR"
+
+        echo "CI_HEALTH_STATUS=$HEALTH_STATUS" >> $GITHUB_ENV
+        echo "CI_HEALTH_BADGE_URL=$BADGE_URL" >> $GITHUB_ENV
+
+    - name: Notify on Health Issues
+      if: failure() || (contains(env.CI_HEALTH_STATUS, 'failing'))
+      uses: actions/github-script@v6
+      with:
+        script: |
+          // Create an issue if CI health is critically degraded
+          const title = `🚨 CI Health Alert: Pipeline Degradation Detected`;
+          const body = `
+          ## CI Health Alert
+
+          **Detected**: ${new Date().toISOString()}
+          **Commit**: ${{ github.sha }}
+          **Status**: ${{ env.CI_HEALTH_STATUS || 'unknown' }}
+
+          ### Issue Description
+          The automated CI health monitoring has detected significant issues with the pipeline.
+
+          ### Immediate Actions Required
+          1. Review the failed workflows in GitHub Actions
+          2. Check the CI health report in the artifacts
+          3. Verify all required secrets and configurations
+          4. Run local tests to identify issues: \`pytest tests/ -v\`
+
+          ### Related Files
+          - CI Health Monitor: \`.github/ci-monitor.py\`
+          - Post-Push Monitor: \`.github/post-push-ci-monitor.py\`
+          - CI Workflows: \`.github/workflows/\`
+
+          This issue was automatically generated by the CI health monitoring system.
+          `;
+
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'ci-health,automated'
+          });
+
+          // Only create issue if one doesn't already exist
+          if (issues.data.length === 0) {
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['ci-health', 'automated', 'priority-high']
+            });
+          }
+
+  integration-test:
+    name: Test CI Monitoring Integration
+    runs-on: ubuntu-latest
+    needs: ci-health-monitoring
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Test Monitoring Scripts
+      run: |
+        echo "🧪 Testing CI monitoring integration..."
+
+        # Test script syntax
+        python -m py_compile .github/ci-monitor.py
+        python -m py_compile .github/post-push-ci-monitor.py
+
+        # Test help functions
+        python .github/ci-monitor.py --help
+        python .github/post-push-ci-monitor.py --help
+
+        echo "✅ All monitoring scripts are valid"
+
+    - name: Verify Executable Permissions
+      run: |
+        echo "🔐 Verifying executable permissions..."
+
+        files=(
+          ".github/post-push-ci-monitor.py"
+          "scripts/ci-push-wrapper.sh"
+          ".github/hooks/post-receive"
+        )
+
+        for file in "${files[@]}"; do
+          if [[ -x "$file" ]]; then
+            echo "✅ $file: executable"
+          else
+            echo "❌ $file: not executable"
+            exit 1
+          fi
+        done
+
+    - name: Test Push Wrapper (Dry Run)
+      run: |
+        echo "🧪 Testing CI push wrapper (dry run)..."
+
+        # Test script syntax without actual execution
+        bash -n scripts/ci-push-wrapper.sh
+
+        echo "✅ Push wrapper script is valid"

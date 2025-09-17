@@ -7,7 +7,7 @@ import asyncio
 import time
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, Set, TYPE_CHECKING, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, TYPE_CHECKING
 
 import aiohttp
 from stellar_sdk import Asset
@@ -208,7 +208,9 @@ class StellarOrderBookTracker:
         task = asyncio.create_task(self._track_pair_orderbook(trading_pair, session))
         self._stream_tasks[trading_pair] = task
 
-    async def _track_pair_orderbook(self, trading_pair: str, session: aiohttp.ClientSession) -> None:
+    async def _track_pair_orderbook(
+        self, trading_pair: str, session: aiohttp.ClientSession
+    ) -> None:
         """Track order book for a specific trading pair."""
         while self._connected:
             try:

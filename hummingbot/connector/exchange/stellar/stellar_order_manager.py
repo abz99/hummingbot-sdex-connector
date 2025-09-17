@@ -21,10 +21,9 @@ from enum import Enum
 from typing import Any, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
 
 import structlog
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-
 from stellar_sdk import Asset, Keypair, TransactionEnvelope
 from stellar_sdk.exceptions import SdkError
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 if TYPE_CHECKING:
     from .stellar_asset_manager import ModernAssetManager
@@ -919,7 +918,7 @@ class ModernStellarOrderManager:
                 "amount": "500.0000000",  # Simulated partial fill
                 "price": "0.1000000",
                 "selling": {"asset_type": "native"},
-                "buying": {"asset_type": "credit_alphanum4", "asset_code": "USDC"}
+                "buying": {"asset_type": "credit_alphanum4", "asset_code": "USDC"},
             }
         except Exception as e:
             self.logger.error("Failed to get offer details", offer_id=offer_id, error=str(e))

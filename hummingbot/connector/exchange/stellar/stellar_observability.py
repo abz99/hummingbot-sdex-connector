@@ -167,13 +167,19 @@ class StellarObservabilityFramework:
         self._init_default_alert_rules()
         self._init_health_checks()
 
-    def _safe_create_metric(self, metric_class, name: str, description: str, labels=None, registry=None, **kwargs):
+    def _safe_create_metric(
+        self, metric_class, name: str, description: str, labels=None, registry=None, **kwargs
+    ):
         """Safely create metric, handling duplicates in test environments."""
         try:
             if labels:
-                return metric_class(name, description, labels, registry=registry or self.metrics.registry, **kwargs)
+                return metric_class(
+                    name, description, labels, registry=registry or self.metrics.registry, **kwargs
+                )
             else:
-                return metric_class(name, description, registry=registry or self.metrics.registry, **kwargs)
+                return metric_class(
+                    name, description, registry=registry or self.metrics.registry, **kwargs
+                )
         except ValueError as e:
             if "Duplicated timeseries" in str(e):
                 # In tests, return None to avoid registration conflicts
@@ -183,9 +189,11 @@ class StellarObservabilityFramework:
 
     def _init_production_metrics(self) -> None:
         """Initialize production-specific metrics."""
-        
+
         # In test environments, clear existing collectors to avoid duplicates
-        if hasattr(self.metrics, 'registry') and hasattr(self.metrics.registry, '_collector_to_names'):
+        if hasattr(self.metrics, "registry") and hasattr(
+            self.metrics.registry, "_collector_to_names"
+        ):
             # Create a list copy to avoid modification during iteration
             collectors = list(self.metrics.registry._collector_to_names.keys())
             for collector in collectors:
@@ -193,8 +201,8 @@ class StellarObservabilityFramework:
                     self.metrics.registry.unregister(collector)
                 except KeyError:
                     pass  # Already unregistered
-        
-        # Observability system metrics  
+
+        # Observability system metrics
         self.observability_events = Counter(
             "stellar_observability_events_total",
             "Total observability events",
@@ -204,7 +212,7 @@ class StellarObservabilityFramework:
 
         self.alert_firings = Counter(
             "stellar_alert_firings_total",
-            "Total alert firings", 
+            "Total alert firings",
             ["alert_rule", "level"],
             registry=self.metrics.registry,
         )
@@ -217,7 +225,7 @@ class StellarObservabilityFramework:
         )
 
         self.system_uptime = Gauge(
-            "stellar_system_uptime_seconds", 
+            "stellar_system_uptime_seconds",
             "System uptime in seconds",
             registry=self.metrics.registry,
         )
@@ -418,7 +426,7 @@ class StellarObservabilityFramework:
             "error_type": type(error).__name__,
         }
         error_context.update(context or {})
-        
+
         self.logger.error(error_name, **error_context)
 
     async def stop_observability_system(self) -> None:
@@ -874,11 +882,15 @@ class StellarObservabilityFramework:
             self.add_alert_rule(rule)
             self.logger.info(f"Registered QA alert rule: {rule_name}")
 
-    async def handle_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]) -> None:
+    async def handle_qa_event(
+        self, event_type: ObservabilityEvent, context: Dict[str, Any]
+    ) -> None:
         """Handle QA-specific observability events."""
         try:
             if self.observability_events:
-                self.observability_events.labels(event_type=event_type.value, status="triggered").inc()
+                self.observability_events.labels(
+                    event_type=event_type.value, status="triggered"
+                ).inc()
 
             # Log QA event with context
             self.logger.warning(

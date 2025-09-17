@@ -46,12 +46,12 @@ jobs:
     
     - name: Run secret scanning
       run: |
-        python -m pytest test/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_no_hardcoded_secrets_in_repository -v
+        python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_no_hardcoded_secrets_in_repository -v
     
     - name: Run dependency vulnerability scan
       run: |
-        safety check --json --output safety-report.json || echo "Safety scan completed"
-        python -m pytest test/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_dependency_security_scan -v
+        safety check -o json > safety-report.json || echo "Safety scan completed"
+        python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_dependency_security_scan -v
     
     - name: Run static security analysis
       run: |

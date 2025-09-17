@@ -25,7 +25,7 @@
     },
     {
       "path": "/home/abz/projects/stellar-hummingbot-connector-v3/.github/workflows/ci.yml",
-      "hash": "6306f6f22c8afba3f33a684723a154fcde899baef9f17b33b575cfb9cf4018f7",
+      "hash": "d2a6330c5b267628b078c3a80523b233987d60b603860bf633f9b4413a70b46f",
       "exists": true
     },
     {
@@ -39,6 +39,6 @@
       "exists": false
     }
   ],
-  "last_indexed": "2025-09-16T06:47:35.685250+00:00",
-  "hash": "325f17d4003580c2188d83239b2d41825ba691ec10cd5d0366f52589ea68d6cc"
+  "last_indexed": "2025-09-16T20:09:47.700468+00:00",
+  "hash": "4a44b018af4763332f98755314fababb474560b1e67797acedb127dc2c64696d"
 }

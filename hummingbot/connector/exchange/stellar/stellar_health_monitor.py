@@ -386,11 +386,15 @@ class StellarHealthMonitor:
         """Add an alert handler."""
         self.alert_handlers.append(handler)
 
-    def add_failure_callback(self, callback: Callable[[str, HealthCheckResult], Awaitable[None]]) -> None:
+    def add_failure_callback(
+        self, callback: Callable[[str, HealthCheckResult], Awaitable[None]]
+    ) -> None:
         """Add a callback for endpoint failures."""
         self.failure_callbacks.append(callback)
 
-    def add_recovery_callback(self, callback: Callable[[str, HealthCheckResult], Awaitable[None]]) -> None:
+    def add_recovery_callback(
+        self, callback: Callable[[str, HealthCheckResult], Awaitable[None]]
+    ) -> None:
         """Add a callback for endpoint recoveries."""
         self.recovery_callbacks.append(callback)
 

@@ -9,9 +9,8 @@ from decimal import Decimal
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 # Hummingbot imports (using stubs for development)
-from src.hummingbot_stubs.connector.exchange_base import ExchangeBase
+from src.hummingbot_stubs.connector.exchange_base import ExchangeBase, OrderType
 from src.hummingbot_stubs.core.api_throttler.async_throttler import AsyncThrottler, RateLimit
-from src.hummingbot_stubs.connector.exchange_base import OrderType
 from src.hummingbot_stubs.core.data_type.common import TradeType
 from src.hummingbot_stubs.core.web_assistant.web_assistants_factory import WebAssistantsFactory
 
@@ -95,15 +94,17 @@ class StellarExchange(ExchangeBase):
 
             # Initialize managers
             self._asset_manager = ModernAssetManager(
-                chain_interface=self._chain_interface, 
+                chain_interface=self._chain_interface,
                 observability=self._observability,
                 security_framework=self._security_framework,
             )
             await self._asset_manager.initialize()
 
             # Get account ID from security framework (placeholder for now)
-            account_id = getattr(self._security_framework, 'primary_account_id', 'PLACEHOLDER_ACCOUNT_ID')
-            
+            account_id = getattr(
+                self._security_framework, "primary_account_id", "PLACEHOLDER_ACCOUNT_ID"
+            )
+
             try:
                 self._order_manager = ModernStellarOrderManager(
                     chain_interface=self._chain_interface,
@@ -114,9 +115,7 @@ class StellarExchange(ExchangeBase):
                 await self._order_manager.start()
             except Exception as e:
                 await self._observability.log_event(
-                    'order_manager_init_failed',
-                    {'error': str(e)},
-                    level='error'
+                    "order_manager_init_failed", {"error": str(e)}, level="error"
                 )
                 # Continue without order manager for graceful degradation
                 self._order_manager = None
@@ -205,7 +204,7 @@ class StellarExchange(ExchangeBase):
                 await self._observability.log_event(
                     "order_operation_unavailable",
                     {"reason": "order_manager_not_initialized"},
-                    level="warning"
+                    level="warning",
                 )
                 return None  # Graceful failure for tests
 
@@ -233,7 +232,7 @@ class StellarExchange(ExchangeBase):
                     "amount": str(amount),
                     "price": str(price) if price else "market",
                     "is_buy": is_buy,
-                }
+                },
             )
 
             return stellar_order.order_id
@@ -246,7 +245,7 @@ class StellarExchange(ExchangeBase):
                     "client_order_id": order_id,
                     "trading_pair": trading_pair,
                     "amount": str(amount),
-                }
+                },
             )
             raise
 
@@ -268,7 +267,7 @@ class StellarExchange(ExchangeBase):
                 await self._observability.log_event(
                     "order_operation_unavailable",
                     {"reason": "order_manager_not_initialized"},
-                    level="warning"
+                    level="warning",
                 )
                 return False  # Graceful failure for tests
 
@@ -276,8 +275,7 @@ class StellarExchange(ExchangeBase):
             in_flight_order = self._in_flight_orders.get(order_id)
             if not in_flight_order:
                 await self._observability.log_event(
-                    "order_not_found_for_cancellation",
-                    {"client_order_id": order_id}
+                    "order_not_found_for_cancellation", {"client_order_id": order_id}
                 )
                 return False
 
@@ -294,16 +292,14 @@ class StellarExchange(ExchangeBase):
                     {
                         "client_order_id": order_id,
                         "stellar_order_id": in_flight_order.order_id,
-                    }
+                    },
                 )
 
             return result.success
 
         except Exception as e:
             await self._observability.log_error(
-                "order_cancellation_failed",
-                e,
-                {"client_order_id": order_id}
+                "order_cancellation_failed", e, {"client_order_id": order_id}
             )
             return False
 
@@ -326,8 +322,7 @@ class StellarExchange(ExchangeBase):
                 "id": order_id,
                 "client_order_id": order_id,
                 "trading_pair": self._construct_trading_pair_name(
-                    in_flight_order.selling_asset, 
-                    in_flight_order.buying_asset
+                    in_flight_order.selling_asset, in_flight_order.buying_asset
                 ),
                 "order_type": "LIMIT",  # Stellar DEX uses limit orders
                 "order_side": "BUY" if in_flight_order.is_buy_order else "SELL",
@@ -338,15 +333,17 @@ class StellarExchange(ExchangeBase):
                 "fee_asset": "XLM",
                 "fee_paid": "0.00001",  # Stellar network fee
                 "status": in_flight_order.status.value,
-                "creation_timestamp": in_flight_order.created_at.timestamp() if in_flight_order.created_at else None,
-                "last_update_timestamp": in_flight_order.updated_at.timestamp() if in_flight_order.updated_at else None,
+                "creation_timestamp": (
+                    in_flight_order.created_at.timestamp() if in_flight_order.created_at else None
+                ),
+                "last_update_timestamp": (
+                    in_flight_order.updated_at.timestamp() if in_flight_order.updated_at else None
+                ),
             }
 
         except Exception as e:
             await self._observability.log_error(
-                "order_retrieval_failed",
-                e,
-                {"client_order_id": order_id}
+                "order_retrieval_failed", e, {"client_order_id": order_id}
             )
             return None
 
@@ -357,7 +354,7 @@ class StellarExchange(ExchangeBase):
                 return
 
             # Get primary account ID from security framework
-            account_id = getattr(self._security_framework, 'primary_account_id', None)
+            account_id = getattr(self._security_framework, "primary_account_id", None)
             if not account_id:
                 await self._observability.log_event("no_primary_account_for_balance_update")
                 return
@@ -375,15 +372,12 @@ class StellarExchange(ExchangeBase):
                 {
                     "account_id": account_id,
                     "balance_count": len(balances),
-                    "total_xlm": str(balances.get("XLM", Decimal("0")))
-                }
+                    "total_xlm": str(balances.get("XLM", Decimal("0"))),
+                },
             )
 
         except Exception as e:
-            await self._observability.log_error(
-                "balance_update_failed",
-                e
-            )
+            await self._observability.log_error("balance_update_failed", e)
 
     def _parse_trading_pair(self, trading_pair: str, is_buy: bool) -> Tuple[Any, Any]:
         """Parse trading pair string into Stellar assets."""
@@ -397,9 +391,17 @@ class StellarExchange(ExchangeBase):
 
             # For now, assume native XLM for XLM and create dummy assets for others
             from stellar_sdk import Asset
-            
-            base_asset = Asset.native() if base_code == "XLM" else Asset(base_code, "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5")
-            quote_asset = Asset.native() if quote_code == "XLM" else Asset(quote_code, "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5")
+
+            base_asset = (
+                Asset.native()
+                if base_code == "XLM"
+                else Asset(base_code, "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5")
+            )
+            quote_asset = (
+                Asset.native()
+                if quote_code == "XLM"
+                else Asset(quote_code, "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5")
+            )
 
             # For buy orders: selling quote asset, buying base asset
             # For sell orders: selling base asset, buying quote asset
@@ -436,13 +438,14 @@ class StellarExchange(ExchangeBase):
     def current_timestamp(self) -> float:
         """Get current timestamp."""
         import time
+
         self._last_timestamp = time.time()
         return self._last_timestamp
 
     def tick(self, timestamp: float) -> None:
         """Process periodic tick for connector updates."""
         self._last_timestamp = timestamp
-        
+
         # Trigger background tasks if needed
         if self._ready and self._order_manager:
             # Could trigger order status updates, balance updates, etc.

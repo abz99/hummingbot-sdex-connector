@@ -101,10 +101,10 @@ class EnterpriseSecurityFramework:
     async def get_keypair(self, account_id: str) -> Optional[Keypair]:
         """
         Get keypair for account from security provider.
-        
+
         Args:
             account_id: Account ID to get keypair for
-            
+
         Returns:
             Keypair if available, None otherwise
         """
@@ -112,33 +112,29 @@ class EnterpriseSecurityFramework:
             # Check if we have the keypair cached
             if account_id in self._active_keypairs:
                 return self._active_keypairs[account_id]
-            
+
             # For development/testing, create a random keypair
             # In production, this would retrieve from HSM/secure storage
-            if self.config and hasattr(self.config, 'name') and 'test' in self.config.name.lower():
+            if self.config and hasattr(self.config, "name") and "test" in self.config.name.lower():
                 keypair = Keypair.random()
                 self._active_keypairs[account_id] = keypair
-                
+
                 await self.observability.log_event(
-                    "keypair_generated_for_testing",
-                    {"account_id": account_id}
+                    "keypair_generated_for_testing", {"account_id": account_id}
                 )
-                
+
                 return keypair
-            
+
             # In production, would implement actual HSM/MPC/Hardware wallet integration
             await self.observability.log_event(
-                "keypair_request_production_not_implemented",
-                {"account_id": account_id}
+                "keypair_request_production_not_implemented", {"account_id": account_id}
             )
-            
+
             return None
-            
+
         except Exception as e:
             await self.observability.log_error(
-                "keypair_retrieval_failed", 
-                e, 
-                {"account_id": account_id}
+                "keypair_retrieval_failed", e, {"account_id": account_id}
             )
             return None
 
@@ -148,19 +144,21 @@ class EnterpriseSecurityFramework:
         # For testing, return the first cached account ID
         if self._active_keypairs:
             return list(self._active_keypairs.keys())[0]
-        
+
         # For testing environment, create a default account
-        if self.config and hasattr(self.config, 'name') and 'test' in self.config.name.lower():
+        if self.config and hasattr(self.config, "name") and "test" in self.config.name.lower():
             default_account_id = "GCDEFAULTACCOUNT123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             return default_account_id
-            
+
         return None
 
     def is_development_mode(self) -> bool:
         """Check if running in development/testing mode."""
-        return (self.config and 
-                hasattr(self.config, 'name') and 
-                any(env in self.config.name.lower() for env in ['test', 'dev', 'local']))
+        return (
+            self.config
+            and hasattr(self.config, "name")
+            and any(env in self.config.name.lower() for env in ["test", "dev", "local"])
+        )
 
     async def get_signing_keypair(self, account_id: str) -> Keypair:
         """
@@ -196,7 +194,10 @@ class EnterpriseSecurityFramework:
 
             # Parse the transaction XDR
             from stellar_sdk import TransactionEnvelope
-            envelope = TransactionEnvelope.from_xdr(transaction_xdr, network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE)
+
+            envelope = TransactionEnvelope.from_xdr(
+                transaction_xdr, network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE
+            )
 
             # Sign the transaction with the keypair
             signed_envelope = keypair.sign(envelope)
@@ -209,7 +210,7 @@ class EnterpriseSecurityFramework:
                 {
                     "account_id": account_id,
                     "provider": self._primary_provider.value if self._primary_provider else "local",
-                    "signature_count": len(signed_envelope.signatures)
+                    "signature_count": len(signed_envelope.signatures),
                 },
             )
 

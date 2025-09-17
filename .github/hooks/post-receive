@@ -1,0 +1,50 @@
+#!/bin/bash
+# Post-receive hook for automated CI health verification
+# Automatically runs after each push to guarantee CI pipeline health
+
+set -e
+
+echo "🔄 Post-receive hook: Automated CI health verification..."
+
+PROJECT_ROOT="$(pwd)"
+LOGS_DIR="$PROJECT_ROOT/logs"
+mkdir -p "$LOGS_DIR"
+
+# Get the pushed commit SHA
+while read oldrev newrev refname; do
+    # Only process pushes to main branch
+    if [[ $refname == "refs/heads/main" ]]; then
+        COMMIT_SHA="$newrev"
+        echo "📍 Processing push to main: $COMMIT_SHA"
+
+        # Wait a moment for GitHub to process the push
+        echo "⏳ Waiting for GitHub to process push..."
+        sleep 10
+
+        # Run post-push CI monitoring
+        echo "🔍 Starting automated CI health verification..."
+
+        if python .github/post-push-ci-monitor.py --commit "$COMMIT_SHA" --save-results; then
+            echo "✅ CI health verification completed successfully"
+
+            # Log success
+            echo "$(date): SUCCESS - CI verification passed for $COMMIT_SHA" >> "$LOGS_DIR/ci_verification.log"
+
+        else
+            echo "❌ CI health verification detected issues"
+
+            # Log failure
+            echo "$(date): FAILURE - CI verification failed for $COMMIT_SHA" >> "$LOGS_DIR/ci_verification.log"
+
+            # Send notification (if configured)
+            if command -v notify-send &> /dev/null; then
+                notify-send "CI Verification Failed" "Issues detected in commit $COMMIT_SHA"
+            fi
+
+            # Optionally fail the hook (uncomment to block pushes on CI issues)
+            # exit 1
+        fi
+    fi
+done
+
+echo "✅ Post-receive hook completed"

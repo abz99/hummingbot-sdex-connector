@@ -10,7 +10,7 @@ import time
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, TYPE_CHECKING, Union
 
 import aiohttp
 
@@ -357,7 +357,9 @@ class SorobanContractManager:
                 account = await self.chain_interface.get_account_data(source_account)
             else:
                 # Use a valid placeholder account for simulation
-                account = Account(account="GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF", sequence=0)  # Placeholder
+                account = Account(
+                    account="GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF", sequence=0
+                )  # Placeholder
 
             # Create transaction builder for simulation
             builder = TransactionBuilder(

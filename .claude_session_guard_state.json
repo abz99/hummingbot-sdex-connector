@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "last_session_validation": "2025-09-16T19:12:32.252568",
+  "rule_checksum": "bc4c64e494f2a455",
+  "session_count": 1,
+  "violations_detected": 1,
+  "last_compression_recovery": null,
+  "enforcement_level": "STRICT",
+  "last_validation_passed": false
+}

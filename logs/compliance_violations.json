@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-09-16T20:13:43.330923",
+  "violations": [
+    {
+      "rule_id": "SC-003",
+      "severity": "MAJOR",
+      "description": "Too many uncommitted files: 3960",
+      "timestamp": "2025-09-16T20:12:49.153135",
+      "auto_fixable": false
+    },
+    {
+      "rule_id": "DR-001",
+      "severity": "CRITICAL",
+      "description": "ABSOLUTE PROHIBITION VIOLATED: Failing tests detected",
+      "timestamp": "2025-09-16T20:12:58.300669",
+      "auto_fixable": false
+    },
+    {
+      "rule_id": "DR-004-FLAKE8",
+      "severity": "MAJOR",
+      "description": "flake8 violations detected",
+      "timestamp": "2025-09-16T20:13:03.378878",
+      "auto_fixable": false
+    },
+    {
+      "rule_id": "DR-004-MYPY",
+      "severity": "MAJOR",
+      "description": "mypy violations detected",
+      "timestamp": "2025-09-16T20:13:27.297709",
+      "auto_fixable": false
+    },
+    {
+      "rule_id": "DM-003",
+      "severity": "MAJOR",
+      "description": "Session documentation not updated",
+      "timestamp": "2025-09-16T20:13:27.297972",
+      "auto_fixable": false
+    },
+    {
+      "rule_id": "QA-001",
+      "severity": "MAJOR",
+      "description": "Test coverage 0.0% below required 85%",
+      "timestamp": "2025-09-16T20:13:39.341533",
+      "auto_fixable": false
+    }
+  ],
+  "compliance_score": 25.0
+}

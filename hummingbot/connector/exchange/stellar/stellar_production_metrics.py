@@ -730,7 +730,9 @@ class StellarProductionMetricsFramework:
         return {"predicted_cost": 120.0, "accuracy": 0.78, "confidence": 0.85}
 
     @asynccontextmanager
-    async def track_business_operation(self, operation_name: str, business_context: Dict[str, Any]) -> None:
+    async def track_business_operation(
+        self, operation_name: str, business_context: Dict[str, Any]
+    ) -> None:
         """Context manager for tracking business operations."""
         start_time = time.time()
         operation_id = f"{operation_name}_{int(start_time)}"

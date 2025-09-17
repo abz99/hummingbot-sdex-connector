@@ -87,7 +87,9 @@ class ModernStellarChainInterface:
             self.session_pool = aiohttp.ClientSession(connector=connector, timeout=timeout)
 
             # Initialize Horizon servers with failover
-            horizon_urls = [str(self.config.horizon.primary)] + [str(url) for url in self.config.horizon.fallbacks]
+            horizon_urls = [str(self.config.horizon.primary)] + [
+                str(url) for url in self.config.horizon.fallbacks
+            ]
             for horizon_url in horizon_urls:
                 # AiohttpClient manages its own session internally
                 aiohttp_client = AiohttpClient()
@@ -111,7 +113,7 @@ class ModernStellarChainInterface:
             asyncio.create_task(self._monitor_server_health())
 
             if self.observability:
-                    await self.observability.log_event(
+                await self.observability.log_event(
                     "chain_interface_started",
                     {
                         "horizon_servers": len(self.horizon_servers),
@@ -122,7 +124,7 @@ class ModernStellarChainInterface:
 
         except Exception as e:
             if self.observability:
-                    await self.observability.log_error("chain_interface_start_failed", e)
+                await self.observability.log_error("chain_interface_start_failed", e)
             raise
 
     async def stop(self) -> None:
@@ -131,7 +133,7 @@ class ModernStellarChainInterface:
             await self.session_pool.close()
 
         if self.observability:
-                    await self.observability.log_event("chain_interface_stopped")
+            await self.observability.log_event("chain_interface_stopped")
 
     async def get_account_with_retry(
         self, account_id: str, max_retries: int = 3
@@ -167,16 +169,16 @@ class ModernStellarChainInterface:
             except Exception as e:
                 if self.observability:
                     await self.observability.log_error(
-                    "account_fetch_failed",
-                    e,
-                    {
-                        "account_id": account_id,
-                        "attempt": attempt,
-                        "horizon_url": (
-                            self.current_horizon.horizon_url if self.current_horizon else None
-                        ),
-                    },
-                )
+                        "account_fetch_failed",
+                        e,
+                        {
+                            "account_id": account_id,
+                            "attempt": attempt,
+                            "horizon_url": (
+                                self.current_horizon.horizon_url if self.current_horizon else None
+                            ),
+                        },
+                    )
 
                 if attempt < max_retries - 1:
                     await self._switch_to_next_horizon()
@@ -217,8 +219,8 @@ class ModernStellarChainInterface:
             except Exception as e:
                 if self.observability:
                     await self.observability.log_error(
-                    "sequence_number_error", e, {"account_id": account_id}
-                )
+                        "sequence_number_error", e, {"account_id": account_id}
+                    )
                 raise
 
     async def calculate_minimum_balance(self, account: Account) -> Decimal:
@@ -255,11 +257,15 @@ class ModernStellarChainInterface:
 
         except Exception as e:
             if self.observability:
-                    await self.observability.log_error(
-                "reserve_calculation_failed",
-                e,
-                {"account_id": getattr(account, "account_id", getattr(account, "id", "unknown"))},
-            )
+                await self.observability.log_error(
+                    "reserve_calculation_failed",
+                    e,
+                    {
+                        "account_id": getattr(
+                            account, "account_id", getattr(account, "id", "unknown")
+                        )
+                    },
+                )
             # Return conservative estimate
             return Decimal("5.0")
 
@@ -313,7 +319,7 @@ class ModernStellarChainInterface:
     ) -> TransactionBuilder:
         """
         Create a manage offer transaction.
-        
+
         Args:
             source_keypair: Account keypair for the transaction
             selling_asset: Asset being sold
@@ -321,17 +327,17 @@ class ModernStellarChainInterface:
             amount: Amount to sell
             price: Price ratio (selling/buying)
             offer_id: Existing offer ID to modify, or None for new offer
-            
+
         Returns:
             TransactionBuilder ready for submission
         """
         try:
             source_account_id = source_keypair.public_key
             account = await self.get_account_with_retry(source_account_id)
-            
+
             if not account:
                 raise ValueError(f"Source account {source_account_id} not found")
-                
+
             # Build transaction
             transaction_builder = (
                 TransactionBuilder(
@@ -348,7 +354,7 @@ class ModernStellarChainInterface:
                 )
                 .set_timeout(30)  # 30 second timeout
             )
-            
+
             await self.observability.log_event(
                 "manage_offer_transaction_created",
                 {
@@ -357,23 +363,23 @@ class ModernStellarChainInterface:
                     "amount": amount,
                     "price": price,
                     "offer_id": offer_id,
-                }
+                },
             )
-            
+
             return transaction_builder
-            
+
         except Exception as e:
             if self.observability:
-                    await self.observability.log_error(
-                "manage_offer_creation_failed",
-                e,
-                {
-                    "selling_asset": str(selling_asset),
-                    "buying_asset": str(buying_asset),
-                    "amount": amount,
-                    "price": price,
-                }
-            )
+                await self.observability.log_error(
+                    "manage_offer_creation_failed",
+                    e,
+                    {
+                        "selling_asset": str(selling_asset),
+                        "buying_asset": str(buying_asset),
+                        "amount": amount,
+                        "price": price,
+                    },
+                )
             raise
 
     async def submit_transaction(
@@ -384,12 +390,12 @@ class ModernStellarChainInterface:
     ) -> Any:
         """
         Submit a transaction to the Stellar network with retry logic.
-        
+
         Args:
             transaction_builder: Prepared transaction builder
             source_keypair: Keypair to sign the transaction
             max_retries: Maximum retry attempts
-            
+
         Returns:
             Transaction response from Stellar network
         """
@@ -398,45 +404,47 @@ class ModernStellarChainInterface:
                 async with self.request_semaphore:
                     if not self.current_horizon:
                         await self._switch_to_next_horizon()
-                        
+
                     if self.current_horizon is None:
                         raise RuntimeError("No healthy Horizon servers available")
-                    
+
                     # Sign and build the transaction
                     transaction = transaction_builder.build()
                     transaction.sign(source_keypair)
-                    
+
                     # Submit to network
                     response = await self.current_horizon.submit_transaction(transaction)
-                    
+
                     await self.observability.log_event(
                         "transaction_submitted_successfully",
                         {
                             "hash": response.hash,
                             "attempt": attempt + 1,
                             "horizon_url": self.current_horizon.horizon_url,
-                        }
+                        },
                     )
-                    
+
                     return response
-                    
+
             except Exception as e:
                 if self.observability:
                     await self.observability.log_error(
-                    "transaction_submission_failed",
-                    e,
-                    {
-                        "attempt": attempt + 1,
-                        "horizon_url": self.current_horizon.horizon_url if self.current_horizon else None,
-                    }
-                )
-                
+                        "transaction_submission_failed",
+                        e,
+                        {
+                            "attempt": attempt + 1,
+                            "horizon_url": (
+                                self.current_horizon.horizon_url if self.current_horizon else None
+                            ),
+                        },
+                    )
+
                 if attempt < max_retries - 1:
                     await self._switch_to_next_horizon()
                     await asyncio.sleep(2**attempt)  # Exponential backoff
                 else:
                     raise
-                    
+
         raise RuntimeError("Transaction submission failed after all retries")
 
     async def create_payment_transaction(
@@ -448,23 +456,23 @@ class ModernStellarChainInterface:
     ) -> TransactionBuilder:
         """
         Create a payment transaction.
-        
+
         Args:
             source_keypair: Source account keypair
             destination_account: Destination account ID
             asset: Asset to send
             amount: Amount to send
-            
+
         Returns:
             TransactionBuilder ready for submission
         """
         try:
             source_account_id = source_keypair.public_key
             account = await self.get_account_with_retry(source_account_id)
-            
+
             if not account:
                 raise ValueError(f"Source account {source_account_id} not found")
-                
+
             transaction_builder = (
                 TransactionBuilder(
                     source_account=account,
@@ -478,29 +486,29 @@ class ModernStellarChainInterface:
                 )
                 .set_timeout(30)
             )
-            
+
             await self.observability.log_event(
                 "payment_transaction_created",
                 {
                     "destination": destination_account,
                     "asset": str(asset),
                     "amount": amount,
-                }
+                },
             )
-            
+
             return transaction_builder
-            
+
         except Exception as e:
             if self.observability:
-                    await self.observability.log_error(
-                "payment_creation_failed",
-                e,
-                {
-                    "destination": destination_account,
-                    "asset": str(asset),
-                    "amount": amount,
-                }
-            )
+                await self.observability.log_error(
+                    "payment_creation_failed",
+                    e,
+                    {
+                        "destination": destination_account,
+                        "asset": str(asset),
+                        "amount": amount,
+                    },
+                )
             raise
 
     async def create_trustline_transaction(
@@ -511,22 +519,22 @@ class ModernStellarChainInterface:
     ) -> TransactionBuilder:
         """
         Create a trustline transaction.
-        
+
         Args:
             source_keypair: Source account keypair
             asset: Asset to trust
             limit: Trust limit (None for unlimited)
-            
+
         Returns:
             TransactionBuilder ready for submission
         """
         try:
             source_account_id = source_keypair.public_key
             account = await self.get_account_with_retry(source_account_id)
-            
+
             if not account:
                 raise ValueError(f"Source account {source_account_id} not found")
-                
+
             transaction_builder = (
                 TransactionBuilder(
                     source_account=account,
@@ -539,27 +547,27 @@ class ModernStellarChainInterface:
                 )
                 .set_timeout(30)
             )
-            
+
             await self.observability.log_event(
                 "trustline_transaction_created",
                 {
                     "asset": str(asset),
                     "limit": limit,
-                }
+                },
             )
-            
+
             return transaction_builder
-            
+
         except Exception as e:
             if self.observability:
-                    await self.observability.log_error(
-                "trustline_creation_failed",
-                e,
-                {
-                    "asset": str(asset),
-                    "limit": limit,
-                }
-            )
+                await self.observability.log_error(
+                    "trustline_creation_failed",
+                    e,
+                    {
+                        "asset": str(asset),
+                        "limit": limit,
+                    },
+                )
             raise
 
     async def check_soroban_health(self) -> bool:
@@ -574,16 +582,24 @@ class ModernStellarChainInterface:
                 async with session.get(health_url, timeout=10) as response:
                     if response.status == 200:
                         if self.observability:
-                            await self.observability.log_event("soroban_health_check_success", {"url": health_url})
+                            await self.observability.log_event(
+                                "soroban_health_check_success", {"url": health_url}
+                            )
                         return True
                     else:
                         if self.observability:
-                            await self.observability.log_event("soroban_health_check_failed",
-                                {"url": health_url, "status": response.status})
+                            await self.observability.log_event(
+                                "soroban_health_check_failed",
+                                {"url": health_url, "status": response.status},
+                            )
                         return False
         except Exception as e:
             if self.observability:
-                await self.observability.log_error("soroban_health_check_error", e, {"endpoint": self.config.soroban.primary if self.config.soroban else "none"})
+                await self.observability.log_error(
+                    "soroban_health_check_error",
+                    e,
+                    {"endpoint": self.config.soroban.primary if self.config.soroban else "none"},
+                )
             return False
 
     async def get_latest_ledger(self) -> Optional[Dict[str, Any]]:
@@ -596,19 +612,24 @@ class ModernStellarChainInterface:
             ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
             response = await ledgers_call.call()
 
-            if response and 'records' in response and len(response['records']) > 0:
-                latest_ledger = response['records'][0]
+            if response and "records" in response and len(response["records"]) > 0:
+                latest_ledger = response["records"][0]
 
                 if self.observability:
-                    await self.observability.log_event("latest_ledger_retrieved", {
-                        "sequence": latest_ledger.get("sequence"),
-                        "closed_at": latest_ledger.get("closed_at")
-                    })
+                    await self.observability.log_event(
+                        "latest_ledger_retrieved",
+                        {
+                            "sequence": latest_ledger.get("sequence"),
+                            "closed_at": latest_ledger.get("closed_at"),
+                        },
+                    )
 
                 return latest_ledger
             else:
                 if self.observability:
-                    await self.observability.log_event("latest_ledger_empty_response", {"response": response})
+                    await self.observability.log_event(
+                        "latest_ledger_empty_response", {"response": response}
+                    )
                 return None
 
         except Exception as e:
@@ -623,11 +644,13 @@ class ModernStellarChainInterface:
                     if self.current_horizon:
                         ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
                         response = await ledgers_call.call()
-                        if response and 'records' in response and len(response['records']) > 0:
-                            return response['records'][0]
+                        if response and "records" in response and len(response["records"]) > 0:
+                            return response["records"][0]
                 except Exception as retry_e:
                     if self.observability:
-                        await self.observability.log_error("latest_ledger_retry_failed", retry_e, {})
+                        await self.observability.log_error(
+                            "latest_ledger_retry_failed", retry_e, {}
+                        )
 
             return None
 
@@ -635,7 +658,9 @@ class ModernStellarChainInterface:
         """Get current network information."""
         return {
             "network_passphrase": self.network_passphrase,
-            "current_horizon_url": self.current_horizon.horizon_url if self.current_horizon else None,
+            "current_horizon_url": (
+                self.current_horizon.horizon_url if self.current_horizon else None
+            ),
             "horizon_servers": [server.horizon_url for server in self.horizon_servers],
             "horizon_health": self._horizon_health_status,
             "active_server_index": self._current_horizon_index,

@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-09-16T19:34:50.056814",
+  "tests": {
+    "directory_structure": {
+      "status": "pass",
+      "missing_directories": [],
+      "missing_files": []
+    },
+    "script_syntax": {
+      "status": "pass",
+      "scripts_tested": 3,
+      "valid_scripts": 3
+    },
+    "executable_permissions": {
+      "status": "pass",
+      "executables_tested": 4
+    },
+    "dependencies": {
+      "status": "pass",
+      "python_deps": [
+        "requests: available",
+        "json: available",
+        "subprocess: available",
+        "pathlib: available",
+        "datetime: available"
+      ],
+      "external_tools": [
+        "git: available",
+        "bash: available"
+      ]
+    },
+    "git_integration": {
+      "status": "pass",
+      "in_git_repo": true,
+      "can_get_sha": true,
+      "has_remote": true,
+      "commit_sha": "fa109990"
+    },
+    "ci_monitor_basic": {
+      "status": "pass",
+      "help_works": true,
+      "basic_execution": true,
+      "stderr": null
+    },
+    "post_push_monitor_basic": {
+      "status": "pass",
+      "help_works": true,
+      "stderr": null
+    }
+  },
+  "overall_status": "healthy",
+  "issues": [],
+  "recommendations": []
+}

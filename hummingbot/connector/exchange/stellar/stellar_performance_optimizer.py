@@ -10,7 +10,7 @@ import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import aiohttp
 
@@ -135,10 +135,7 @@ class RequestCache:
     def cleanup_expired(self) -> int:
         """Remove expired entries in batch. Returns number of entries removed."""
         now = time.time()
-        expired_keys = [
-            key for key, entry in self._cache.items()
-            if now >= entry.expires_at
-        ]
+        expired_keys = [key for key, entry in self._cache.items() if now >= entry.expires_at]
 
         for key in expired_keys:
             del self._cache[key]

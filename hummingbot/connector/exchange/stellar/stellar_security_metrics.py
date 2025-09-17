@@ -7,12 +7,12 @@ import json
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
+from decimal import Decimal
 from enum import auto, Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from .stellar_logging import get_stellar_logger, LogCategory
-from decimal import Decimal
 
 
 class RequirementStatus(Enum):
@@ -99,7 +99,9 @@ class SecurityRequirement:
         if self.acceptance_criteria is None:
             self.acceptance_criteria = []
 
-    def update_status(self, status: RequirementStatus, notes: str = "", user: str = "system") -> None:
+    def update_status(
+        self, status: RequirementStatus, notes: str = "", user: str = "system"
+    ) -> None:
         """Update requirement status with audit trail."""
         self.status = status
         self.last_updated = time.time()

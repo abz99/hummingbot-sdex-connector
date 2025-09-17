@@ -254,7 +254,7 @@ class HSMKeyStore:
         self.logger.warning(
             f"HSM store_key called for {key_id} - using placeholder",
             category=LogCategory.SECURITY,
-            key_id=key_id
+            key_id=key_id,
         )
         # Placeholder: Return False to indicate HSM unavailable
         return False
@@ -264,7 +264,7 @@ class HSMKeyStore:
         self.logger.warning(
             f"HSM retrieve_key called for {key_id} - using placeholder",
             category=LogCategory.SECURITY,
-            key_id=key_id
+            key_id=key_id,
         )
         # Placeholder: Return None to indicate key not found in HSM
         return None
@@ -274,7 +274,7 @@ class HSMKeyStore:
         self.logger.warning(
             f"HSM delete_key called for {key_id} - using placeholder",
             category=LogCategory.SECURITY,
-            key_id=key_id
+            key_id=key_id,
         )
         # Placeholder: Return False to indicate deletion not performed
         return False
@@ -282,8 +282,7 @@ class HSMKeyStore:
     async def list_keys(self) -> List[KeyMetadata]:
         """List all keys in HSM (placeholder implementation)."""
         self.logger.warning(
-            "HSM list_keys called - using placeholder",
-            category=LogCategory.SECURITY
+            "HSM list_keys called - using placeholder", category=LogCategory.SECURITY
         )
         # Placeholder: Return empty list since no HSM is configured
         return []
