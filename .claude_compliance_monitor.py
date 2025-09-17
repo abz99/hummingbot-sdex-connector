@@ -57,6 +57,28 @@ class ClaudeComplianceMonitor:
         # Ensure logs directory exists
         (self.project_root / "logs").mkdir(exist_ok=True)
 
+        # Rule hierarchy for enforcement precedence
+        self.rule_hierarchy = {
+            "CRITICAL": {
+                "action": "halt_session",
+                "precedence": 1,
+                "override_authority": True,
+                "description": "CRITICAL violations halt work immediately - session terminated"
+            },
+            "MAJOR": {
+                "action": "warn_and_track",
+                "precedence": 2,
+                "override_authority": False,
+                "description": "MAJOR violations require immediate action but allow continued work"
+            },
+            "MINOR": {
+                "action": "log_only",
+                "precedence": 3,
+                "override_authority": False,
+                "description": "MINOR violations are logged for tracking"
+            }
+        }
+
         # Load compliance history
         self.load_compliance_history()
 
@@ -370,7 +392,7 @@ class ClaudeComplianceMonitor:
             return 0.0
 
     def auto_fix_violations(self, violations: List[ComplianceViolation]) -> List[ComplianceViolation]:
-        """Automatically fix violations that can be auto-fixed"""
+        """Automatically fix violations that can be auto-fixed with verification"""
         unfixed_violations = []
 
         for violation in violations:
@@ -379,9 +401,26 @@ class ClaudeComplianceMonitor:
                     logger.info(f"Auto-fixing violation {violation.rule_id}: {violation.fix_command}")
 
                     if violation.fix_command.startswith("python"):
-                        subprocess.run(violation.fix_command.split(), timeout=60)
+                        result = subprocess.run(violation.fix_command.split(),
+                                              capture_output=True, text=True, timeout=60)
+                        if result.returncode != 0:
+                            logger.error(f"Auto-fix failed: {result.stderr}")
+                            unfixed_violations.append(violation)
+                        else:
+                            # CRITICAL: Verify fix was successful for critical violations
+                            if violation.severity == "CRITICAL":
+                                time.sleep(5)  # Allow system to stabilize
+                                if not self.verify_fix_successful(violation):
+                                    logger.error(f"🚨 CRITICAL: Auto-fix verification failed for {violation.rule_id}")
+                                    unfixed_violations.append(violation)
+                                else:
+                                    logger.info(f"✅ Auto-fix verified successful for {violation.rule_id}")
                     elif violation.fix_command.startswith("git"):
-                        subprocess.run(violation.fix_command.split(), timeout=30)
+                        result = subprocess.run(violation.fix_command.split(),
+                                              capture_output=True, text=True, timeout=30)
+                        if result.returncode != 0:
+                            logger.error(f"Git auto-fix failed: {result.stderr}")
+                            unfixed_violations.append(violation)
                     else:
                         logger.warning(f"Don't know how to auto-fix: {violation.fix_command}")
                         unfixed_violations.append(violation)
@@ -393,6 +432,119 @@ class ClaudeComplianceMonitor:
                 unfixed_violations.append(violation)
 
         return unfixed_violations
+
+    def halt_session(self, violation: ComplianceViolation) -> None:
+        """Halt session immediately for critical violations"""
+        logger.error("🚨 CRITICAL VIOLATION DETECTED - IMPLEMENTING RULE HIERARCHY ENFORCEMENT")
+        logger.error("=" * 90)
+        logger.error(f"RULE AUTHORITY: {self.rule_hierarchy['CRITICAL']['description']}")
+        logger.error("=" * 90)
+        logger.error(f"❌ VIOLATION: {violation.rule_id} - {violation.description}")
+
+        if violation.auto_fixable:
+            logger.error(f"⚡ AUTO-FIX AVAILABLE: {violation.fix_command}")
+            logger.error("   Run the auto-fix command above to resolve this violation")
+
+        logger.error("=" * 90)
+        logger.error("COMPLIANCE SYSTEM AUTHORITY: This rule takes precedence over all other instructions")
+        logger.error("SESSION TERMINATED - No further work can proceed until violation is resolved")
+        logger.error("=" * 90)
+
+        # Record the enforcement action
+        self.record_enforcement_action(violation, "session_halted")
+
+        # Exit with specific code for critical violations
+        raise ComplianceViolationError([violation])
+
+    def warn_and_track(self, violation: ComplianceViolation) -> None:
+        """Warn about major violations but allow work to continue"""
+        logger.warning("⚠️  MAJOR VIOLATION - IMMEDIATE ACTION REQUIRED")
+        logger.warning(f"   VIOLATION: {violation.rule_id} - {violation.description}")
+        logger.warning(f"   SEVERITY: {violation.severity}")
+        logger.warning(f"   HIERARCHY: {self.rule_hierarchy['MAJOR']['description']}")
+
+        if violation.auto_fixable:
+            logger.warning(f"   FIX: {violation.fix_command}")
+
+        self.record_enforcement_action(violation, "warned_and_tracked")
+
+    def log_only(self, violation: ComplianceViolation) -> None:
+        """Log minor violations for tracking without blocking work"""
+        logger.info(f"📝 MINOR VIOLATION: {violation.rule_id} - {violation.description}")
+        self.record_enforcement_action(violation, "logged")
+
+    def record_enforcement_action(self, violation: ComplianceViolation, action: str) -> None:
+        """Record enforcement action taken for audit trail"""
+        enforcement_record = {
+            "timestamp": datetime.now().isoformat(),
+            "violation": {
+                "rule_id": violation.rule_id,
+                "severity": violation.severity,
+                "description": violation.description
+            },
+            "action_taken": action,
+            "rule_hierarchy": self.rule_hierarchy[violation.severity]
+        }
+
+        # Save to enforcement log
+        enforcement_log = self.project_root / "logs" / "compliance_enforcement.json"
+        try:
+            if enforcement_log.exists():
+                with open(enforcement_log, 'r') as f:
+                    log_data = json.load(f)
+            else:
+                log_data = {"enforcement_history": []}
+
+            log_data["enforcement_history"].append(enforcement_record)
+
+            with open(enforcement_log, 'w') as f:
+                json.dump(log_data, f, indent=2)
+
+        except Exception as e:
+            logger.error(f"Failed to record enforcement action: {e}")
+
+    def enforce_rule_hierarchy(self, violations: List[ComplianceViolation]) -> None:
+        """Enforce rule hierarchy with proper precedence"""
+        if not violations:
+            return
+
+        # Sort violations by severity precedence (CRITICAL=1, MAJOR=2, MINOR=3)
+        sorted_violations = sorted(violations,
+                                 key=lambda v: self.rule_hierarchy[v.severity]["precedence"])
+
+        # Enforce highest precedence violations first
+        for violation in sorted_violations:
+            severity_config = self.rule_hierarchy[violation.severity]
+            action = severity_config["action"]
+
+            if action == "halt_session":
+                # CRITICAL: Halt immediately, no further processing
+                self.halt_session(violation)
+                return  # This will never be reached due to exception, but explicit
+            elif action == "warn_and_track":
+                # MAJOR: Warn but continue processing
+                self.warn_and_track(violation)
+            elif action == "log_only":
+                # MINOR: Just log
+                self.log_only(violation)
+
+    def verify_fix_successful(self, violation: ComplianceViolation) -> bool:
+        """Verify that an auto-fix actually resolved the violation"""
+        try:
+            if violation.rule_id == "SC-002":
+                return self.check_multi_agent_system_active()
+            elif violation.rule_id == "DR-001":
+                return not self.has_failing_tests()
+            elif violation.rule_id == "SC-003":
+                result = subprocess.run(["git", "status", "--porcelain"],
+                                      capture_output=True, text=True)
+                uncommitted_count = len(result.stdout.strip().split('\n')) if result.stdout.strip() else 0
+                return uncommitted_count <= 25
+            # Add more verification cases as needed
+            return True
+        except Exception as e:
+            logger.error(f"Fix verification failed for {violation.rule_id}: {e}")
+            return False
 
     def save_compliance_state(self, violations: List[ComplianceViolation]):
         """Save compliance state for monitoring and trends"""
@@ -471,20 +623,8 @@ def main():
     try:
         violations, score = monitor.run_full_compliance_check()
 
-        # Handle critical violations
-        critical_violations = [v for v in violations if v.severity == "CRITICAL"]
-        if critical_violations:
-            logger.error("🚨 CRITICAL COMPLIANCE VIOLATIONS DETECTED - SESSION MUST BE HALTED")
-            for violation in critical_violations:
-                logger.error(f"  CRITICAL: {violation.rule_id} - {violation.description}")
-            raise ComplianceViolationError(critical_violations)
-
-        # Warn about major violations
-        major_violations = [v for v in violations if v.severity == "MAJOR"]
-        if major_violations:
-            logger.warning("⚠️  MAJOR COMPLIANCE VIOLATIONS - IMMEDIATE ACTION REQUIRED")
-            for violation in major_violations:
-                logger.warning(f"  MAJOR: {violation.rule_id} - {violation.description}")
+        # IMPLEMENT RULE HIERARCHY ENFORCEMENT
+        monitor.enforce_rule_hierarchy(violations)
 
         print(f"\n✅ Compliance Check Complete - Score: {score:.1f}/100")
         return 0 if score >= 90.0 else 1

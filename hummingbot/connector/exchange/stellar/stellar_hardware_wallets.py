@@ -238,8 +238,6 @@ class LedgerWallet(HardwareWalletInterface):
 
             if self._simulation_mode:
                 # Generate a deterministic test key based on path
-                from stellar_sdk import Keypair
-
                 test_keypair = Keypair.random()
                 self.logger.info(
                     f"Simulation mode: generated test public key for path {derivation_path}",
@@ -277,8 +275,6 @@ class LedgerWallet(HardwareWalletInterface):
 
             if self._simulation_mode:
                 # Generate a test signature for simulation
-                from stellar_sdk import Keypair
-
                 test_keypair = Keypair.random()
                 signed_envelope = test_keypair.sign(transaction_envelope)
 

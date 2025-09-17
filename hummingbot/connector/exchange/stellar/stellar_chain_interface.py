@@ -604,55 +604,64 @@ class ModernStellarChainInterface:
 
     async def get_latest_ledger(self) -> Optional[Dict[str, Any]]:
         """Get the latest ledger information."""
+        if not self.current_horizon:
+            return None
+
         try:
-            if not self.current_horizon:
-                return None
-
-            # Use Stellar SDK to get ledgers
-            ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
-            response = await ledgers_call.call()
-
-            if response and "records" in response and len(response["records"]) > 0:
-                latest_ledger = response["records"][0]
-
-                if self.observability:
-                    await self.observability.log_event(
-                        "latest_ledger_retrieved",
-                        {
-                            "sequence": latest_ledger.get("sequence"),
-                            "closed_at": latest_ledger.get("closed_at"),
-                        },
-                    )
-
-                return latest_ledger
-            else:
-                if self.observability:
-                    await self.observability.log_event(
-                        "latest_ledger_empty_response", {"response": response}
-                    )
-                return None
-
+            return await self._fetch_latest_ledger()
         except Exception as e:
             if self.observability:
                 await self.observability.log_error("latest_ledger_fetch_failed", e, {})
+            return await self._try_ledger_failover()
 
-            # Try failover if available
-            if len(self.horizon_servers) > 1:
-                await self._switch_to_next_horizon()
-                # Retry once with next server
-                try:
-                    if self.current_horizon:
-                        ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
-                        response = await ledgers_call.call()
-                        if response and "records" in response and len(response["records"]) > 0:
-                            return response["records"][0]
-                except Exception as retry_e:
-                    if self.observability:
-                        await self.observability.log_error(
-                            "latest_ledger_retry_failed", retry_e, {}
-                        )
+    async def _fetch_latest_ledger(self) -> Optional[Dict[str, Any]]:
+        """Fetch latest ledger from current horizon server."""
+        ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
+        response = await ledgers_call.call()
 
+        if response and "records" in response and len(response["records"]) > 0:
+            latest_ledger = response["records"][0]
+            await self._log_ledger_success(latest_ledger)
+            return latest_ledger
+        else:
+            await self._log_ledger_empty_response(response)
             return None
+
+    async def _log_ledger_success(self, latest_ledger: Dict[str, Any]) -> None:
+        """Log successful ledger retrieval."""
+        if self.observability:
+            await self.observability.log_event(
+                "latest_ledger_retrieved",
+                {
+                    "sequence": latest_ledger.get("sequence"),
+                    "closed_at": latest_ledger.get("closed_at"),
+                },
+            )
+
+    async def _log_ledger_empty_response(self, response: Dict[str, Any]) -> None:
+        """Log empty response from ledger query."""
+        if self.observability:
+            await self.observability.log_event(
+                "latest_ledger_empty_response", {"response": response}
+            )
+
+    async def _try_ledger_failover(self) -> Optional[Dict[str, Any]]:
+        """Try failover to next horizon server for ledger fetch."""
+        if len(self.horizon_servers) <= 1:
+            return None
+
+        await self._switch_to_next_horizon()
+        try:
+            if self.current_horizon:
+                ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
+                response = await ledgers_call.call()
+                if response and "records" in response and len(response["records"]) > 0:
+                    return response["records"][0]
+        except Exception as retry_e:
+            if self.observability:
+                await self.observability.log_error("latest_ledger_retry_failed", retry_e, {})
+
+        return None
 
     def get_network_info(self) -> Dict[str, Any]:
         """Get current network information."""

@@ -139,31 +139,99 @@ class ClaudeCodeStartup:
         except Exception as e:
             logger.error(f"❌ Knowledge base indexing error: {e}")
             return False
-    
-    def initialize_agents(self) -> bool:
-        """Initialize persistent agents."""
-        logger.info("🤖 Initializing agents...")
-        
+
+    def verify_multi_agent_system_active(self) -> bool:
+        """Verify multi-agent system is actually active with all 8 agents."""
         try:
+            # Check agent manager status
             result = subprocess.run([
                 sys.executable,
                 str(self.scripts_dir / "agent_manager.py"),
-                "--init"
-            ], capture_output=True, text=True, timeout=60)
-            
-            if result.returncode == 0:
-                logger.info("✅ Agents initialized successfully")
-                return True
-            else:
-                logger.error(f"❌ Agent initialization failed: {result.stderr}")
+                "--status"
+            ], capture_output=True, text=True, timeout=15)
+
+            if result.returncode != 0:
+                logger.warning(f"⚠️  Agent status check failed: {result.stderr}")
                 return False
-                
+
+            # Parse output to check for 8 active agents
+            output = result.stdout
+            if "System Status: active" not in output and "System Status: running" not in output:
+                logger.warning("⚠️  System status is not active/running")
+                return False
+
+            # Count active agents (should be 8)
+            active_agent_count = 0
+            for line in output.split('\n'):
+                if "✅" in line and "active" in line.lower():
+                    active_agent_count += 1
+
+            if active_agent_count < 8:
+                logger.warning(f"⚠️  Only {active_agent_count}/8 agents are active")
+                return False
+
+            logger.info(f"✅ Multi-agent system verified: {active_agent_count}/8 agents active")
+            return True
+
         except subprocess.TimeoutExpired:
-            logger.error("❌ Agent initialization timed out")
+            logger.warning("⚠️  Multi-agent verification timed out")
             return False
         except Exception as e:
-            logger.error(f"❌ Agent initialization error: {e}")
+            logger.warning(f"⚠️  Multi-agent verification error: {e}")
             return False
+
+    def initialize_agents(self) -> bool:
+        """Initialize persistent agents with robust retry mechanism."""
+        logger.info("🤖 Initializing agents...")
+
+        max_retries = 3
+        retry_delay = 5
+
+        for attempt in range(max_retries):
+            try:
+                if attempt > 0:
+                    logger.info(f"🔄 Retry attempt {attempt + 1}/{max_retries} for agent initialization...")
+                    time.sleep(retry_delay)
+
+                # Initialize agents
+                result = subprocess.run([
+                    sys.executable,
+                    str(self.scripts_dir / "agent_manager.py"),
+                    "--init"
+                ], capture_output=True, text=True, timeout=90)
+
+                if result.returncode == 0:
+                    logger.info("✅ Agents initialized successfully")
+
+                    # CRITICAL: Verify agents are actually active
+                    if self.verify_multi_agent_system_active():
+                        logger.info("✅ Multi-agent system verification passed")
+                        return True
+                    else:
+                        logger.warning(f"⚠️  Agents initialized but system not active (attempt {attempt + 1})")
+                        if attempt < max_retries - 1:
+                            continue
+                        else:
+                            logger.error("❌ Failed to activate multi-agent system after all retries")
+                            return False
+                else:
+                    logger.warning(f"⚠️  Agent initialization failed on attempt {attempt + 1}: {result.stderr}")
+                    if attempt == max_retries - 1:
+                        logger.error("❌ Agent initialization failed after all retries")
+                        return False
+
+            except subprocess.TimeoutExpired:
+                logger.warning(f"⚠️  Agent initialization timed out on attempt {attempt + 1}")
+                if attempt == max_retries - 1:
+                    logger.error("❌ Agent initialization timed out after all retries")
+                    return False
+            except Exception as e:
+                logger.warning(f"⚠️  Agent initialization error on attempt {attempt + 1}: {e}")
+                if attempt == max_retries - 1:
+                    logger.error(f"❌ Agent initialization failed after all retries: {e}")
+                    return False
+
+        return False
     
     def start_background_services(self) -> bool:
         """Start background monitoring services."""
@@ -333,10 +401,20 @@ def main():
     
     # Run startup sequence
     success = startup.run_startup_sequence()
-    
+
     if not success:
+        logger.error("❌ STARTUP SEQUENCE FAILED")
         sys.exit(1)
-    
+
+    # CRITICAL: Final validation of multi-agent system
+    logger.info("🔍 Performing final multi-agent system validation...")
+    if not startup.verify_multi_agent_system_active():
+        logger.error("🚨 CRITICAL: Multi-agent system is not fully active after startup")
+        logger.error("This violates compliance rule SC-002 and session cannot proceed")
+        logger.error("Please check agent_manager logs and retry startup")
+        sys.exit(2)
+
+    logger.info("✅ STARTUP COMPLETE: Multi-agent system is active and verified")
     return True
 
 
