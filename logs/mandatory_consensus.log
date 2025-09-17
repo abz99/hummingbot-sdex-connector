@@ -1,0 +1,36 @@
+[2025-09-17 14:32:53,322] CONSENSUS: 🔒 ENFORCING CONSENSUS REQUIREMENT for ci_pipeline_status
+[2025-09-17 14:32:53,323] CONSENSUS: 🤝 REQUIRING CONSENSUS for claim type: ci_pipeline_status
+[2025-09-17 14:32:53,323] CONSENSUS: 📋 Required agents for consensus: ['DevOpsEngineer', 'QAEngineer']
+[2025-09-17 14:32:53,324] CONSENSUS: 📞 Requesting consensus from 2 agents
+[2025-09-17 14:32:53,325] CONSENSUS: ❌ Failed to get approval from DevOpsEngineer: attempted relative import with no known parent package
+[2025-09-17 14:32:53,326] CONSENSUS: ❌ Failed to get approval from QAEngineer: attempted relative import with no known parent package
+[2025-09-17 14:32:53,326] CONSENSUS: 📊 Consensus evaluation: 0/2 approved
+[2025-09-17 14:32:53,329] CONSENSUS: 💾 Consensus result saved for ci_pipeline_status
+[2025-09-17 14:37:58,743] CONSENSUS: 🔒 ENFORCING CONSENSUS REQUIREMENT for ci_pipeline_status
+[2025-09-17 14:37:58,743] CONSENSUS: 🤝 REQUIRING CONSENSUS for claim type: ci_pipeline_status
+[2025-09-17 14:37:58,743] CONSENSUS: 📋 Required agents for consensus: ['DevOpsEngineer', 'QAEngineer']
+[2025-09-17 14:37:58,744] CONSENSUS: Error checking existing consensus: '>' not supported between instances of 'str' and 'float'
+[2025-09-17 14:37:58,745] CONSENSUS: 📞 Requesting consensus from 2 agents
+[2025-09-17 14:37:58,745] CONSENSUS: ❌ Failed to get approval from DevOpsEngineer: attempted relative import with no known parent package
+[2025-09-17 14:37:58,746] CONSENSUS: ❌ Failed to get approval from QAEngineer: attempted relative import with no known parent package
+[2025-09-17 14:37:58,746] CONSENSUS: 📊 Consensus evaluation: 0/2 approved
+[2025-09-17 14:37:58,748] CONSENSUS: 💾 Consensus result saved for ci_pipeline_status
+[2025-09-17 14:37:58,924] CONSENSUS: 🔒 ENFORCING CONSENSUS REQUIREMENT for operational_readiness
+[2025-09-17 14:37:58,924] CONSENSUS: 🤝 REQUIRING CONSENSUS for claim type: operational_readiness
+[2025-09-17 14:37:58,925] CONSENSUS: 📋 Required agents for consensus: ['DevOpsEngineer', 'QAEngineer', 'SecurityEngineer']
+[2025-09-17 14:37:58,925] CONSENSUS: 📞 Requesting consensus from 3 agents
+[2025-09-17 14:37:58,926] CONSENSUS: ❌ Failed to get approval from DevOpsEngineer: attempted relative import with no known parent package
+[2025-09-17 14:37:58,926] CONSENSUS: ❌ Failed to get approval from QAEngineer: attempted relative import with no known parent package
+[2025-09-17 14:37:58,927] CONSENSUS: ❌ Failed to get approval from SecurityEngineer: attempted relative import with no known parent package
+[2025-09-17 14:37:58,927] CONSENSUS: 📊 Consensus evaluation: 0/3 approved
+[2025-09-17 14:37:58,929] CONSENSUS: 💾 Consensus result saved for operational_readiness
+[2025-09-17 14:37:59,122] CONSENSUS: 🔒 ENFORCING CONSENSUS REQUIREMENT for mission_accomplished
+[2025-09-17 14:37:59,122] CONSENSUS: 🤝 REQUIRING CONSENSUS for claim type: mission_accomplished
+[2025-09-17 14:37:59,123] CONSENSUS: 📋 Required agents for consensus: ['ProjectManager', 'DevOpsEngineer', 'QAEngineer', 'SecurityEngineer']
+[2025-09-17 14:37:59,124] CONSENSUS: 📞 Requesting consensus from 4 agents
+[2025-09-17 14:37:59,125] CONSENSUS: ❌ Failed to get approval from ProjectManager: attempted relative import with no known parent package
+[2025-09-17 14:37:59,125] CONSENSUS: ❌ Failed to get approval from DevOpsEngineer: attempted relative import with no known parent package
+[2025-09-17 14:37:59,126] CONSENSUS: ❌ Failed to get approval from QAEngineer: attempted relative import with no known parent package
+[2025-09-17 14:37:59,126] CONSENSUS: ❌ Failed to get approval from SecurityEngineer: attempted relative import with no known parent package
+[2025-09-17 14:37:59,127] CONSENSUS: 📊 Consensus evaluation: 0/4 approved
+[2025-09-17 14:37:59,129] CONSENSUS: 💾 Consensus result saved for mission_accomplished

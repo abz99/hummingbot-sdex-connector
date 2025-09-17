@@ -1,0 +1,138 @@
+[
+  {
+    "claim_type": "ci_pipeline_status",
+    "claim_details": "CI Pipelines are operational",
+    "consensus_status": "consensus_failed",
+    "consensus_achieved": false,
+    "required_agents": [
+      "DevOpsEngineer",
+      "QAEngineer"
+    ],
+    "summary": "\u274c Consensus failed: 2 agent(s) rejected",
+    "timestamp": "2025-09-17T14:32:53.327339",
+    "approvals": [
+      {
+        "agent_name": "DevOpsEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:32:53.326033",
+        "verification_data": null
+      },
+      {
+        "agent_name": "QAEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:32:53.326702",
+        "verification_data": null
+      }
+    ]
+  },
+  {
+    "claim_type": "ci_pipeline_status",
+    "claim_details": "CI pipelines are operational",
+    "consensus_status": "consensus_failed",
+    "consensus_achieved": false,
+    "required_agents": [
+      "DevOpsEngineer",
+      "QAEngineer"
+    ],
+    "summary": "\u274c Consensus failed: 2 agent(s) rejected",
+    "timestamp": "2025-09-17T14:37:58.746990",
+    "approvals": [
+      {
+        "agent_name": "DevOpsEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:58.746146",
+        "verification_data": null
+      },
+      {
+        "agent_name": "QAEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:58.746559",
+        "verification_data": null
+      }
+    ]
+  },
+  {
+    "claim_type": "operational_readiness",
+    "claim_details": "System is ready for production",
+    "consensus_status": "consensus_failed",
+    "consensus_achieved": false,
+    "required_agents": [
+      "DevOpsEngineer",
+      "QAEngineer",
+      "SecurityEngineer"
+    ],
+    "summary": "\u274c Consensus failed: 3 agent(s) rejected",
+    "timestamp": "2025-09-17T14:37:58.927939",
+    "approvals": [
+      {
+        "agent_name": "DevOpsEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:58.926759",
+        "verification_data": null
+      },
+      {
+        "agent_name": "QAEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:58.927159",
+        "verification_data": null
+      },
+      {
+        "agent_name": "SecurityEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:58.927505",
+        "verification_data": null
+      }
+    ]
+  },
+  {
+    "claim_type": "mission_accomplished",
+    "claim_details": "Mission accomplished",
+    "consensus_status": "consensus_failed",
+    "consensus_achieved": false,
+    "required_agents": [
+      "ProjectManager",
+      "DevOpsEngineer",
+      "QAEngineer",
+      "SecurityEngineer"
+    ],
+    "summary": "\u274c Consensus failed: 4 agent(s) rejected",
+    "timestamp": "2025-09-17T14:37:59.127751",
+    "approvals": [
+      {
+        "agent_name": "ProjectManager",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:59.125436",
+        "verification_data": null
+      },
+      {
+        "agent_name": "DevOpsEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:59.126008",
+        "verification_data": null
+      },
+      {
+        "agent_name": "QAEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:59.126574",
+        "verification_data": null
+      },
+      {
+        "agent_name": "SecurityEngineer",
+        "decision": "rejected",
+        "reasoning": "Agent communication failed: attempted relative import with no known parent package",
+        "timestamp": "2025-09-17T14:37:59.127174",
+        "verification_data": null
+      }
+    ]
+  }
+]

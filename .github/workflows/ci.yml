@@ -36,13 +36,12 @@ jobs:
         python -m pip install --upgrade pip
         # Install pytest and test dependencies first
         pip install pytest pytest-asyncio pytest-benchmark
-        # Install security tools with simplified dependencies to avoid version conflicts
-        pip install safety bandit --no-deps --force-reinstall
+        # Install security tools with compatible versions
+        pip install safety==3.1.0 bandit==1.7.5 tenacity==8.2.3
         pip install semgrep --no-warn-conflicts
         # Install project dependencies needed for tests
         pip install -r requirements.txt
-        # Skip GitGuardian for now to avoid npm dependency issues
-        echo "Security tools installed (excluding GitGuardian)"
+        echo "Security tools installed successfully"
     
     - name: Run secret scanning
       run: |
@@ -51,6 +50,7 @@ jobs:
     - name: Run dependency vulnerability scan
       run: |
         echo "Starting dependency vulnerability scan..."
+        # Use compatible safety version
         safety check --json --output safety-report.json || echo '{"vulnerabilities": [], "scan_date": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'", "status": "no_vulnerabilities"}' > safety-report.json
         echo "Safety report generated successfully"
         python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_dependency_security_scan -v

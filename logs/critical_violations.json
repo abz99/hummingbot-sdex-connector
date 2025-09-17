@@ -1,0 +1,602 @@
+[
+  {
+    "timestamp": "2025-09-17T14:32:41.966060",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:33:43.578413",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:33:44.652161",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:33:58.492716",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:33:59.571239",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:37:52.192824",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:37:53.448865",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:37:54.853038",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:37:56.029470",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:37:57.252913",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:37:58.548821",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:00.387054",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:01.475396",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:02.760333",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:03.863799",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:05.028401",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:06.101232",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:07.422977",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:08.530539",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:09.901502",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:10.984846",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:12.466882",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:13.535328",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T14:38:14.785382",
+    "enforcement_passed": false,
+    "summary": "\ud83d\udea8 3/3 CI PIPELINES FAILING",
+    "enforcement_action": "BLOCK_ALL_SUCCESS_CLAIMS",
+    "failing_count": 3,
+    "total_count": 3,
+    "failing_pipelines": [
+      {
+        "name": "Stellar Hummingbot Connector CI",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "Production Deployment Pipeline",
+        "status": "missing",
+        "conclusion": "critical_failure"
+      },
+      {
+        "name": "CI Health Dashboard",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  }
+]
