@@ -122,6 +122,12 @@ class VaultKeyStore(KeyStoreBackend):
                 return await self._auth_userpass()
             elif self.config.auth_method == VaultAuthMethod.APPROLE:
                 return await self._auth_approle()
+            elif self.config.auth_method == VaultAuthMethod.KUBERNETES:
+                return await self._auth_kubernetes()
+            elif self.config.auth_method == VaultAuthMethod.AWS:
+                return await self._auth_aws()
+            elif self.config.auth_method == VaultAuthMethod.AZURE:
+                return await self._auth_azure()
             else:
                 raise NotImplementedError(f"Auth method not implemented: {self.config.auth_method}")
 
@@ -271,6 +277,75 @@ class VaultKeyStore(KeyStoreBackend):
             else:
                 error_text = await response.text()
                 raise Exception(f"AppRole authentication failed: {response.status} - {error_text}")
+
+    async def _auth_kubernetes(self) -> bool:
+        """Authenticate using Kubernetes service account."""
+        if not self.config.service_account_token_path:
+            raise ValueError("Service account token path required for KUBERNETES auth method")
+
+        try:
+            # Read the service account token
+            with open(self.config.service_account_token_path, 'r') as f:
+                jwt_token = f.read().strip()
+
+            role = self.config.kubernetes_role or "default"
+            auth_data = {"jwt": jwt_token, "role": role}
+
+            headers = {}
+            if self.config.namespace:
+                headers["X-Vault-Namespace"] = self.config.namespace
+
+            async with self._session.post(
+                f"{self.config.url}/v1/auth/kubernetes/login", json=auth_data, headers=headers
+            ) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    auth_info = data.get("auth", {})
+
+                    token = auth_info.get("client_token")
+                    if not token:
+                        raise Exception("No token received from kubernetes auth")
+
+                    self._token = VaultToken(
+                        token=token,
+                        accessor=auth_info.get("accessor", ""),
+                        policies=auth_info.get("policies", []),
+                        renewable=auth_info.get("renewable", False),
+                        lease_duration=auth_info.get("lease_duration", 3600),
+                    )
+
+                    self.logger.info(
+                        "Vault Kubernetes authentication successful",
+                        category=LogCategory.SECURITY,
+                        role=role,
+                        policies=self._token.policies,
+                    )
+
+                    return True
+                else:
+                    error_text = await response.text()
+                    raise Exception(f"Kubernetes authentication failed: {response.status} - {error_text}")
+
+        except FileNotFoundError:
+            raise ValueError(f"Service account token file not found: {self.config.service_account_token_path}")
+
+    async def _auth_aws(self) -> bool:
+        """Authenticate using AWS IAM credentials."""
+        # This is a placeholder implementation for AWS IAM authentication
+        # In production, this would integrate with AWS SDK to sign requests
+        raise NotImplementedError(
+            "AWS IAM authentication requires AWS SDK integration. "
+            "Please configure TOKEN, USERPASS, APPROLE, or KUBERNETES auth methods instead."
+        )
+
+    async def _auth_azure(self) -> bool:
+        """Authenticate using Azure Managed Identity."""
+        # This is a placeholder implementation for Azure authentication
+        # In production, this would integrate with Azure Identity SDK
+        raise NotImplementedError(
+            "Azure Managed Identity authentication requires Azure SDK integration. "
+            "Please configure TOKEN, USERPASS, APPROLE, or KUBERNETES auth methods instead."
+        )
 
     def _get_headers(self) -> Dict[str, str]:
         """Get headers for Vault requests."""

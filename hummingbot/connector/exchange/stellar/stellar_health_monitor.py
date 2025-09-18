@@ -113,8 +113,56 @@ class HealthCheckProvider:
     async def check_health(
         self, endpoint: str, session: aiohttp.ClientSession
     ) -> HealthCheckResult:
-        """Perform health check for an endpoint."""
-        raise NotImplementedError
+        """Perform basic health check for an endpoint.
+
+        This is the default implementation that performs a simple HTTP GET request.
+        Subclasses should override this method for more specific health checks.
+        """
+        start_time = time.time()
+
+        try:
+            async with session.get(endpoint, timeout=aiohttp.ClientTimeout(total=10)) as response:
+                response_time = time.time() - start_time
+
+                if response.status == 200:
+                    status = HealthStatus.HEALTHY
+                    error_message = None
+                elif response.status in [404, 500, 502, 503, 504]:
+                    status = HealthStatus.UNHEALTHY
+                    error_message = f"HTTP {response.status}"
+                else:
+                    status = HealthStatus.DEGRADED
+                    error_message = f"HTTP {response.status}"
+
+                return HealthCheckResult(
+                    endpoint=endpoint,
+                    check_type=HealthCheckType.CUSTOM,
+                    status=status,
+                    response_time=response_time,
+                    error_message=error_message,
+                    metadata={"status_code": response.status}
+                )
+
+        except asyncio.TimeoutError:
+            response_time = time.time() - start_time
+            return HealthCheckResult(
+                endpoint=endpoint,
+                check_type=HealthCheckType.CUSTOM,
+                status=HealthStatus.UNHEALTHY,
+                response_time=response_time,
+                error_message="Request timeout",
+                metadata={"error_type": "timeout"}
+            )
+        except Exception as e:
+            response_time = time.time() - start_time
+            return HealthCheckResult(
+                endpoint=endpoint,
+                check_type=HealthCheckType.CUSTOM,
+                status=HealthStatus.CRITICAL,
+                response_time=response_time,
+                error_message=str(e),
+                metadata={"error_type": type(e).__name__}
+            )
 
 
 class HorizonHealthChecker(HealthCheckProvider):
