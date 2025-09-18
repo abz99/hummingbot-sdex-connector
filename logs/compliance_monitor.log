@@ -124,3 +124,6 @@
 [2025-09-18 08:45:09,882] COMPLIANCE: Loaded 6 historical violations
 [2025-09-18 08:45:09,883] COMPLIANCE: 🔍 Running full compliance check...
 [2025-09-18 08:46:17,019] COMPLIANCE: has_committed_failing_tests check not fully implemented
+[2025-09-18 14:01:18,621] COMPLIANCE: Loaded 6 historical violations
+[2025-09-18 14:01:18,622] COMPLIANCE: 🔍 Running full compliance check...
+[2025-09-18 14:02:25,989] COMPLIANCE: has_committed_failing_tests check not fully implemented

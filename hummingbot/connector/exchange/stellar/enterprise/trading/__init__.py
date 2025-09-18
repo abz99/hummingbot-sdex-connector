@@ -20,14 +20,36 @@ Usage:
     await yield_farm.optimize_yields()
 """
 
-# Import trading modules when they're moved here
-# from .liquidity_management import StellarLiquidityManager
-# from .yield_farming import StellarYieldFarming
+# Import trading modules
+from .liquidity_management import (
+    StellarLiquidityManagement,
+    LiquidityStrategy,
+    InventoryTarget,
+    AssetInventory,
+    LiquidityProvision
+)
+from .yield_farming import (
+    StellarYieldFarming,
+    YieldStrategy,
+    FarmStatus,
+    YieldFarm,
+    YieldPosition
+)
 
 __all__ = [
-    # Will be populated as modules are moved
-    # "StellarLiquidityManager",
-    # "StellarYieldFarming",
+    # Liquidity management
+    "StellarLiquidityManagement",
+    "LiquidityStrategy",
+    "InventoryTarget",
+    "AssetInventory",
+    "LiquidityProvision",
+
+    # Yield farming
+    "StellarYieldFarming",
+    "YieldStrategy",
+    "FarmStatus",
+    "YieldFarm",
+    "YieldPosition",
 ]
 
 # Trading tier metadata
