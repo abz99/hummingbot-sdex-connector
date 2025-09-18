@@ -256,34 +256,37 @@ jobs:
           duration=$((end_time - start_time))
           
           echo "⏱️  Total indexing time: ${duration}s"
-          
+
           # Generate report
           python scripts/knowledge_base_indexer.py --report > benchmark-report.json
-          
-          # Analyze performance
-          python -c "
-          import json
-          
-          with open('benchmark-report.json') as f:
-              report = json.load(f)
-          
-          kb_count = report.get('knowledge_base_count', 0)
-          file_count = report.get('tracked_file_count', 0)
-          
-          print(f'📈 Performance metrics:')
-          print(f'   Knowledge bases: {kb_count}')
-          print(f'   Tracked files: {file_count}')
-          print(f'   Indexing time: ${duration}s')
-          print(f'   Files per second: {file_count / max(duration, 1):.1f}')
-          
-          # Performance thresholds
-          if duration > 60:
-              print('⚠️  Indexing took longer than 60 seconds')
-          elif duration > 30:
-              print('⚠️  Indexing took longer than 30 seconds')
-          else:
-              print('✅ Indexing performance acceptable')
-          " duration=$duration
+
+          # Analyze performance with duration passed as environment variable
+          DURATION_SEC=$duration python -c "
+import json
+import os
+
+duration = int(os.environ.get('DURATION_SEC', 0))
+
+with open('benchmark-report.json') as f:
+    report = json.load(f)
+
+kb_count = report.get('knowledge_base_count', 0)
+file_count = report.get('tracked_file_count', 0)
+
+print(f'📈 Performance metrics:')
+print(f'   Knowledge bases: {kb_count}')
+print(f'   Tracked files: {file_count}')
+print(f'   Indexing time: {duration}s')
+print(f'   Files per second: {file_count / max(duration, 1):.1f}')
+
+# Performance thresholds
+if duration > 60:
+    print('⚠️  Indexing took longer than 60 seconds')
+elif duration > 30:
+    print('⚠️  Indexing took longer than 30 seconds')
+else:
+    print('✅ Indexing performance acceptable')
+"
       
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
@@ -301,7 +304,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Scan for secrets in knowledge base files
-        uses: trufflesecurity/trufflehog@v3.63.2-beta
+        uses: trufflesecurity/trufflehog@v3.82.13
         with:
           path: ./knowledge/
           base: main
