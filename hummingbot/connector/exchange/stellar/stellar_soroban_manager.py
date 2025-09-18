@@ -78,34 +78,14 @@ class ContractOperation:
     timestamp: float = field(default_factory=time.time)
 
 
-@dataclass
-class SwapQuote:
-    """AMM swap quote."""
-
-    input_token: str
-    output_token: str
-    input_amount: Decimal
-    output_amount: Decimal
-    price_impact: Decimal
-    fee: Decimal
-    route: List[str]
-    expires_at: float
-    slippage_tolerance: Decimal = Decimal("0.005")  # 0.5% default
-
-
-@dataclass
-class LiquidityPool:
-    """Liquidity pool information."""
-
-    pool_id: str
-    token_a: str
-    token_b: str
-    reserve_a: Decimal
-    reserve_b: Decimal
-    total_supply: Decimal
-    fee_rate: Decimal
-    apy: Optional[Decimal] = None
-    volume_24h: Optional[Decimal] = None
+# DEPRECATED: These types have been moved to stellar_amm_types_unified.py
+# Import from there for new code:
+from .stellar_amm_types_unified import (
+    SwapQuote,
+    LiquidityPool,
+    SorobanSwapQuoteCompat,
+    SorobanLiquidityPoolCompat,
+)
 
 
 class SorobanContractManager:

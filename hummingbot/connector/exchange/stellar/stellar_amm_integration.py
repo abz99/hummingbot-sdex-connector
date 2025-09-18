@@ -36,77 +36,15 @@ from hummingbot.core.utils.async_utils import safe_ensure_future
 from hummingbot.logger import HummingbotLogger
 
 
-class AMMType(Enum):
-    """AMM protocol types supported on Stellar"""
-
-    CONSTANT_PRODUCT = "constant_product"
-    STABLE_SWAP = "stable_swap"
-    WEIGHTED_POOL = "weighted_pool"
-
-
-class LiquidityPoolStatus(Enum):
-    """Liquidity pool operational status"""
-
-    ACTIVE = "active"
-    PAUSED = "paused"
-    DEPRECATED = "deprecated"
-    EMERGENCY_STOP = "emergency_stop"
-
-
-@dataclass
-class LiquidityPool:
-    """Represents a Stellar liquidity pool"""
-
-    id: str
-    asset_a: Asset
-    asset_b: Asset
-    reserves_a: Decimal
-    reserves_b: Decimal
-    total_shares: Decimal
-    fee_bp: int  # Fee in basis points
-    amm_type: AMMType
-    status: LiquidityPoolStatus
-    last_updated: float = field(default_factory=time.time)
-    volume_24h: Decimal = field(default=Decimal("0"))
-    apy: Decimal = field(default=Decimal("0"))
-    total_value_locked: Decimal = field(default=Decimal("0"))
-
-    @property
-    def price_a_to_b(self) -> Decimal:
-        """Current price of asset A in terms of asset B"""
-        if self.reserves_a == 0:
-            return Decimal("0")
-        return self.reserves_b / self.reserves_a
-
-    @property
-    def price_b_to_a(self) -> Decimal:
-        """Current price of asset B in terms of asset A"""
-        if self.reserves_b == 0:
-            return Decimal("0")
-        return self.reserves_a / self.reserves_b
-
-
-@dataclass
-class SwapQuote:
-    """AMM swap quote with pricing and impact information"""
-
-    input_asset: Asset
-    output_asset: Asset
-    input_amount: Decimal
-    output_amount: Decimal
-    price: Decimal
-    price_impact: Decimal
-    fee: Decimal
-    slippage: Decimal
-    pool_id: str
-    route: List[str]  # Pool IDs in swap route
-    minimum_received: Decimal
-    expiry: float
-
-    @property
-    def is_expired(self) -> bool:
-        """Check if quote has expired"""
-        return time.time() > self.expiry
+# DEPRECATED: These types have been moved to stellar_amm_types_unified.py
+# Import from there for new code:
+from .stellar_amm_types_unified import (
+    AMMType,
+    LiquidityPoolStatus,
+    LiquidityPool,
+    SwapQuote,
+    LiquidityPosition,
+)
 
 
 @dataclass

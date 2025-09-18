@@ -13,7 +13,8 @@ from typing import Any, Dict, List, Optional, Union
 from stellar_sdk import Account, Keypair, TransactionEnvelope
 
 from .stellar_logging import get_stellar_logger, LogCategory
-from .stellar_security_manager import KeyMetadata, SecurityLevel
+from .stellar_security_manager import KeyMetadata
+from .stellar_security_types_unified import SecurityLevel
 
 
 class HardwareWalletStatus(Enum):

@@ -33,13 +33,15 @@ from .stellar_logging import correlation_id, get_stellar_logger, LogCategory
 from .stellar_metrics import get_stellar_metrics, StellarMetrics
 
 
-class AlertLevel(Enum):
-    """Alert severity levels."""
-
-    INFO = "info"
-    WARNING = "warning"
-    CRITICAL = "critical"
-    EMERGENCY = "emergency"
+# DEPRECATED: These types have been moved to stellar_observability_types_unified.py
+# Import from there for new code:
+from .stellar_observability_types_unified import (
+    AlertSeverity as AlertLevel,  # Alias for backward compatibility
+    AlertRule,
+    Alert,
+    HealthCheckStatus,
+    HealthCheckResult,
+)
 
 
 class ObservabilityEvent(Enum):
@@ -62,69 +64,7 @@ class ObservabilityEvent(Enum):
     QA_METRICS_STALE = "qa_metrics_stale"
 
 
-@dataclass
-class AlertRule:
-    """Definition of an alert rule."""
-
-    name: str
-    description: str
-    metric_name: str
-    threshold: Union[float, int]
-    comparison: str  # 'gt', 'lt', 'eq', 'gte', 'lte'
-    duration: int  # seconds
-    level: AlertLevel
-    labels: Dict[str, str] = None
-    enabled: bool = True
-
-    def __post_init__(self) -> None:
-        if self.labels is None:
-            self.labels = {}
-
-
-@dataclass
-class Alert:
-    """An active alert."""
-
-    rule_name: str
-    level: AlertLevel
-    message: str
-    metric_name: str
-    current_value: float
-    threshold: float
-    timestamp: float
-    labels: Dict[str, str] = None
-    correlation_id: str = None
-
-    def __post_init__(self) -> None:
-        if self.labels is None:
-            self.labels = {}
-
-
-class HealthCheckStatus(Enum):
-    """Health check status values."""
-
-    HEALTHY = "healthy"
-    DEGRADED = "degraded"
-    UNHEALTHY = "unhealthy"
-    UNKNOWN = "unknown"
-
-
-@dataclass
-class HealthCheckResult:
-    """Result of a health check."""
-
-    component: str
-    status: HealthCheckStatus
-    response_time: float
-    message: str = ""
-    details: Dict[str, Any] = None
-    timestamp: float = None
-
-    def __post_init__(self) -> None:
-        if self.details is None:
-            self.details = {}
-        if self.timestamp is None:
-            self.timestamp = time.time()
+# AlertRule, Alert, HealthCheckStatus, and HealthCheckResult are now imported from unified types above
 
 
 class StellarObservabilityFramework:

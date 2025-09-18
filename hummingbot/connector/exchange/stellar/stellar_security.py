@@ -15,24 +15,12 @@ if TYPE_CHECKING:
     from .stellar_observability import StellarObservabilityFramework
 
 
-class SecurityProvider(Enum):
-    """Supported security providers."""
-
-    LOCAL = "local"
-    HSM_AWS = "hsm_aws"
-    HSM_AZURE = "hsm_azure"
-    HSM_THALES = "hsm_thales"
-    MPC = "mpc"
-    HARDWARE_WALLET = "hardware_wallet"
-
-
-@dataclass
-class SecurityConfig:
-    """Configuration for security providers."""
-
-    provider: SecurityProvider
-    config: Dict[str, Any]
-    backup_providers: List[SecurityProvider] = None
+# DEPRECATED: These types have been moved to stellar_security_types_unified.py
+# Import from there for new code:
+from .stellar_security_types_unified import (
+    SecurityProvider,
+    EnterpriseSecurityConfig as SecurityConfig,
+)
 
 
 class EnterpriseSecurityFramework:

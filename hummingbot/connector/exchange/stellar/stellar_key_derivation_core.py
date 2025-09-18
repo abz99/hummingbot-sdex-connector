@@ -26,7 +26,7 @@ from .stellar_key_derivation_types import (
     MasterSeed,
 )
 from .stellar_logging import get_stellar_logger, LogCategory
-from .stellar_security_types import SecurityLevel
+from .stellar_security_types_unified import SecurityLevel
 
 
 class SecureKeyDerivation:

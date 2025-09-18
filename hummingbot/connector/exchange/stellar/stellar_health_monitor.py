@@ -18,93 +18,19 @@ from .stellar_logging import get_stellar_logger, LogCategory, with_correlation_i
 from .stellar_metrics import get_stellar_metrics
 
 
-class HealthStatus(Enum):
-    """Health status levels."""
-
-    HEALTHY = auto()
-    DEGRADED = auto()
-    UNHEALTHY = auto()
-    CRITICAL = auto()
-    UNKNOWN = auto()
-
-
-class AlertSeverity(Enum):
-    """Alert severity levels."""
-
-    INFO = auto()
-    WARNING = auto()
-    ERROR = auto()
-    CRITICAL = auto()
+# DEPRECATED: These types have been moved to stellar_observability_types_unified.py
+# Import from there for new code:
+from .stellar_observability_types_unified import (
+    HealthStatus,
+    AlertSeverity,
+    HealthCheckType,
+    HealthCheckResult,
+    Alert,
+    EndpointHealth,
+)
 
 
-class HealthCheckType(Enum):
-    """Types of health checks."""
-
-    HORIZON_API = auto()
-    SOROBAN_RPC = auto()
-    CORE_NODE = auto()
-    FRIENDBOT = auto()
-    CUSTOM = auto()
-
-
-@dataclass
-class HealthCheckResult:
-    """Result of a health check."""
-
-    endpoint: str
-    check_type: HealthCheckType
-    status: HealthStatus
-    response_time: float
-    timestamp: datetime = field(default_factory=datetime.utcnow)
-    error_message: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class EndpointHealth:
-    """Health tracking for an endpoint."""
-
-    url: str
-    check_type: HealthCheckType
-    current_status: HealthStatus = HealthStatus.UNKNOWN
-    consecutive_failures: int = 0
-    consecutive_successes: int = 0
-    last_success: Optional[datetime] = None
-    last_failure: Optional[datetime] = None
-    total_checks: int = 0
-    total_failures: int = 0
-    avg_response_time: float = 0.0
-    recent_results: List[HealthCheckResult] = field(default_factory=list)
-
-    def get_success_rate(self, window_minutes: int = 60) -> float:
-        """Get success rate over time window."""
-        if not self.recent_results:
-            return 0.0
-
-        cutoff = datetime.utcnow() - timedelta(minutes=window_minutes)
-        recent = [r for r in self.recent_results if r.timestamp > cutoff]
-
-        if not recent:
-            return 0.0
-
-        successes = sum(1 for r in recent if r.status == HealthStatus.HEALTHY)
-        return successes / len(recent)
-
-
-@dataclass
-class Alert:
-    """Health monitoring alert."""
-
-    id: str
-    severity: AlertSeverity
-    title: str
-    message: str
-    endpoint: Optional[str] = None
-    check_type: Optional[HealthCheckType] = None
-    timestamp: datetime = field(default_factory=datetime.utcnow)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    acknowledged: bool = False
-    resolved: bool = False
+# EndpointHealth and Alert are now imported from unified types above
 
 
 class HealthCheckProvider:

@@ -15,7 +15,7 @@ from .stellar_account_pool_manager import StellarAccountPoolManager
 from .stellar_key_derivation import HierarchicalKeyManager
 from .stellar_logging import get_stellar_logger, LogCategory
 from .stellar_network_manager import StellarNetwork, StellarNetworkManager
-from .stellar_security_types import SecurityLevel
+from .stellar_security_types_unified import SecurityLevel
 from .stellar_test_account_types import (
     AccountStatus,
     TestAccount,

@@ -10,45 +10,14 @@ from enum import auto, Enum
 from typing import Any, Dict, List, Optional, Protocol, runtime_checkable, Tuple
 
 
-class SecurityLevel(Enum):
-    """Security levels for key operations."""
-
-    DEVELOPMENT = auto()
-    TESTING = auto()
-    STAGING = auto()
-    PRODUCTION = auto()
-
-
-class KeyStoreType(Enum):
-    """Types of key storage backends."""
-
-    MEMORY = auto()
-    FILE_SYSTEM = auto()
-    HSM = auto()
-    HARDWARE_WALLET = auto()
-    VAULT = auto()
-
-
-class HardwareWalletType(Enum):
-    """Supported hardware wallet types."""
-
-    LEDGER = auto()
-    TREZOR = auto()
-
-
-@dataclass
-class SecurityConfig:
-    """Security configuration settings."""
-
-    security_level: SecurityLevel = SecurityLevel.DEVELOPMENT
-    require_hardware_security: bool = False
-    key_derivation_iterations: int = 100000
-    session_timeout_minutes: int = 30
-    max_failed_attempts: int = 3
-    enable_audit_logging: bool = True
-    encryption_algorithm: str = "AES-256-GCM"
-    backup_enabled: bool = True
-    backup_encryption: bool = True
+# DEPRECATED: These types have been moved to stellar_security_types_unified.py
+# Import from there for new code:
+from .stellar_security_types_unified import (
+    SecurityLevel,
+    KeyStoreType,
+    HardwareWalletType,
+    SecurityConfig,
+)
 
 
 @dataclass

@@ -15,7 +15,8 @@ import aiohttp
 from stellar_sdk import Keypair
 
 from .stellar_logging import get_stellar_logger, LogCategory
-from .stellar_security_manager import KeyMetadata, KeyStoreBackend, KeyStoreType, SecurityLevel
+from .stellar_security_manager import KeyMetadata, KeyStoreBackend
+from .stellar_security_types_unified import KeyStoreType, SecurityLevel
 
 
 class VaultAuthMethod(Enum):

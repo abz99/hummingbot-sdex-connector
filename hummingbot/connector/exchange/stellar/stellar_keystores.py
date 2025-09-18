@@ -11,7 +11,8 @@ import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from .stellar_logging import get_stellar_logger, LogCategory
-from .stellar_security_types import KeyMetadata, KeyStoreType, SecurityLevel
+from .stellar_security_types import KeyMetadata
+from .stellar_security_types_unified import KeyStoreType, SecurityLevel
 
 
 class MemoryKeyStore:

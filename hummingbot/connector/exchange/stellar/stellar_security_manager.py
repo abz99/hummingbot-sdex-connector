@@ -15,6 +15,8 @@ from .stellar_security_types import (
     KeyMetadata,
     KeyStoreBackend,
     KeyStoreType,
+)
+from .stellar_security_types_unified import (
     SecurityConfig,
     SecurityLevel,
 )

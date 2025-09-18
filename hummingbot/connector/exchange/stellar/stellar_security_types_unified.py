@@ -134,7 +134,7 @@ class NetworkSecurityConfigModel(BaseModel):
 
 # Protocol definitions for type checking
 @runtime_checkable
-class SecurityProvider(Protocol):
+class SecurityProviderProtocol(Protocol):
     """Protocol for security provider implementations."""
 
     async def sign_transaction(self, transaction: Any) -> bytes:
@@ -147,7 +147,7 @@ class SecurityProvider(Protocol):
 
 
 @runtime_checkable
-class KeyStore(Protocol):
+class KeyStoreProtocol(Protocol):
     """Protocol for key storage implementations."""
 
     async def store_key(self, key_id: str, key_data: bytes) -> bool:
@@ -214,8 +214,8 @@ __all__ = [
     "UnifiedSecurityConfig",
     "NetworkSecurityConfigModel",
     # Protocols
-    "SecurityProvider",
-    "KeyStore",
+    "SecurityProviderProtocol",
+    "KeyStoreProtocol",
     # Backward compatibility aliases
     "SecurityLevel",  # Use SecurityEnvironment instead
     "SecurityConfig",  # Use UnifiedSecurityConfig instead
