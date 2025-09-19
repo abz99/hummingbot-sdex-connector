@@ -18,8 +18,8 @@ from .stellar_security_types import (
 )
 from .stellar_security_types_unified import (
     SecurityConfig,
-    SecurityEnvironment as SecurityLevel,
 )
+from .stellar_security_types_unified import SecurityEnvironment as SecurityLevel
 from .stellar_security_validation import (
     create_default_rate_limits,
     RateLimitConfig,

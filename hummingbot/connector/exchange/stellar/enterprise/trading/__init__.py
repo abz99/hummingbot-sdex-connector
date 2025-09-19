@@ -22,19 +22,13 @@ Usage:
 
 # Import trading modules
 from .liquidity_management import (
-    StellarLiquidityManagement,
-    LiquidityStrategy,
-    InventoryTarget,
     AssetInventory,
-    LiquidityProvision
+    InventoryTarget,
+    LiquidityProvision,
+    LiquidityStrategy,
+    StellarLiquidityManagement,
 )
-from .yield_farming import (
-    StellarYieldFarming,
-    YieldStrategy,
-    FarmStatus,
-    YieldFarm,
-    YieldPosition
-)
+from .yield_farming import FarmStatus, StellarYieldFarming, YieldFarm, YieldPosition, YieldStrategy
 
 __all__ = [
     # Liquidity management
@@ -43,7 +37,6 @@ __all__ = [
     "InventoryTarget",
     "AssetInventory",
     "LiquidityProvision",
-
     # Yield farming
     "StellarYieldFarming",
     "YieldStrategy",
@@ -58,8 +51,5 @@ TIER_INFO = {
     "business_value": "HIGH",
     "total_lines": 2263,
     "modules": 2,
-    "features": [
-        "liquidity_management",
-        "yield_farming"
-    ]
+    "features": ["liquidity_management", "yield_farming"],
 }

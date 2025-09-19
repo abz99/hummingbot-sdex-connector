@@ -17,18 +17,16 @@ from .stellar_error_classification import ErrorContext, StellarErrorManager
 from .stellar_logging import get_stellar_logger, LogCategory, with_correlation_id
 from .stellar_metrics import get_stellar_metrics
 
-
 # DEPRECATED: These types have been moved to stellar_observability_types_unified.py
 # Import from there for new code:
 from .stellar_observability_types_unified import (
-    HealthStatus,
-    AlertSeverity,
-    HealthCheckType,
-    HealthCheckResult,
     Alert,
+    AlertSeverity,
     EndpointHealth,
+    HealthCheckResult,
+    HealthCheckType,
+    HealthStatus,
 )
-
 
 # EndpointHealth and Alert are now imported from unified types above
 
@@ -66,7 +64,7 @@ class HealthCheckProvider:
                     status=status,
                     response_time=response_time,
                     error_message=error_message,
-                    metadata={"status_code": response.status}
+                    metadata={"status_code": response.status},
                 )
 
         except asyncio.TimeoutError:
@@ -77,7 +75,7 @@ class HealthCheckProvider:
                 status=HealthStatus.UNHEALTHY,
                 response_time=response_time,
                 error_message="Request timeout",
-                metadata={"error_type": "timeout"}
+                metadata={"error_type": "timeout"},
             )
         except Exception as e:
             response_time = time.time() - start_time
@@ -87,7 +85,7 @@ class HealthCheckProvider:
                 status=HealthStatus.CRITICAL,
                 response_time=response_time,
                 error_message=str(e),
-                metadata={"error_type": type(e).__name__}
+                metadata={"error_type": type(e).__name__},
             )
 
 
@@ -372,7 +370,9 @@ class StellarHealthMonitor:
         """Add a callback for endpoint recoveries."""
         self.recovery_callbacks.append(callback)
 
-    async def check_health(self, endpoint: str, session: aiohttp.ClientSession) -> HealthCheckResult:
+    async def check_health(
+        self, endpoint: str, session: aiohttp.ClientSession
+    ) -> HealthCheckResult:
         """Check health of an endpoint using appropriate health checker.
 
         This method provides compatibility with tests that expect a direct check_health method.

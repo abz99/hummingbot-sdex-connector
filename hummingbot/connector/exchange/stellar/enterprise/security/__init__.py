@@ -22,9 +22,11 @@ Usage:
     await hw_wallet.connect_ledger()
 """
 
-# Import security modules
-from .vault_integration import VaultKeyStore, VaultConfig, VaultAuthMethod
 from .hardware_wallets import HardwareWalletManager, LedgerWallet, TrezorWallet
+
+# Import security modules
+from .vault_integration import VaultAuthMethod, VaultConfig, VaultKeyStore
+
 # from .security_hardening import StellarSecurityHardening  # TODO: Move and update
 # from .security_metrics import StellarSecurityMetrics      # TODO: Move and update
 
@@ -33,12 +35,10 @@ __all__ = [
     "VaultKeyStore",
     "VaultConfig",
     "VaultAuthMethod",
-
     # Hardware wallets
     "HardwareWalletManager",
     "LedgerWallet",
     "TrezorWallet",
-
     # TODO: Enable when moved
     # "StellarSecurityHardening",
     # "StellarSecurityMetrics",
@@ -50,10 +50,5 @@ TIER_INFO = {
     "business_value": "CRITICAL",
     "total_lines": 3047,
     "modules": 4,
-    "features": [
-        "vault_integration",
-        "hardware_wallets",
-        "security_hardening",
-        "security_metrics"
-    ]
+    "features": ["vault_integration", "hardware_wallets", "security_hardening", "security_metrics"],
 }

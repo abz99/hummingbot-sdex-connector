@@ -35,15 +35,14 @@ from hummingbot.core.data_type.common import TradeType
 from hummingbot.core.utils.async_utils import safe_ensure_future
 from hummingbot.logger import HummingbotLogger
 
-
 # DEPRECATED: These types have been moved to stellar_amm_types_unified.py
 # Import from there for new code:
 from .stellar_amm_types_unified import (
     AMMType,
-    LiquidityPoolStatus,
     LiquidityPool,
-    SwapQuote,
+    LiquidityPoolStatus,
     LiquidityPosition,
+    SwapQuote,
 )
 
 

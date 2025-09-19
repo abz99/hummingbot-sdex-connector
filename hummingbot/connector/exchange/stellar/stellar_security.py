@@ -17,9 +17,9 @@ if TYPE_CHECKING:
 
 # DEPRECATED: These types have been moved to stellar_security_types_unified.py
 # Import from there for new code:
+from .stellar_security_types_unified import EnterpriseSecurityConfig as SecurityConfig
 from .stellar_security_types_unified import (
     SecurityProvider,
-    EnterpriseSecurityConfig as SecurityConfig,
 )
 
 

@@ -48,6 +48,6 @@ TIER_INFO = {
         "performance_optimizer",
         "web_assistant",
         "user_stream_tracker",
-        "utilities"
-    ]
+        "utilities",
+    ],
 }

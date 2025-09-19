@@ -772,14 +772,18 @@ class ModernStellarOrderManager:
                 correlation_id,
             )
 
-    def _validate_asset_pair(self, selling_asset: Asset, buying_asset: Asset, correlation_id: str) -> None:
+    def _validate_asset_pair(
+        self, selling_asset: Asset, buying_asset: Asset, correlation_id: str
+    ) -> None:
         """Validate asset pair compatibility."""
         if selling_asset == buying_asset:
             raise OrderValidationError(
                 "Selling and buying assets cannot be the same", "SameAssets", correlation_id
             )
 
-    async def _validate_asset_support(self, selling_asset: Asset, buying_asset: Asset, correlation_id: str) -> None:
+    async def _validate_asset_support(
+        self, selling_asset: Asset, buying_asset: Asset, correlation_id: str
+    ) -> None:
         """Validate that assets are supported by the system."""
         try:
             await self.asset_manager.validate_asset(selling_asset)

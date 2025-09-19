@@ -6,11 +6,11 @@ This module consolidates duplicate observability-related types across the codeba
 to establish a single source of truth while maintaining semantic clarity.
 """
 
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import auto, Enum
 from typing import Any, Dict, List, Optional, Union
-import time
 
 try:
     from pydantic import BaseModel, Field
@@ -20,12 +20,13 @@ except ImportError:
         pass
 
     def Field(**kwargs):
-        return kwargs.get('default')
+        return kwargs.get("default")
 
 
 # =============================================================================
 # ALERT SYSTEM TYPES
 # =============================================================================
+
 
 class AlertSeverity(Enum):
     """Unified alert severity levels for all monitoring systems."""
@@ -115,6 +116,7 @@ class AlertRule:
 # =============================================================================
 # HEALTH CHECK TYPES
 # =============================================================================
+
 
 class HealthStatus(Enum):
     """Unified health status levels."""
@@ -211,7 +213,7 @@ class EndpointHealth:
 
         # Keep only recent results
         if len(self.recent_results) > self.max_recent_results:
-            self.recent_results = self.recent_results[-self.max_recent_results:]
+            self.recent_results = self.recent_results[-self.max_recent_results :]
 
         # Update statistics
         self.total_checks += 1
@@ -264,9 +266,16 @@ HealthCheckStatus = HealthStatus
 class HealthMonitorAlertCompat:
     """Backward compatibility for health monitor Alert class."""
 
-    def __init__(self, id: str, severity: AlertSeverity, title: str, message: str,
-                 endpoint: Optional[str] = None, check_type: Optional[HealthCheckType] = None,
-                 **kwargs):
+    def __init__(
+        self,
+        id: str,
+        severity: AlertSeverity,
+        title: str,
+        message: str,
+        endpoint: Optional[str] = None,
+        check_type: Optional[HealthCheckType] = None,
+        **kwargs,
+    ):
         self.alert = UnifiedAlert(
             id=id,
             severity=severity,
@@ -275,7 +284,7 @@ class HealthMonitorAlertCompat:
             message=message,
             endpoint=endpoint,
             source_component=str(check_type) if check_type else None,
-            **kwargs
+            **kwargs,
         )
 
     def __getattr__(self, name):
@@ -285,9 +294,16 @@ class HealthMonitorAlertCompat:
 class ObservabilityAlertCompat:
     """Backward compatibility for observability Alert class."""
 
-    def __init__(self, rule_name: str, level: AlertSeverity, message: str,
-                 metric_name: str, current_value: float, threshold: float,
-                 **kwargs):
+    def __init__(
+        self,
+        rule_name: str,
+        level: AlertSeverity,
+        message: str,
+        metric_name: str,
+        current_value: float,
+        threshold: float,
+        **kwargs,
+    ):
         self.alert = UnifiedAlert(
             id=f"{rule_name}_{int(time.time())}",
             severity=level,
@@ -298,7 +314,7 @@ class ObservabilityAlertCompat:
             current_value=current_value,
             threshold=threshold,
             rule_name=rule_name,
-            **kwargs
+            **kwargs,
         )
 
     def __getattr__(self, name):
@@ -308,9 +324,16 @@ class ObservabilityAlertCompat:
 class HealthCheckResultCompat:
     """Backward compatibility for different HealthCheckResult field names."""
 
-    def __init__(self, component: Optional[str] = None, endpoint: Optional[str] = None,
-                 check_type: Optional[HealthCheckType] = None, status: Optional[HealthStatus] = None,
-                 response_time: float = 0.0, message: str = "", **kwargs):
+    def __init__(
+        self,
+        component: Optional[str] = None,
+        endpoint: Optional[str] = None,
+        check_type: Optional[HealthCheckType] = None,
+        status: Optional[HealthStatus] = None,
+        response_time: float = 0.0,
+        message: str = "",
+        **kwargs,
+    ):
         # Determine component name
         comp = component or endpoint or "unknown"
 
@@ -321,12 +344,12 @@ class HealthCheckResultCompat:
             response_time=response_time,
             message=message,
             endpoint=endpoint,
-            **kwargs
+            **kwargs,
         )
 
     def __getattr__(self, name):
         # Map old field names to new ones
-        if name == 'timestamp' and hasattr(self.result, 'timestamp_float'):
+        if name == "timestamp" and hasattr(self.result, "timestamp_float"):
             return self.result.timestamp_float
         return getattr(self.result, name)
 
@@ -346,13 +369,11 @@ __all__ = [
     "HealthCheckType",
     "UnifiedHealthCheckResult",
     "EndpointHealth",
-
     # Backward compatibility aliases
     "Alert",  # -> UnifiedAlert
     "AlertLevel",  # -> AlertSeverity
     "HealthCheckResult",  # -> UnifiedHealthCheckResult
     "HealthCheckStatus",  # -> HealthStatus
-
     # Compatibility wrappers
     "HealthMonitorAlertCompat",
     "ObservabilityAlertCompat",

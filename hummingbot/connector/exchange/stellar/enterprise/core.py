@@ -7,12 +7,12 @@ features in the Stellar connector while maintaining backward compatibility.
 """
 
 import asyncio
+import importlib
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Type, Union
-import importlib
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Type, Union
 
 from ..stellar_logging import get_stellar_logger, LogCategory
 
@@ -20,9 +20,9 @@ from ..stellar_logging import get_stellar_logger, LogCategory
 class FeatureTier(Enum):
     """Enterprise feature tiers by business value."""
 
-    CORE = "core"              # Always enabled core functionality
-    SECURITY = "security"      # Enterprise security features
-    TRADING = "trading"        # Advanced trading and DeFi features
+    CORE = "core"  # Always enabled core functionality
+    SECURITY = "security"  # Enterprise security features
+    TRADING = "trading"  # Advanced trading and DeFi features
     INFRASTRUCTURE = "infrastructure"  # Development and operations tools
 
 
@@ -62,7 +62,7 @@ class FeatureDefinition:
 
     # Business metadata
     business_value: str = "MEDIUM"  # LOW, MEDIUM, HIGH, CRITICAL
-    risk_level: str = "MEDIUM"     # LOW, MEDIUM, HIGH, CRITICAL
+    risk_level: str = "MEDIUM"  # LOW, MEDIUM, HIGH, CRITICAL
 
     # Technical metadata
     estimated_overhead_ms: int = 0
@@ -102,8 +102,8 @@ class EnterpriseFeatureConfig:
         """Get list of enabled feature IDs."""
         enabled = []
         for field_name, value in self.__dict__.items():
-            if field_name.endswith('_enabled') and value:
-                feature_id = field_name.replace('_enabled', '')
+            if field_name.endswith("_enabled") and value:
+                feature_id = field_name.replace("_enabled", "")
                 enabled.append(feature_id)
         return enabled
 
@@ -137,7 +137,7 @@ class StellarEnterpriseFeatureRegistry:
             required_config=["vault_url", "vault_auth_method"],
             required_credentials=["vault_token"],
             estimated_overhead_ms=50,
-            memory_overhead_mb=25
+            memory_overhead_mb=25,
         )
 
         self._features["hardware_wallet"] = FeatureDefinition(
@@ -151,7 +151,7 @@ class StellarEnterpriseFeatureRegistry:
             risk_level="MEDIUM",
             required_config=["supported_wallets"],
             estimated_overhead_ms=100,
-            memory_overhead_mb=15
+            memory_overhead_mb=15,
         )
 
         self._features["security_hardening"] = FeatureDefinition(
@@ -165,7 +165,7 @@ class StellarEnterpriseFeatureRegistry:
             risk_level="MEDIUM",
             required_config=["security_policy"],
             estimated_overhead_ms=25,
-            memory_overhead_mb=10
+            memory_overhead_mb=10,
         )
 
         self._features["security_metrics"] = FeatureDefinition(
@@ -179,7 +179,7 @@ class StellarEnterpriseFeatureRegistry:
             risk_level="LOW",
             dependencies=[FeatureDependency("security_hardening", required=False)],
             estimated_overhead_ms=15,
-            memory_overhead_mb=20
+            memory_overhead_mb=20,
         )
 
         # Trading Tier Features
@@ -195,7 +195,7 @@ class StellarEnterpriseFeatureRegistry:
             dependencies=[FeatureDependency("yield_farming", required=False)],
             required_config=["liquidity_strategy", "risk_limits"],
             estimated_overhead_ms=75,
-            memory_overhead_mb=50
+            memory_overhead_mb=50,
         )
 
         self._features["yield_farming"] = FeatureDefinition(
@@ -209,7 +209,7 @@ class StellarEnterpriseFeatureRegistry:
             risk_level="HIGH",
             required_config=["yield_strategy", "max_risk_exposure"],
             estimated_overhead_ms=100,
-            memory_overhead_mb=40
+            memory_overhead_mb=40,
         )
 
         # Infrastructure Tier Features
@@ -223,7 +223,7 @@ class StellarEnterpriseFeatureRegistry:
             business_value="MEDIUM",
             risk_level="LOW",
             estimated_overhead_ms=10,
-            memory_overhead_mb=5
+            memory_overhead_mb=5,
         )
 
         self._features["load_testing"] = FeatureDefinition(
@@ -236,7 +236,7 @@ class StellarEnterpriseFeatureRegistry:
             business_value="MEDIUM",
             risk_level="LOW",
             estimated_overhead_ms=0,  # Only active during testing
-            memory_overhead_mb=30
+            memory_overhead_mb=30,
         )
 
         self._features["performance_optimizer"] = FeatureDefinition(
@@ -249,7 +249,7 @@ class StellarEnterpriseFeatureRegistry:
             business_value="MEDIUM",
             risk_level="LOW",
             estimated_overhead_ms=-20,  # Negative overhead (optimization)
-            memory_overhead_mb=15
+            memory_overhead_mb=15,
         )
 
     async def initialize_features(self) -> Dict[str, FeatureStatus]:
@@ -287,8 +287,13 @@ class StellarEnterpriseFeatureRegistry:
 
         # Validate dependencies
         for dependency in feature.dependencies:
-            if dependency.required and dependency.feature_id not in self.config.get_enabled_features():
-                raise ValueError(f"Required dependency {dependency.feature_id} not enabled for {feature_id}")
+            if (
+                dependency.required
+                and dependency.feature_id not in self.config.get_enabled_features()
+            ):
+                raise ValueError(
+                    f"Required dependency {dependency.feature_id} not enabled for {feature_id}"
+                )
 
         # Load module
         try:
@@ -307,7 +312,9 @@ class StellarEnterpriseFeatureRegistry:
         feature_instance = feature_class()
 
         # Initialize if it has an async initialize method
-        if hasattr(feature_instance, 'initialize') and asyncio.iscoroutinefunction(feature_instance.initialize):
+        if hasattr(feature_instance, "initialize") and asyncio.iscoroutinefunction(
+            feature_instance.initialize
+        ):
             await feature_instance.initialize()
 
         self._feature_instances[feature_id] = feature_instance
@@ -329,17 +336,19 @@ class StellarEnterpriseFeatureRegistry:
         for feature_id in enabled_features:
             if feature_id in self._features:
                 feature = self._features[feature_id]
-                info.append({
-                    "feature_id": feature.feature_id,
-                    "name": feature.name,
-                    "description": feature.description,
-                    "tier": feature.tier.value,
-                    "status": feature.status.value,
-                    "business_value": feature.business_value,
-                    "overhead_ms": feature.estimated_overhead_ms,
-                    "memory_mb": feature.memory_overhead_mb,
-                    "last_error": feature.last_error
-                })
+                info.append(
+                    {
+                        "feature_id": feature.feature_id,
+                        "name": feature.name,
+                        "description": feature.description,
+                        "tier": feature.tier.value,
+                        "status": feature.status.value,
+                        "business_value": feature.business_value,
+                        "overhead_ms": feature.estimated_overhead_ms,
+                        "memory_mb": feature.memory_overhead_mb,
+                        "last_error": feature.last_error,
+                    }
+                )
 
         return info
 
@@ -362,7 +371,7 @@ class StellarEnterpriseFeatureRegistry:
         return {
             "time_overhead_ms": total_time_ms,
             "memory_overhead_mb": total_memory_mb,
-            "feature_count": len(enabled_features)
+            "feature_count": len(enabled_features),
         }
 
 
@@ -375,7 +384,9 @@ def get_enterprise_features() -> Optional[StellarEnterpriseFeatureRegistry]:
     return _feature_registry
 
 
-def initialize_enterprise_features(config: EnterpriseFeatureConfig) -> StellarEnterpriseFeatureRegistry:
+def initialize_enterprise_features(
+    config: EnterpriseFeatureConfig,
+) -> StellarEnterpriseFeatureRegistry:
     """Initialize the global enterprise features registry."""
     global _feature_registry
     _feature_registry = StellarEnterpriseFeatureRegistry(config)
@@ -408,5 +419,5 @@ __all__ = [
     "initialize_enterprise_features",
     "get_enterprise_features",
     "is_feature_enabled",
-    "get_feature"
+    "get_feature",
 ]

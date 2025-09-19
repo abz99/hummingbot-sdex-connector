@@ -72,14 +72,14 @@ class TestSecurityReports:
         QA_ID: REQ-SEC-002b
         Acceptance Criteria: Bandit report exists and is valid JSON with expected fields
         """
+        import tempfile
+        import json
+
         project_root = Path(__file__).parent.parent.parent
         bandit_report = project_root / "bandit-report.json"
 
         if not bandit_report.exists():
             # Bandit report not found - create minimal mock for testing
-            import tempfile
-            import json
-
             # Create temporary bandit report for testing
             mock_report = {
                 "metrics": {"total_lines": 1000, "lines_skipped": 0},

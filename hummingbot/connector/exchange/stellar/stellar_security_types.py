@@ -9,14 +9,13 @@ from dataclasses import dataclass, field
 from enum import auto, Enum
 from typing import Any, Dict, List, Optional, Protocol, runtime_checkable, Tuple
 
-
 # DEPRECATED: These types have been moved to stellar_security_types_unified.py
 # Import from there for new code:
 from .stellar_security_types_unified import (
-    SecurityLevel,
-    KeyStoreType,
     HardwareWalletType,
+    KeyStoreType,
     SecurityConfig,
+    SecurityLevel,
 )
 
 

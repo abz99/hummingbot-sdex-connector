@@ -32,15 +32,18 @@ from prometheus_client import (
 from .stellar_logging import correlation_id, get_stellar_logger, LogCategory
 from .stellar_metrics import get_stellar_metrics, StellarMetrics
 
-
 # DEPRECATED: These types have been moved to stellar_observability_types_unified.py
 # Import from there for new code:
 from .stellar_observability_types_unified import (
-    AlertSeverity as AlertLevel,  # Alias for backward compatibility
-    AlertRule,
     Alert,
-    HealthCheckStatus,
+    AlertRule,
+)
+from .stellar_observability_types_unified import (
+    AlertSeverity as AlertLevel,  # Alias for backward compatibility
+)
+from .stellar_observability_types_unified import (
     HealthCheckResult,
+    HealthCheckStatus,
 )
 
 
@@ -839,9 +842,7 @@ class StellarObservabilityFramework:
     def _record_qa_event_metrics(self, event_type: ObservabilityEvent) -> None:
         """Record metrics for QA event."""
         if self.observability_events:
-            self.observability_events.labels(
-                event_type=event_type.value, status="triggered"
-            ).inc()
+            self.observability_events.labels(event_type=event_type.value, status="triggered").inc()
 
     def _log_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]) -> None:
         """Log QA event with context information."""
@@ -854,7 +855,9 @@ class StellarObservabilityFramework:
             },
         )
 
-    async def _dispatch_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]) -> None:
+    async def _dispatch_qa_event(
+        self, event_type: ObservabilityEvent, context: Dict[str, Any]
+    ) -> None:
         """Dispatch QA event to appropriate handler."""
         qa_event_handlers = {
             ObservabilityEvent.QA_COVERAGE_LOW: self._handle_coverage_alert,

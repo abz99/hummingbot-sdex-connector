@@ -18,7 +18,7 @@ except ImportError:
         pass
 
     def Field(**kwargs):
-        return kwargs.get('default')
+        return kwargs.get("default")
 
 
 class SecurityEnvironment(Enum):
@@ -181,23 +181,23 @@ class SecurityConfigCompat:
         self._params = kwargs
 
         # Common attributes from existing usage patterns
-        self.security_level = kwargs.get('security_level', SecurityEnvironment.DEVELOPMENT)
-        self.require_hardware_security = kwargs.get('require_hardware_security', False)
-        self.verify_certificates = kwargs.get('verify_certificates', True)
-        self.provider = kwargs.get('provider', SecurityProvider.LOCAL)
-        self.config = kwargs.get('config', {})
-        self.backup_providers = kwargs.get('backup_providers', [])
+        self.security_level = kwargs.get("security_level", SecurityEnvironment.DEVELOPMENT)
+        self.require_hardware_security = kwargs.get("require_hardware_security", False)
+        self.verify_certificates = kwargs.get("verify_certificates", True)
+        self.provider = kwargs.get("provider", SecurityProvider.LOCAL)
+        self.config = kwargs.get("config", {})
+        self.backup_providers = kwargs.get("backup_providers", [])
 
         # Additional compatibility attributes
-        self.min_tls_version = kwargs.get('min_tls_version', "1.2")
-        self.request_signing_enabled = kwargs.get('request_signing_enabled', True)
-        self.algorithm = kwargs.get('algorithm', "ed25519")
-        self.key_derivation_iterations = kwargs.get('key_derivation_iterations', 100000)
-        self.session_timeout_minutes = kwargs.get('session_timeout_minutes', 30)
-        self.max_failed_attempts = kwargs.get('max_failed_attempts', 3)
-        self.enable_audit_logging = kwargs.get('enable_audit_logging', True)
-        self.encryption_algorithm = kwargs.get('encryption_algorithm', "AES-256-GCM")
-        self.backup_enabled = kwargs.get('backup_enabled', True)
+        self.min_tls_version = kwargs.get("min_tls_version", "1.2")
+        self.request_signing_enabled = kwargs.get("request_signing_enabled", True)
+        self.algorithm = kwargs.get("algorithm", "ed25519")
+        self.key_derivation_iterations = kwargs.get("key_derivation_iterations", 100000)
+        self.session_timeout_minutes = kwargs.get("session_timeout_minutes", 30)
+        self.max_failed_attempts = kwargs.get("max_failed_attempts", 3)
+        self.enable_audit_logging = kwargs.get("enable_audit_logging", True)
+        self.encryption_algorithm = kwargs.get("encryption_algorithm", "AES-256-GCM")
+        self.backup_enabled = kwargs.get("backup_enabled", True)
 
 
 # Use compatibility wrapper as default SecurityConfig

@@ -174,9 +174,7 @@ class StellarUserStreamTracker:
         task = asyncio.create_task(self._stream_account_events(account_id, session))
         self._stream_tasks[account_id] = task
 
-    async def _stream_account_events(
-        self, account_id: str, session: aiohttp.ClientSession
-    ) -> None:
+    async def _stream_account_events(self, account_id: str, session: aiohttp.ClientSession) -> None:
         """Stream events for a specific account."""
         reconnect_attempts = 0
 

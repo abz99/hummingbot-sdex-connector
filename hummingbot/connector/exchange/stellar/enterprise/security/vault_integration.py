@@ -286,7 +286,7 @@ class VaultKeyStore(KeyStoreBackend):
 
         try:
             # Read the service account token
-            with open(self.config.service_account_token_path, 'r') as f:
+            with open(self.config.service_account_token_path, "r") as f:
                 jwt_token = f.read().strip()
 
             role = self.config.kubernetes_role or "default"
@@ -325,10 +325,14 @@ class VaultKeyStore(KeyStoreBackend):
                     return True
                 else:
                     error_text = await response.text()
-                    raise Exception(f"Kubernetes authentication failed: {response.status} - {error_text}")
+                    raise Exception(
+                        f"Kubernetes authentication failed: {response.status} - {error_text}"
+                    )
 
         except FileNotFoundError:
-            raise ValueError(f"Service account token file not found: {self.config.service_account_token_path}")
+            raise ValueError(
+                f"Service account token file not found: {self.config.service_account_token_path}"
+            )
 
     async def _auth_aws(self) -> bool:
         """Authenticate using AWS IAM credentials."""

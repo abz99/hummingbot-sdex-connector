@@ -26,21 +26,22 @@ except ImportError:
         pass
 
     def Field(**kwargs):
-        return kwargs.get('default')
+        return kwargs.get("default")
 
 
 # =============================================================================
 # AMM PROTOCOL TYPES
 # =============================================================================
 
+
 class AMMType(Enum):
     """AMM protocol types supported."""
 
     CONSTANT_PRODUCT = "constant_product"  # Uniswap v2 style (x*y=k)
-    STABLE_SWAP = "stable_swap"           # StableSwap for similar assets
-    WEIGHTED_POOL = "weighted_pool"       # Balancer style weighted pools
+    STABLE_SWAP = "stable_swap"  # StableSwap for similar assets
+    WEIGHTED_POOL = "weighted_pool"  # Balancer style weighted pools
     CONCENTRATED_LIQUIDITY = "concentrated_liquidity"  # Uniswap v3 style
-    HYBRID = "hybrid"                     # Combined mechanisms
+    HYBRID = "hybrid"  # Combined mechanisms
 
 
 class LiquidityPoolStatus(Enum):
@@ -66,6 +67,7 @@ class SwapStatus(Enum):
 # =============================================================================
 # LIQUIDITY POOL TYPES
 # =============================================================================
+
 
 @dataclass
 class UnifiedLiquidityPool:
@@ -190,6 +192,7 @@ class UnifiedLiquidityPool:
 # SWAP QUOTE TYPES
 # =============================================================================
 
+
 @dataclass
 class UnifiedSwapQuote:
     """Unified swap quote representation."""
@@ -197,7 +200,7 @@ class UnifiedSwapQuote:
     # Input/output assets
     input_asset: Union[Asset, str]
     output_asset: Union[Asset, str]
-    input_token: Optional[str] = None   # For Soroban compatibility
+    input_token: Optional[str] = None  # For Soroban compatibility
     output_token: Optional[str] = None  # For Soroban compatibility
 
     # Amounts
@@ -271,6 +274,7 @@ class UnifiedSwapQuote:
 # LIQUIDITY POSITION TYPES
 # =============================================================================
 
+
 @dataclass
 class LiquidityPosition:
     """User's liquidity provider position."""
@@ -313,7 +317,11 @@ class LiquidityPosition:
             return Decimal("0")
 
         price_ratio = current_price_a / self.entry_price_a
-        sqrt_ratio = price_ratio.sqrt() if hasattr(price_ratio, 'sqrt') else Decimal(float(price_ratio) ** 0.5)
+        sqrt_ratio = (
+            price_ratio.sqrt()
+            if hasattr(price_ratio, "sqrt")
+            else Decimal(float(price_ratio) ** 0.5)
+        )
 
         # IL = (2 * sqrt(price_ratio) / (1 + price_ratio)) - 1
         il = (2 * sqrt_ratio / (1 + price_ratio)) - 1
@@ -334,9 +342,17 @@ SwapQuote = UnifiedSwapQuote
 class SorobanLiquidityPoolCompat:
     """Backward compatibility for Soroban LiquidityPool."""
 
-    def __init__(self, pool_id: str, token_a: str, token_b: str,
-                 reserve_a: Decimal, reserve_b: Decimal, total_supply: Decimal,
-                 fee_rate: Decimal, **kwargs):
+    def __init__(
+        self,
+        pool_id: str,
+        token_a: str,
+        token_b: str,
+        reserve_a: Decimal,
+        reserve_b: Decimal,
+        total_supply: Decimal,
+        fee_rate: Decimal,
+        **kwargs,
+    ):
         self.pool = UnifiedLiquidityPool(
             pool_id=pool_id,
             token_a=token_a,
@@ -345,18 +361,18 @@ class SorobanLiquidityPoolCompat:
             reserves_b=reserve_b,
             total_shares=total_supply,
             fee_rate=fee_rate,
-            **kwargs
+            **kwargs,
         )
 
     def __getattr__(self, name):
         # Map old field names to new ones
         field_mapping = {
-            'token_a': 'token_a',
-            'token_b': 'token_b',
-            'reserve_a': 'reserves_a',
-            'reserve_b': 'reserves_b',
-            'total_supply': 'total_shares',
-            'fee_rate': 'fee_decimal'
+            "token_a": "token_a",
+            "token_b": "token_b",
+            "reserve_a": "reserves_a",
+            "reserve_b": "reserves_b",
+            "total_supply": "total_shares",
+            "fee_rate": "fee_decimal",
         }
         mapped_name = field_mapping.get(name, name)
         return getattr(self.pool, mapped_name)
@@ -365,9 +381,18 @@ class SorobanLiquidityPoolCompat:
 class SorobanSwapQuoteCompat:
     """Backward compatibility for Soroban SwapQuote."""
 
-    def __init__(self, input_token: str, output_token: str, input_amount: Decimal,
-                 output_amount: Decimal, price_impact: Decimal, fee: Decimal,
-                 route: List[str], expires_at: float, **kwargs):
+    def __init__(
+        self,
+        input_token: str,
+        output_token: str,
+        input_amount: Decimal,
+        output_amount: Decimal,
+        price_impact: Decimal,
+        fee: Decimal,
+        route: List[str],
+        expires_at: float,
+        **kwargs,
+    ):
         self.quote = UnifiedSwapQuote(
             input_asset=input_token,
             output_asset=output_token,
@@ -377,16 +402,16 @@ class SorobanSwapQuoteCompat:
             fee=fee,
             route=route,
             expires_at=expires_at,
-            **kwargs
+            **kwargs,
         )
 
     def __getattr__(self, name):
         # Map old field names to new ones
         field_mapping = {
-            'input_token': 'input_token',
-            'output_token': 'output_token',
-            'expires_at': 'expiry',
-            'slippage_tolerance': 'slippage'
+            "input_token": "input_token",
+            "output_token": "output_token",
+            "expires_at": "expiry",
+            "slippage_tolerance": "slippage",
         }
         mapped_name = field_mapping.get(name, name)
         return getattr(self.quote, mapped_name)
@@ -404,11 +429,9 @@ __all__ = [
     "UnifiedLiquidityPool",
     "UnifiedSwapQuote",
     "LiquidityPosition",
-
     # Backward compatibility aliases
     "LiquidityPool",  # -> UnifiedLiquidityPool
     "SwapQuote",  # -> UnifiedSwapQuote
-
     # Compatibility wrappers
     "SorobanLiquidityPoolCompat",
     "SorobanSwapQuoteCompat",

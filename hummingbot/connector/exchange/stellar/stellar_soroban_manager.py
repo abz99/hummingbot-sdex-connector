@@ -24,10 +24,10 @@ from stellar_sdk.exceptions import BaseRequestError
 
 # DEPRECATED: These types have been moved to stellar_amm_types_unified.py
 from .stellar_amm_types_unified import (
-    SwapQuote,
     LiquidityPool,
-    SorobanSwapQuoteCompat,
     SorobanLiquidityPoolCompat,
+    SorobanSwapQuoteCompat,
+    SwapQuote,
 )
 
 # Use standard logging instead of HummingbotLogger for compatibility
