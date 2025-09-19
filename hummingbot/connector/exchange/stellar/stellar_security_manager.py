@@ -59,9 +59,20 @@ class StellarSecurityManager:
 
     def _initialize_key_stores(self, key_store_path: Optional[str] = None) -> None:
         """Initialize key storage backends based on configuration."""
-        # Always include memory store for development
-        if self.config.security_level == SecurityLevel.DEVELOPMENT:
+        # Always include memory store as fallback
+        try:
             self._stores[KeyStoreType.MEMORY] = MemoryKeyStore()
+            self.logger.info(
+                "Memory key store initialized successfully",
+                category=LogCategory.SECURITY,
+                store_type=KeyStoreType.MEMORY.name,
+            )
+        except Exception as e:
+            self.logger.error(
+                f"Failed to initialize memory key store: {e}",
+                category=LogCategory.SECURITY,
+                exception=e,
+            )
 
         # File system store for testing and above
         if self.config.security_level in [
@@ -69,17 +80,63 @@ class StellarSecurityManager:
             SecurityLevel.STAGING,
             SecurityLevel.PRODUCTION,
         ]:
-            base_path = key_store_path or os.path.join(os.path.expanduser("~"), ".stellar-keys")
-            self._stores[KeyStoreType.FILE] = FileSystemKeyStore(base_path)
+            try:
+                base_path = key_store_path or os.path.join(os.path.expanduser("~"), ".stellar-keys")
+                self._stores[KeyStoreType.FILE] = FileSystemKeyStore(base_path)
+                self.logger.info(
+                    f"File system key store initialized at: {base_path}",
+                    category=LogCategory.SECURITY,
+                    store_type=KeyStoreType.FILE.name,
+                    base_path=base_path,
+                )
+            except Exception as e:
+                self.logger.error(
+                    f"Failed to initialize file system key store: {e}",
+                    category=LogCategory.SECURITY,
+                    exception=e,
+                )
+                # Fall back to memory store if file store fails
+                if KeyStoreType.MEMORY not in self._stores:
+                    self._stores[KeyStoreType.MEMORY] = MemoryKeyStore()
+                    self.logger.warning(
+                        "Falling back to memory key store after file store failure",
+                        category=LogCategory.SECURITY,
+                    )
 
         # HSM for production (placeholder)
         if (
             self.config.security_level == SecurityLevel.PRODUCTION
             and self.config.require_hardware_security
         ):
-            # This would be configured with actual HSM details in production
-            hsm_config: Dict[str, Any] = {}
-            self._stores[KeyStoreType.HSM] = HSMKeyStore(hsm_config)
+            try:
+                # This would be configured with actual HSM details in production
+                hsm_config: Dict[str, Any] = {}
+                self._stores[KeyStoreType.HSM] = HSMKeyStore(hsm_config)
+                self.logger.info(
+                    "HSM key store initialized successfully",
+                    category=LogCategory.SECURITY,
+                    store_type=KeyStoreType.HSM.name,
+                )
+            except Exception as e:
+                self.logger.error(
+                    f"Failed to initialize HSM key store: {e}",
+                    category=LogCategory.SECURITY,
+                    exception=e,
+                )
+
+        # Ensure we have at least one store available
+        if not self._stores:
+            self.logger.error(
+                "No key stores could be initialized",
+                category=LogCategory.SECURITY,
+                security_level=self.config.security_level.name,
+            )
+            # Create a memory store as emergency fallback
+            self._stores[KeyStoreType.MEMORY] = MemoryKeyStore()
+            self.logger.warning(
+                "Emergency fallback: using memory key store",
+                category=LogCategory.SECURITY,
+            )
 
     def _map_security_to_validation_level(self, security_level: SecurityLevel) -> ValidationLevel:
         """Map security level to validation level."""
@@ -238,12 +295,33 @@ class StellarSecurityManager:
                 )
                 raise ValueError(sanitized_error)
 
-            # Determine storage type based on security level
+            # Determine storage type based on security level and availability
             if store_type is None:
                 if self.config.security_level == SecurityLevel.DEVELOPMENT:
                     store_type = KeyStoreType.MEMORY
                 else:
                     store_type = KeyStoreType.FILE
+
+            # Fallback to available store if preferred type is not available
+            if store_type not in self._stores:
+                available_stores = list(self._stores.keys())
+                if not available_stores:
+                    error_msg = "No key stores available for storage"
+                    self.logger.error(
+                        error_msg,
+                        category=LogCategory.SECURITY,
+                        operation="store_keypair",
+                        requested_store=store_type.name,
+                    )
+                    raise ValueError(error_msg)
+
+                store_type = available_stores[0]  # Use first available store
+                self.logger.warning(
+                    f"Requested store type not available, using fallback: {store_type.name}",
+                    category=LogCategory.SECURITY,
+                    operation="store_keypair",
+                    fallback_store=store_type.name,
+                )
 
             # Create key metadata
             key_id = f"stellar_{account_id[:8]}_{int(time.time())}"
