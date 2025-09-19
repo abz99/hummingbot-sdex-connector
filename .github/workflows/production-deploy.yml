@@ -75,20 +75,20 @@ jobs:
 
         # Check for HIGH/MEDIUM severity issues that should fail the build
         python3 -c "
-import json
-with open('bandit-report.json', 'r') as f:
-    data = json.load(f)
-results = data.get('results', [])
-high_med_issues = [r for r in results if r['issue_severity'] in ['HIGH', 'MEDIUM']]
-if high_med_issues:
-    print(f'❌ CRITICAL: {len(high_med_issues)} HIGH/MEDIUM severity security issues found')
-    for issue in high_med_issues:
-        print(f'   {issue[\"filename\"]}:{issue[\"line_number\"]} - {issue[\"issue_text\"]}')
-    exit(1)
-else:
-    total_issues = len(results)
-    print(f'✅ Security scan passed: {total_issues} total issues, 0 HIGH/MEDIUM severity')
-"
+        import json
+        with open('bandit-report.json', 'r') as f:
+            data = json.load(f)
+        results = data.get('results', [])
+        high_med_issues = [r for r in results if r['issue_severity'] in ['HIGH', 'MEDIUM']]
+        if high_med_issues:
+            print(f'❌ CRITICAL: {len(high_med_issues)} HIGH/MEDIUM severity security issues found')
+            for issue in high_med_issues:
+                print(f'   {issue[\"filename\"]}:{issue[\"line_number\"]} - {issue[\"issue_text\"]}')
+            exit(1)
+        else:
+            total_issues = len(results)
+            print(f'✅ Security scan passed: {total_issues} total issues, 0 HIGH/MEDIUM severity')
+        "
         
     - name: Security Scan - Safety
       run: |
