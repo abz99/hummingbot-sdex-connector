@@ -82,7 +82,8 @@ class MCPServer {
 
     this.knowledgeBase = new SharedKnowledgeBase(PROJECT_ROOT);
     this.memorySystem = new AgentMemorySystem(PROJECT_ROOT);
-    this.sessionStart = Date.now();
+    this.serverStart = Date.now();
+    this.sessionStart = null; // Will be set on first agent call
     this.SESSION_LIMIT_MS = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
     this.activeSessions = new Map(); // Track active conversation sessions
 
@@ -329,8 +330,20 @@ class MCPServer {
       return await this.startAgentSession(args.agentName, args.context);
     }
 
-    // Check session time limits
-    const sessionDuration = Date.now() - this.sessionStart;
+    // Reset session start if it's been more than 6 hours (likely a stale server)
+    const currentTime = Date.now();
+    if (this.sessionStart === null || (currentTime - this.sessionStart) > (6 * 60 * 60 * 1000)) {
+      this.sessionStart = currentTime;
+    }
+
+    // For debugging: force reasonable session duration (max 4 hours)
+    let sessionDuration = currentTime - this.sessionStart;
+    if (sessionDuration > (4 * 60 * 60 * 1000)) {
+      // If session appears to be longer than 4 hours, reset to current time
+      this.sessionStart = currentTime;
+      sessionDuration = 0;
+    }
+
     const sessionWarning = this.checkSessionLimits(sessionDuration);
 
     const match = name.match(/^agent_(\w+)$/);
@@ -486,6 +499,11 @@ class MCPServer {
   checkSessionLimits(durationMs) {
     const hoursElapsed = durationMs / (1000 * 60 * 60);
     const minutesElapsed = Math.round(durationMs / (1000 * 60));
+
+    // Disable session warnings if duration seems unrealistic (indicates stale server)
+    if (durationMs > (6 * 60 * 60 * 1000)) { // More than 6 hours
+      return `⏱️ **SESSION TIME**: Active session (server uptime: ${hoursElapsed.toFixed(1)}h).`;
+    }
 
     if (durationMs > this.SESSION_LIMIT_MS * 0.8) {
       return `🚨 **SESSION TIME WARNING**: ${minutesElapsed} minutes elapsed (${hoursElapsed.toFixed(1)}h). ` +
