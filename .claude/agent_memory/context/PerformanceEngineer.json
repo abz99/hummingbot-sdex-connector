@@ -1,0 +1,36 @@
+{
+  "agentName": "PerformanceEngineer",
+  "createdAt": "2025-09-19T21:57:11.861Z",
+  "lastAccessed": "2025-09-19T21:57:11.861Z",
+  "personalContext": {},
+  "workflowState": {},
+  "learnings": [
+    {
+      "id": "ba980434-9aa4-4409-9dad-caf07f55e2cb",
+      "timestamp": "2025-09-19T21:57:11.864Z",
+      "type": "user_instruction",
+      "content": "performance_files_assignment",
+      "context": {
+        "task": "Update your agent memory system to include performance-related files: monitoring configurations, observability framework docs, and any performance test results. Focus on optimization and system performance metrics.",
+        "sessionId": "PerformanceEngineer-00a2cc71"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 1,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {},
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-19T21:57:11.864Z"
+}

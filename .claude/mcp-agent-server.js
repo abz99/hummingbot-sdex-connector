@@ -69,6 +69,13 @@ const agents = {
     category: "specialist",
     description: "Create and maintain comprehensive documentation that enables successful adoption and contribution",
     capabilities: ["technical_writing", "api_documentation", "developer_experience_design", "documentation_automation"]
+  },
+  ComplianceOfficer: {
+    name: "ComplianceOfficer",
+    role: "Compliance & Governance Specialist",
+    category: "reviewer",
+    description: "Ensure regulatory compliance and governance standards through continuous monitoring and proactive guardrail updates",
+    capabilities: ["regulatory_compliance", "policy_enforcement", "risk_assessment", "governance_frameworks", "audit_coordination", "compliance_monitoring"]
   }
 };
 

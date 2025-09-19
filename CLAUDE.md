@@ -53,39 +53,27 @@ exec(open('.claude_session_auto_init.py').read())
 - Set `SKIP_CLAUDE_AUTO_INIT=1` to skip session auto-initialization
 - Set `SKIP_CLAUDE_STARTUP=1` to skip automated startup entirely
 
-**CORE INSTRUCTION FILES** ⭐ (Auto-indexed for all agents):
-   - `stellar_sdex_checklist_v3.md` - **Master implementation roadmap**
-   - `stellar_sdex_tdd_v3.md` - **Technical design blueprint**
-   - `PROJECT_STATUS.md` - **Current project state** (auto-updated)
-   - `qa/quality_catalogue.yml` - **Quality requirements** (auto-tracked)
+**CORE INSTRUCTION FILES** ⭐ (Essential only - optimized for context):
+
+@PROJECT_STATUS.md
+@DEVELOPMENT_RULES.md
+@PRODUCTION_READINESS_REPORT.md
 
 **🚀 STARTUP EXECUTION** - Run this immediately upon session start:
 
 ## 📊 PROGRESS TRACKING SYSTEM
 
-### Critical Status Files (READ FIRST)
-- `PROJECT_STATUS.md` - **Main project status dashboard** 📊
-  - Project health dashboard with progress metrics
-  - Quality metrics and risk register
-  - Phase completion tracking (25% complete)
-- **CORE INSTRUCTION FILES** ⭐:
-  - `stellar_sdex_checklist_v3.md` - **Master implementation checklist (46KB)**
-    - Production roadmap (10-12 weeks, 4 phases)  
-    - Modern Stellar SDK v8.x + Hummingbot v1.27+ patterns
-    - Enterprise security (HSM, MPC, Hardware wallets)
-    - Soroban smart contracts + SEP standards support
-  - `stellar_sdex_tdd_v3.md` - **Technical design document (91KB)**
-    - Advanced hybrid CLOB/AMM architecture
-    - Modern AsyncIO implementation patterns  
-    - Component specifications and code examples
-    - Production observability framework
-- **NEW TRACKING COMPONENTS** 🆕:
-  - `CHANGELOG.md` - **Semantic versioning change log**
-  - `docs/decisions/` - **Architecture Decision Records (4 ADRs)**
-  - Enhanced metrics and risk tracking in PROJECT_STATUS.md
-- `PHASE_1_COMPLETION_REPORT.md` - Phase 1 achievements and context
-- `PHASE_1_CODE_REVIEW.md` - Comprehensive code review results
-- `DEVELOPMENT_RULES.md` - Development guidelines and rules
+### Critical Status Files (Optimized Memory)
+Essential files auto-imported above (3 files only to preserve context):
+
+- **PROJECT_STATUS.md** - Main project status dashboard 📊
+- **DEVELOPMENT_RULES.md** - Core development guidelines
+- **PRODUCTION_READINESS_REPORT.md** - Current production status
+
+**Reference Files** (access when needed):
+- `stellar_sdex_checklist_v3.md` - Master implementation checklist
+- `stellar_sdex_tdd_v3.md` - Technical design document
+- Phase reports, QA catalogue, component docs - available via Read tool
 
 ### Session Continuity Strategy
 1. **Before ending session** - Update PROJECT_STATUS.md with:

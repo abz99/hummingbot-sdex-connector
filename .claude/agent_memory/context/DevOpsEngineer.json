@@ -1,0 +1,36 @@
+{
+  "agentName": "DevOpsEngineer",
+  "createdAt": "2025-09-19T21:56:52.916Z",
+  "lastAccessed": "2025-09-19T21:56:52.916Z",
+  "personalContext": {},
+  "workflowState": {},
+  "learnings": [
+    {
+      "id": "f4e29d13-fade-485c-8ddb-33bbdd39033e",
+      "timestamp": "2025-09-19T21:56:52.917Z",
+      "type": "user_instruction",
+      "content": "devops_files_assignment",
+      "context": {
+        "task": "Update your agent memory system to include DevOps files: deployment configurations, Kubernetes YAML files, monitoring configs, and any CI/CD pipeline documentation. These align with your operational responsibilities.",
+        "sessionId": "DevOpsEngineer-a3b813bc"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
+    }
+  ],
+  "preferences": {},
+  "metrics": {
+    "totalInteractions": 1,
+    "successfulTasks": 0,
+    "averageResponseTime": 0,
+    "specializations": []
+  },
+  "relationships": {},
+  "reminders": [],
+  "activeProjects": [],
+  "completedTasks": [],
+  "lastUpdated": "2025-09-19T21:56:52.917Z"
+}

@@ -10,7 +10,7 @@ metadata:
 # Agent Role Hierarchy
 agent_roles:
   coordinator: ["ProjectManager"]
-  reviewers: ["Architect", "SecurityEngineer", "QAEngineer"]  
+  reviewers: ["Architect", "SecurityEngineer", "QAEngineer", "ComplianceOfficer"]
   implementers: ["Implementer", "DevOpsEngineer"]
   specialists: ["PerformanceEngineer", "DocumentationEngineer"]
 
@@ -34,10 +34,17 @@ phase_gates:
     description: "Security threat modeling and mitigation strategy"
     deliverable: "Security analysis report with approval/rejection"
     timeout: "2h"
-    
+
+  compliance_review:
+    owner: "ComplianceOfficer"
+    dependencies: ["security_review"]
+    description: "Regulatory compliance and governance validation"
+    deliverable: "Compliance assessment with guardrail updates"
+    timeout: "1h"
+
   qa_criteria:
     owner: "QAEngineer"
-    dependencies: ["security_review"]
+    dependencies: ["compliance_review"]
     description: "Quality acceptance criteria and test strategy definition"
     deliverable: "Test plan with qa_ids and coverage requirements"
     timeout: "1h"
@@ -51,10 +58,10 @@ phase_gates:
     timeout: "8h"
     
   final_validation:
-    owners: ["Architect", "SecurityEngineer", "QAEngineer"]
+    owners: ["Architect", "SecurityEngineer", "QAEngineer", "ComplianceOfficer"]
     dependencies: ["implementation"]
-    description: "Multi-reviewer validation and approval"
-    deliverable: "Final approval for task completion"
+    description: "Multi-reviewer validation and compliance approval"
+    deliverable: "Final approval for task completion with compliance sign-off"
     timeout: "2h"
 
 # Quality Gates
@@ -75,7 +82,13 @@ quality_requirements:
     - "Security requirements addressed"
     - "No critical vulnerabilities found"
     - "Cryptographic implementations validated"
-  
+
+  compliance:
+    - "Regulatory requirements validated"
+    - "Governance standards met"
+    - "Policy compliance verified"
+    - "Audit trail maintained"
+
   documentation:
     - "API documentation complete"
     - "Usage examples provided"
@@ -94,7 +107,12 @@ escalations:
   
   quality_issues:
     action: "Loop back to implementer with specific feedback"
-    reviewers: ["Architect", "SecurityEngineer", "QAEngineer"]
+    reviewers: ["Architect", "SecurityEngineer", "QAEngineer", "ComplianceOfficer"]
+
+  compliance_violations:
+    action: "Immediate review and remediation"
+    owner: "ComplianceOfficer"
+    escalation: "ProjectManager"
   
   timeline_concerns:
     action: "Re-prioritize and communicate to stakeholders"
