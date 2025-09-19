@@ -11,6 +11,7 @@ import traceback
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -40,6 +41,7 @@ from .stellar_observability_types_unified import (
 )
 from .stellar_observability_types_unified import (
     AlertSeverity as AlertLevel,  # Alias for backward compatibility
+    AlertCategory,
 )
 from .stellar_observability_types_unified import (
     HealthCheckResult,
@@ -213,65 +215,72 @@ class StellarObservabilityFramework:
             AlertRule(
                 name="high_error_rate",
                 description="Error rate exceeds 5% over 5 minutes",
+                category=AlertCategory.PERFORMANCE,
+                severity=AlertLevel.WARNING,
                 metric_name="stellar_errors_total",
                 threshold=0.05,
                 comparison="gt",
                 duration=300,
-                level=AlertLevel.WARNING,
             ),
             AlertRule(
                 name="critical_error_rate",
                 description="Error rate exceeds 10% over 2 minutes",
+                category=AlertCategory.PERFORMANCE,
+                severity=AlertLevel.CRITICAL,
                 metric_name="stellar_errors_total",
                 threshold=0.10,
                 comparison="gt",
                 duration=120,
-                level=AlertLevel.CRITICAL,
             ),
             AlertRule(
                 name="high_response_time",
                 description="Response time exceeds 5 seconds",
+                category=AlertCategory.PERFORMANCE,
+                severity=AlertLevel.WARNING,
                 metric_name="stellar_network_request_duration_seconds",
                 threshold=5.0,
                 comparison="gt",
                 duration=60,
-                level=AlertLevel.WARNING,
             ),
             AlertRule(
                 name="circuit_breaker_open",
                 description="Circuit breaker is open",
+                category=AlertCategory.HEALTH,
+                severity=AlertLevel.CRITICAL,
                 metric_name="stellar_circuit_breaker_state",
                 threshold=1,
                 comparison="gte",
                 duration=0,
-                level=AlertLevel.CRITICAL,
             ),
             AlertRule(
                 name="low_account_balance",
                 description="Account balance below minimum threshold",
+                category=AlertCategory.BUSINESS,
+                severity=AlertLevel.WARNING,
                 metric_name="stellar_account_balance_xlm",
                 threshold=10.0,  # 10 XLM minimum
                 comparison="lt",
                 duration=0,
-                level=AlertLevel.WARNING,
             ),
             AlertRule(
                 name="memory_exhaustion",
                 description="Memory usage exceeds 90%",
+                category=AlertCategory.PERFORMANCE,
+                severity=AlertLevel.CRITICAL,
                 metric_name="stellar_memory_usage_bytes",
                 threshold=0.90,
                 comparison="gt",
                 duration=300,
-                level=AlertLevel.CRITICAL,
             ),
             AlertRule(
                 name="health_check_failure",
                 description="Health check failing",
+                category=AlertCategory.HEALTH,
+                severity=AlertLevel.CRITICAL,
                 metric_name="stellar_health_check_status",
                 threshold=1,
                 comparison="lt",
                 duration=60,
-                level=AlertLevel.CRITICAL,
             ),
         ]
 
@@ -425,15 +434,15 @@ class StellarObservabilityFramework:
                 if should_fire and rule_name not in self.active_alerts:
                     # Fire new alert
                     alert = Alert(
-                        rule_name=rule_name,
-                        level=rule.level,
+                        id=f"{rule_name}_{int(current_time)}",
+                        severity=rule.severity,
+                        category=rule.category,
+                        title=rule.name,
                         message=f"{rule.description} (current: {current_value}, threshold: {rule.threshold})",
                         metric_name=rule.metric_name,
                         current_value=current_value,
                         threshold=rule.threshold,
-                        timestamp=current_time,
-                        labels=rule.labels.copy(),
-                        correlation_id=correlation_id.get(),
+                        timestamp=datetime.utcfromtimestamp(current_time),
                     )
 
                     await self._fire_alert(alert)
@@ -472,21 +481,21 @@ class StellarObservabilityFramework:
 
     async def _fire_alert(self, alert: Alert) -> None:
         """Fire an alert."""
-        self.active_alerts[alert.rule_name] = alert
+        self.active_alerts[alert.id] = alert
 
         # Record metrics
-        self.alert_firings.labels(alert_rule=alert.rule_name, level=alert.level.value).inc()
+        self.alert_firings.labels(alert_rule=alert.id, level=alert.severity.value).inc()
 
         # Log alert
         self.logger.error(
             f"ALERT FIRED: {alert.message}",
             category=(
                 LogCategory.SECURITY
-                if alert.level in [AlertLevel.CRITICAL, AlertLevel.EMERGENCY]
+                if alert.severity in [AlertLevel.CRITICAL, AlertLevel.EMERGENCY]
                 else LogCategory.PERFORMANCE
             ),
-            alert_rule=alert.rule_name,
-            alert_level=alert.level.value,
+            alert_rule=alert.id,
+            alert_level=alert.severity.value,
             current_value=alert.current_value,
             threshold=alert.threshold,
             correlation_id=alert.correlation_id,
@@ -771,51 +780,56 @@ class StellarObservabilityFramework:
         qa_alert_rules = {
             "qa_coverage_low": AlertRule(
                 name="qa_coverage_low",
+                category=AlertCategory.BUSINESS,
+                severity=AlertLevel.WARNING,
                 metric_name="stellar_qa_test_coverage_percentage",
                 threshold=80,
                 comparison="lt",
                 duration=300,  # 5m in seconds
-                level=AlertLevel.WARNING,
                 description="Overall test coverage below 80%",
                 labels={"category": "qa", "component": "testing", "coverage_type": "overall"},
             ),
             "qa_critical_coverage_fail": AlertRule(
                 name="qa_critical_coverage_fail",
+                category=AlertCategory.BUSINESS,
+                severity=AlertLevel.CRITICAL,
                 metric_name="stellar_qa_test_coverage_percentage",
                 threshold=90,
                 comparison="lt",
                 duration=120,  # 2m in seconds
-                level=AlertLevel.CRITICAL,
                 description="Critical module coverage below required threshold",
                 labels={"category": "qa", "component": "testing", "coverage_type": "critical"},
             ),
             "qa_test_failures": AlertRule(
                 name="qa_test_failures",
+                category=AlertCategory.BUSINESS,
+                severity=AlertLevel.WARNING,
                 metric_name="stellar_qa_test_success_rate",
                 threshold=0.95,
                 comparison="lt",
                 duration=180,  # 3m in seconds
-                level=AlertLevel.WARNING,
                 description="Test success rate below 95%",
                 labels={"category": "qa", "component": "testing"},
             ),
             "qa_code_quality_low": AlertRule(
                 name="qa_code_quality_low",
+                category=AlertCategory.BUSINESS,
+                severity=AlertLevel.WARNING,
                 metric_name="stellar_qa_code_quality_score",
                 threshold=7.0,
                 comparison="lt",
                 duration=600,  # 10m in seconds
-                level=AlertLevel.WARNING,
                 description="Code quality score below acceptable threshold",
                 labels={"category": "qa", "component": "quality"},
             ),
             "qa_compliance_fail": AlertRule(
                 name="qa_compliance_fail",
+                category=AlertCategory.BUSINESS,
+                severity=AlertLevel.WARNING,
                 metric_name="stellar_qa_compliance_status",
                 threshold=0,
                 comparison="eq",
                 duration=300,  # 5m in seconds
-                level=AlertLevel.WARNING,
                 description="Non-compliant QA requirements detected",
                 labels={"category": "qa", "component": "compliance"},
             ),
@@ -878,8 +892,8 @@ class StellarObservabilityFramework:
         module = context.get("module", "unknown")
 
         alert = Alert(
-            name="low_test_coverage",
-            level=AlertLevel.WARNING,
+            id="low_test_coverage", category=AlertCategory.BUSINESS, title="low_test_coverage",
+            severity=AlertLevel.WARNING,
             message=f"Test coverage for {module} is {coverage_percentage}% (below 80%)",
             context=context,
             timestamp=time.time(),
@@ -893,8 +907,8 @@ class StellarObservabilityFramework:
         test_suite = context.get("test_suite", "unknown")
 
         alert = Alert(
-            name="test_failures",
-            level=AlertLevel.CRITICAL if success_rate < 0.90 else AlertLevel.WARNING,
+            id="test_failures", category=AlertCategory.BUSINESS, title="test_failures",
+            severity=AlertLevel.CRITICAL if success_rate < 0.90 else AlertLevel.WARNING,
             message=f"Test suite {test_suite} has {success_rate*100:.1f}% success rate",
             context=context,
             timestamp=time.time(),
@@ -907,8 +921,8 @@ class StellarObservabilityFramework:
         quality_score = context.get("quality_score", 0)
 
         alert = Alert(
-            name="low_code_quality",
-            level=AlertLevel.CRITICAL if quality_score < 5.0 else AlertLevel.WARNING,
+            id="low_code_quality", category=AlertCategory.BUSINESS, title="low_code_quality",
+            severity=AlertLevel.CRITICAL if quality_score < 5.0 else AlertLevel.WARNING,
             message=f"Code quality score is {quality_score}/10",
             context=context,
             timestamp=time.time(),
@@ -922,8 +936,8 @@ class StellarObservabilityFramework:
         category = context.get("category", "unknown")
 
         alert = Alert(
-            name="compliance_failure",
-            level=AlertLevel.CRITICAL if category == "security" else AlertLevel.WARNING,
+            id="compliance_failure", category=AlertCategory.COMPLIANCE, title="compliance_failure",
+            severity=AlertLevel.CRITICAL if category == "security" else AlertLevel.WARNING,
             message=f"Requirement {requirement_id} in category {category} is non-compliant",
             context=context,
             timestamp=time.time(),
@@ -937,8 +951,8 @@ class StellarObservabilityFramework:
         severity = context.get("severity", "unknown")
 
         alert = Alert(
-            name="high_defect_rate",
-            level=AlertLevel.CRITICAL if severity == "critical" else AlertLevel.WARNING,
+            id="high_defect_rate", category=AlertCategory.BUSINESS, title="high_defect_rate",
+            severity=AlertLevel.CRITICAL if severity == "critical" else AlertLevel.WARNING,
             message=f"High {severity} defect rate: {defect_rate} defects/hour",
             context=context,
             timestamp=time.time(),
@@ -951,8 +965,8 @@ class StellarObservabilityFramework:
         last_update = context.get("last_update", "unknown")
 
         alert = Alert(
-            name="stale_qa_metrics",
-            level=AlertLevel.WARNING,
+            id="stale_qa_metrics", category=AlertCategory.BUSINESS, title="stale_qa_metrics",
+            severity=AlertLevel.WARNING,
             message=f"QA metrics haven't been updated since {last_update}",
             context=context,
             timestamp=time.time(),
