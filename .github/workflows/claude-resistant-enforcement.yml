@@ -271,7 +271,7 @@ jobs:
           "pytest\\.skip"
           "pytest\\.mark\\.skip"
           "\\|\\|\\s\\*true"
-          "--no-verify"
+          "\\--no-verify"
           "COMMIT BLOCKED"
         )
 
