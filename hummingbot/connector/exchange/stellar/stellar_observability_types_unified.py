@@ -259,6 +259,8 @@ AlertLevel = AlertSeverity
 HealthCheckStatus = HealthStatus
 
 # Create compatibility wrappers for different field names
+
+
 class HealthMonitorAlertCompat:
     """Backward compatibility for health monitor Alert class."""
 

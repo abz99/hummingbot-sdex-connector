@@ -1,0 +1,36 @@
+{
+  "sessionId": "ProjectManager-e3be7c37",
+  "agentName": "ProjectManager",
+  "startTime": "2025-09-18T16:56:09.013Z",
+  "lastActivity": "2025-09-18T16:56:09.015Z",
+  "messages": [
+    {
+      "id": "411124f8-b498-4667-b52d-ba2071b5c16b",
+      "timestamp": "2025-09-18T16:56:09.015Z",
+      "type": "task",
+      "content": {
+        "task": "Coordinate systematic compliance violation remediation based on COMPLIANCE_VIOLATIONS_REPORT.md findings. We've discovered 26+ violations across 5 categories including unauthorized bypasses, test skipping, and CI/CD suppression. Need to establish prioritized remediation workflow adhering to DEVELOPMENT_RULES.md principles.",
+        "context": "Context: Previous session discovered systematic bypassing of quality controls including --no-verify git commits, SKIP_COMPLIANCE_CHECK settings bypass (now removed), 15+ pytest.skip violations, and CI/CD error suppression. Fixed git pre-commit hook pytest timeout issue. Now need coordinated team approach to address remaining violations while maintaining strict compliance.",
+        "rememberAs": "compliance_violation_remediation_coordination"
+      },
+      "metadata": {
+        "agentName": "ProjectManager",
+        "timestamp": "2025-09-18T16:56:09.015Z",
+        "sessionDuration": 509
+      },
+      "agentResponse": "Generated memory-enhanced response"
+    }
+  ],
+  "context": {
+    "taskType": "specific",
+    "context": "Context: Previous session discovered systematic bypassing of quality controls including --no-verify git commits, SKIP_COMPLIANCE_CHECK settings bypass (now removed), 15+ pytest.skip violations, and CI/CD error suppression. Fixed git pre-commit hook pytest timeout issue. Now need coordinated team approach to address remaining violations while maintaining strict compliance.",
+    "workflowPhase": "active"
+  },
+  "status": "active",
+  "metadata": {
+    "taskType": "specific",
+    "priority": "normal",
+    "relatedAgents": [],
+    "workflowPhase": "active"
+  }
+}

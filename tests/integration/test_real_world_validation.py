@@ -83,7 +83,8 @@ async def funded_test_account(testnet_config, test_keypair):
                 await asyncio.sleep(3)
                 return test_keypair
             else:
-                pytest.skip("Friendbot funding failed - testnet may be unavailable")
+                # Friendbot funding failed - raise proper exception instead of skipping
+                raise Exception(f"Friendbot funding failed with status {response.status}. Testnet may be unavailable. Set STELLAR_TESTNET_ENABLED=false to skip testnet tests.")
 
 
 @pytest_asyncio.fixture

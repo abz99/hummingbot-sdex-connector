@@ -70,22 +70,22 @@ jobs:
         
     - name: Security Scan - Bandit
       run: |
-        bandit -r hummingbot/connector/exchange/stellar/ -f json -o bandit-report.json || true
+        bandit -r hummingbot/connector/exchange/stellar/ -f json -o bandit-report.json
         
     - name: Security Scan - Safety
       run: |
         # Use compatible safety version and fix typer conflicts
         pip uninstall safety typer -y || true
         pip install safety==2.3.5 typer==0.7.0 --force-reinstall
-        safety check --json --output safety-report.json || echo '{"vulnerabilities": [], "status": "scan_completed_with_errors"}' > safety-report.json
+        safety check --json --output safety-report.json
         
     - name: Code Quality - Flake8
       run: |
-        flake8 hummingbot/connector/exchange/stellar/ --output-file=flake8-report.txt --format=default || true
+        flake8 hummingbot/connector/exchange/stellar/ --output-file=flake8-report.txt --format=default
         
     - name: Code Quality - MyPy
       run: |
-        mypy hummingbot/connector/exchange/stellar/ --ignore-missing-imports --no-error-summary --show-error-codes > mypy-report.txt || true
+        mypy hummingbot/connector/exchange/stellar/ --ignore-missing-imports --no-error-summary --show-error-codes > mypy-report.txt
         
     - name: Unit Tests
       run: |
@@ -93,17 +93,15 @@ jobs:
         
     - name: Integration Tests
       run: |
-        # Allow integration test failures for deployment pipeline (tests vs deployment)
-        python -m pytest tests/integration/ -v --tb=short --junitxml=integration-test-results.xml || echo "Integration tests failed, but continuing deployment pipeline"
+        python -m pytest tests/integration/ -v --tb=short --junitxml=integration-test-results.xml
         
     - name: Performance Tests
       run: |
-        python -m pytest tests/performance/ -v --tb=short --junitxml=performance-test-results.xml || true
+        python -m pytest tests/performance/ -v --tb=short --junitxml=performance-test-results.xml
         
     - name: Security Tests
       run: |
-        # Allow security test failures for deployment pipeline (security tests vs deployment)
-        python -m pytest tests/security/ -v --tb=short --junitxml=security-test-results.xml || echo "Security tests failed, but continuing deployment pipeline"
+        python -m pytest tests/security/ -v --tb=short --junitxml=security-test-results.xml
         
     - name: Upload Test Results
       uses: actions/upload-artifact@v4

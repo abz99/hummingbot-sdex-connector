@@ -725,7 +725,13 @@ class ModernStellarOrderManager:
         Raises:
             OrderValidationError: For validation failures
         """
-        # Amount validation
+        self._validate_amount(amount, correlation_id)
+        self._validate_price(price, correlation_id)
+        self._validate_asset_pair(selling_asset, buying_asset, correlation_id)
+        await self._validate_asset_support(selling_asset, buying_asset, correlation_id)
+
+    def _validate_amount(self, amount: Decimal, correlation_id: str) -> None:
+        """Validate order amount parameters."""
         if amount <= Decimal("0"):
             raise OrderValidationError(
                 "Order amount must be positive", "InvalidAmount", correlation_id
@@ -745,7 +751,8 @@ class ModernStellarOrderManager:
                 correlation_id,
             )
 
-        # Price validation
+    def _validate_price(self, price: Decimal, correlation_id: str) -> None:
+        """Validate order price parameters."""
         if price <= Decimal("0"):
             raise OrderValidationError(
                 "Order price must be positive", "InvalidPrice", correlation_id
@@ -765,13 +772,15 @@ class ModernStellarOrderManager:
                 correlation_id,
             )
 
-        # Asset validation
+    def _validate_asset_pair(self, selling_asset: Asset, buying_asset: Asset, correlation_id: str) -> None:
+        """Validate asset pair compatibility."""
         if selling_asset == buying_asset:
             raise OrderValidationError(
                 "Selling and buying assets cannot be the same", "SameAssets", correlation_id
             )
 
-        # Validate assets exist and are supported
+    async def _validate_asset_support(self, selling_asset: Asset, buying_asset: Asset, correlation_id: str) -> None:
+        """Validate that assets are supported by the system."""
         try:
             await self.asset_manager.validate_asset(selling_asset)
         except Exception as e:

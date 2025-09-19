@@ -827,39 +827,47 @@ class StellarObservabilityFramework:
     ) -> None:
         """Handle QA-specific observability events."""
         try:
-            if self.observability_events:
-                self.observability_events.labels(
-                    event_type=event_type.value, status="triggered"
-                ).inc()
-
-            # Log QA event with context
-            self.logger.warning(
-                f"QA event triggered: {event_type.value}",
-                extra={
-                    "event_type": event_type.value,
-                    "context": context,
-                    "timestamp": time.time(),
-                },
-            )
-
-            # Handle specific QA events
-            if event_type == ObservabilityEvent.QA_COVERAGE_LOW:
-                await self._handle_coverage_alert(context)
-            elif event_type == ObservabilityEvent.QA_TESTS_FAILING:
-                await self._handle_test_failure_alert(context)
-            elif event_type == ObservabilityEvent.QA_QUALITY_LOW:
-                await self._handle_quality_alert(context)
-            elif event_type == ObservabilityEvent.QA_COMPLIANCE_FAIL:
-                await self._handle_compliance_alert(context)
-            elif event_type == ObservabilityEvent.QA_DEFECT_HIGH:
-                await self._handle_defect_alert(context)
-            elif event_type == ObservabilityEvent.QA_METRICS_STALE:
-                await self._handle_stale_metrics_alert(context)
+            self._record_qa_event_metrics(event_type)
+            self._log_qa_event(event_type, context)
+            await self._dispatch_qa_event(event_type, context)
 
         except Exception as e:
             self.logger.error(f"Error handling QA event {event_type.value}: {str(e)}")
             if self.observability_events:
                 self.observability_events.labels(event_type=event_type.value, status="error").inc()
+
+    def _record_qa_event_metrics(self, event_type: ObservabilityEvent) -> None:
+        """Record metrics for QA event."""
+        if self.observability_events:
+            self.observability_events.labels(
+                event_type=event_type.value, status="triggered"
+            ).inc()
+
+    def _log_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]) -> None:
+        """Log QA event with context information."""
+        self.logger.warning(
+            f"QA event triggered: {event_type.value}",
+            extra={
+                "event_type": event_type.value,
+                "context": context,
+                "timestamp": time.time(),
+            },
+        )
+
+    async def _dispatch_qa_event(self, event_type: ObservabilityEvent, context: Dict[str, Any]) -> None:
+        """Dispatch QA event to appropriate handler."""
+        qa_event_handlers = {
+            ObservabilityEvent.QA_COVERAGE_LOW: self._handle_coverage_alert,
+            ObservabilityEvent.QA_TESTS_FAILING: self._handle_test_failure_alert,
+            ObservabilityEvent.QA_QUALITY_LOW: self._handle_quality_alert,
+            ObservabilityEvent.QA_COMPLIANCE_FAIL: self._handle_compliance_alert,
+            ObservabilityEvent.QA_DEFECT_HIGH: self._handle_defect_alert,
+            ObservabilityEvent.QA_METRICS_STALE: self._handle_stale_metrics_alert,
+        }
+
+        handler = qa_event_handlers.get(event_type)
+        if handler:
+            await handler(context)
 
     async def _handle_coverage_alert(self, context: Dict[str, Any]) -> None:
         """Handle low coverage alerts."""

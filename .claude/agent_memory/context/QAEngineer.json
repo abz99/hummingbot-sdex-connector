@@ -1,7 +1,7 @@
 {
   "agentName": "QAEngineer",
   "createdAt": "2025-09-14T20:55:18.329Z",
-  "lastAccessed": "2025-09-14T21:21:20.871Z",
+  "lastAccessed": "2025-09-18T10:46:49.758Z",
   "personalContext": {},
   "workflowState": {
     "workflow-1757883375307": {
@@ -136,11 +136,41 @@
         "specialization",
         "role"
       ]
+    },
+    {
+      "id": "9fb55e35-de27-49e1-a558-1c104c5e1fdd",
+      "timestamp": "2025-09-18T16:56:41.120Z",
+      "type": "user_instruction",
+      "content": "test_violation_remediation_strategy",
+      "context": {
+        "task": "Define comprehensive test strategy for compliance violation remediation. We have 15+ pytest.skip violations across test_stellar_exchange_contract.py, test_stellar_components_adapted.py, test_stellar_testnet.py, and test_performance_benchmarks.py. Need systematic approach to fix failing tests instead of bypassing them per DEVELOPMENT_RULES.md.",
+        "sessionId": "QAEngineer-3e465923"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
+    },
+    {
+      "id": "da45c027-bc8e-46ba-acd6-7907d2048e9a",
+      "timestamp": "2025-09-18T17:57:09.671Z",
+      "type": "user_instruction",
+      "content": "test_infrastructure_remediation_strategy",
+      "context": {
+        "task": "Define systematic approach to fix 15+ pytest.skip violations without bypassing tests. Target files: tests/unit/test_stellar_exchange_contract.py (5 violations), tests/adapted/test_stellar_components_adapted.py (10+ violations), tests/testnet/test_stellar_testnet.py (module skip), tests/integration/test_performance_benchmarks.py (1 violation). Need proper test infrastructure solutions, not bypasses.",
+        "sessionId": "QAEngineer-bb04c20c"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
     }
   ],
   "preferences": {},
   "metrics": {
-    "totalInteractions": 31,
+    "totalInteractions": 33,
     "successfulTasks": 0,
     "averageResponseTime": 0,
     "specializations": []
@@ -268,5 +298,5 @@
   "reminders": [],
   "activeProjects": [],
   "completedTasks": [],
-  "lastUpdated": "2025-09-14T21:21:20.913Z"
+  "lastUpdated": "2025-09-18T17:57:09.671Z"
 }

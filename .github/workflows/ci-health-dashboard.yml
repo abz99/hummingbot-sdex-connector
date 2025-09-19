@@ -52,7 +52,7 @@ jobs:
       run: |
         echo "🚀 Testing post-push monitoring for current commit..."
         # Quick test without long timeout
-        timeout 300 python .github/post-push-ci-monitor.py --commit ${{ github.sha }} --timeout 300 --save-results || echo "⏰ Post-push monitoring timed out (expected for large repos)"
+        timeout 300 python .github/post-push-ci-monitor.py --commit ${{ github.sha }} --timeout 300 --save-results
 
     - name: Generate Comprehensive Dashboard
       if: github.event.inputs.generate_report == 'true' || github.event_name == 'schedule'

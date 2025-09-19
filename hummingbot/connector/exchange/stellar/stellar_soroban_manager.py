@@ -22,6 +22,14 @@ from stellar_sdk import Account, Keypair, Network, StrKey, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import BaseRequestError
 
+# DEPRECATED: These types have been moved to stellar_amm_types_unified.py
+from .stellar_amm_types_unified import (
+    SwapQuote,
+    LiquidityPool,
+    SorobanSwapQuoteCompat,
+    SorobanLiquidityPoolCompat,
+)
+
 # Use standard logging instead of HummingbotLogger for compatibility
 # from hummingbot.logger import HummingbotLogger
 
@@ -79,13 +87,7 @@ class ContractOperation:
 
 
 # DEPRECATED: These types have been moved to stellar_amm_types_unified.py
-# Import from there for new code:
-from .stellar_amm_types_unified import (
-    SwapQuote,
-    LiquidityPool,
-    SorobanSwapQuoteCompat,
-    SorobanLiquidityPoolCompat,
-)
+# Import moved to top of file for flake8 compliance
 
 
 class SorobanContractManager:

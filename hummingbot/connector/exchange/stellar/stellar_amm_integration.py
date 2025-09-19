@@ -47,21 +47,6 @@ from .stellar_amm_types_unified import (
 )
 
 
-@dataclass
-class LiquidityPosition:
-    """User's liquidity provider position"""
-
-    pool_id: str
-    shares: Decimal
-    asset_a_amount: Decimal
-    asset_b_amount: Decimal
-    entry_price_a: Decimal
-    entry_price_b: Decimal
-    entry_timestamp: float
-    rewards_earned: Decimal = field(default=Decimal("0"))
-    impermanent_loss: Decimal = field(default=Decimal("0"))
-
-
 class StellarAMMIntegration:
     """
     Comprehensive Stellar AMM integration with advanced features:

@@ -1,0 +1,11 @@
+# CRITICAL FILE CHECKSUMS - TAMPER DETECTION
+# These checksums are verified by external systems
+
+2e42406e9c7c2a78c1a097d718b0a4925c3ea36bb099ced1c45f2a69dc8e2360 DEVELOPMENT_RULES.md
+ca64bba964c7f8bc015259962bf30db739792a6ee67edc3b7366d81f40b104f8 .pre-commit-hooks/compliance-guard.py
+6947fab214582fac23a45dd282faee33adb17e8eb826e7df100c81a5a0dd8fb2 .github/workflows/claude-resistant-enforcement.yml
+23c2708f743a0e0e4ae97bae573ec74c815485b30c7a2499ee391639cb0f2613 .compliance/immutable-patterns.dat
+
+# Metadata
+CHECKSUM_CREATED=2025-09-19T08:51:06Z
+CHECKSUM_VERSION=1.0

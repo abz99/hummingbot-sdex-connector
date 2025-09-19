@@ -176,63 +176,91 @@ class StellarUserStreamTracker:
 
     async def _stream_account_events(
         self, account_id: str, session: aiohttp.ClientSession
-    ) -> None:  # noqa: C901
+    ) -> None:
         """Stream events for a specific account."""
         reconnect_attempts = 0
 
         while self._connected and reconnect_attempts < self._max_reconnect_attempts:
             try:
-                # Build Horizon streaming URL
-                # In real implementation, this would be the actual Horizon streaming endpoint
-                horizon_url = self.chain_interface.config.horizon_urls[0]
-                stream_url = f"{horizon_url}/accounts/{account_id}/effects"
-
-                async with session.get(
-                    stream_url,
-                    params={"order": "desc", "cursor": "now"},
-                    headers={"Accept": "text/event-stream"},
-                ) as response:
-
-                    if response.status == 200:
-                        reconnect_attempts = 0  # Reset on successful connection
-
-                        async for line in response.content:
-                            if not self._connected:
-                                break
-
-                            try:
-                                # Parse SSE data (simplified implementation)
-                                line_str = line.decode("utf-8").strip()
-                                if line_str.startswith("data: "):
-                                    data_str = line_str[6:]  # Remove "data: " prefix
-                                    await self._handle_stream_data(account_id, data_str)
-
-                            except Exception as e:
-                                await self.observability.log_error(
-                                    "stream_data_parse_error", e, {"account_id": account_id}
-                                )
-                    else:
-                        raise aiohttp.ClientResponseError(
-                            request_info=response.request_info,
-                            history=response.history,
-                            status=response.status,
-                        )
+                await self._attempt_stream_connection(account_id, session)
+                reconnect_attempts = 0  # Reset on successful connection
+                break
 
             except Exception as e:
-                reconnect_attempts += 1
-
-                await self.observability.log_error(
-                    "stream_connection_error",
-                    e,
-                    {"account_id": account_id, "attempt": reconnect_attempts},
+                reconnect_attempts = await self._handle_stream_error(
+                    account_id, e, reconnect_attempts
                 )
 
-                if reconnect_attempts < self._max_reconnect_attempts:
-                    await asyncio.sleep(self._reconnect_delay * reconnect_attempts)
-                else:
-                    break
+        if reconnect_attempts >= self._max_reconnect_attempts:
+            await self._handle_permanent_disconnect(account_id)
 
-        # Connection failed permanently
+    async def _attempt_stream_connection(
+        self, account_id: str, session: aiohttp.ClientSession
+    ) -> None:
+        """Attempt to establish streaming connection for account."""
+        stream_url = self._build_stream_url(account_id)
+
+        async with session.get(
+            stream_url,
+            params={"order": "desc", "cursor": "now"},
+            headers={"Accept": "text/event-stream"},
+        ) as response:
+
+            if response.status != 200:
+                raise aiohttp.ClientResponseError(
+                    request_info=response.request_info,
+                    history=response.history,
+                    status=response.status,
+                )
+
+            await self._process_stream_response(account_id, response)
+
+    def _build_stream_url(self, account_id: str) -> str:
+        """Build Horizon streaming URL for account."""
+        horizon_url = self.chain_interface.config.horizon_urls[0]
+        return f"{horizon_url}/accounts/{account_id}/effects"
+
+    async def _process_stream_response(
+        self, account_id: str, response: aiohttp.ClientResponse
+    ) -> None:
+        """Process streaming response data."""
+        async for line in response.content:
+            if not self._connected:
+                break
+
+            try:
+                await self._process_stream_line(account_id, line)
+            except Exception as e:
+                await self.observability.log_error(
+                    "stream_data_parse_error", e, {"account_id": account_id}
+                )
+
+    async def _process_stream_line(self, account_id: str, line: bytes) -> None:
+        """Process a single line from stream response."""
+        line_str = line.decode("utf-8").strip()
+        if line_str.startswith("data: "):
+            data_str = line_str[6:]  # Remove "data: " prefix
+            await self._handle_stream_data(account_id, data_str)
+
+    async def _handle_stream_error(
+        self, account_id: str, error: Exception, reconnect_attempts: int
+    ) -> int:
+        """Handle stream connection error and determine reconnection strategy."""
+        reconnect_attempts += 1
+
+        await self.observability.log_error(
+            "stream_connection_error",
+            error,
+            {"account_id": account_id, "attempt": reconnect_attempts},
+        )
+
+        if reconnect_attempts < self._max_reconnect_attempts:
+            await asyncio.sleep(self._reconnect_delay * reconnect_attempts)
+
+        return reconnect_attempts
+
+    async def _handle_permanent_disconnect(self, account_id: str) -> None:
+        """Handle permanent connection failure."""
         await self._event_queue.put(
             StellarUserStreamData(
                 StreamEventType.CONNECTION_LOST,

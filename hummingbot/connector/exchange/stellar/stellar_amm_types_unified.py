@@ -329,6 +329,8 @@ LiquidityPool = UnifiedLiquidityPool
 SwapQuote = UnifiedSwapQuote
 
 # Soroban compatibility wrappers
+
+
 class SorobanLiquidityPoolCompat:
     """Backward compatibility for Soroban LiquidityPool."""
 

@@ -4,6 +4,7 @@ Comprehensive performance testing for real-world validation.
 """
 
 import asyncio
+import os
 import time
 import statistics
 from decimal import Decimal
@@ -109,7 +110,10 @@ class TestThroughputBenchmarks:
         finally:
             await chain_interface.stop()
 
-    @pytest.mark.skip(reason="Account validation issues - needs real testnet accounts")
+    @pytest.mark.skipif(
+        not os.getenv("STELLAR_TESTNET_ENABLED", "false").lower() == "true",
+        reason="Account validation requires STELLAR_TESTNET_ENABLED=true environment variable"
+    )
     async def test_concurrent_account_lookups(self, performance_config):
         """Test concurrent account lookup throughput."""
         chain_interface = ModernStellarChainInterface(

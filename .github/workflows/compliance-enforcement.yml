@@ -1,0 +1,215 @@
+name: 🛡️ Compliance Enforcement
+
+on:
+  push:
+    branches: [ main, develop, staging ]
+  pull_request:
+    branches: [ main, develop, staging ]
+  schedule:
+    # Run daily compliance audit at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  compliance-audit:
+    name: 🔍 Full Compliance Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for comprehensive analysis
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Install Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install pytest flake8 mypy bandit safety
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: 🚫 Check for pytest.skip Violations
+      run: |
+        echo "🔍 Scanning for pytest.skip violations..."
+        violations=$(find . -name "*.py" -path "./tests/*" -exec grep -Hn "pytest\.skip\|pytest\.mark\.skip" {} \; || true)
+
+        if [ -n "$violations" ]; then
+          echo "❌ PYTEST.SKIP VIOLATIONS FOUND:"
+          echo "$violations"
+          echo ""
+          echo "🚨 COMPLIANCE FAILURE: pytest.skip patterns detected"
+          echo "📖 Rule: DEVELOPMENT_RULES.md Line 6 - NEVER use pytest.skip to bypass failing tests"
+          echo ""
+          echo "🔧 Allowed alternatives:"
+          echo "   - @pytest.mark.skipif(condition, reason='...')  # Conditional skipping"
+          echo "   - Fix the underlying test issues instead of bypassing"
+          echo ""
+          exit 1
+        else
+          echo "✅ No pytest.skip violations found"
+        fi
+
+    - name: 🚫 Check for CI/CD Bypasses
+      run: |
+        echo "🔍 Scanning for CI/CD bypass patterns..."
+        bypass_patterns="|| true|--no-verify|SKIP_COMPLIANCE_CHECK"
+        violations=$(find . -name "*.yml" -o -name "*.yaml" -o -name "*.sh" -o -name "*.py" | xargs grep -Hn -E "$bypass_patterns" | grep -v "compliance-enforcement.yml" || true)
+
+        if [ -n "$violations" ]; then
+          echo "❌ CI/CD BYPASS VIOLATIONS FOUND:"
+          echo "$violations"
+          echo ""
+          echo "🚨 COMPLIANCE FAILURE: CI/CD bypass patterns detected"
+          echo "📖 Rule: DEVELOPMENT_RULES.md - NEVER bypass quality controls"
+          exit 1
+        else
+          echo "✅ No CI/CD bypasses found"
+        fi
+
+    - name: 📊 Code Quality Baseline Check
+      run: |
+        echo "🔍 Verifying code quality baseline..."
+
+        # Run flake8 and ensure it passes
+        echo "Running flake8..."
+        flake8 hummingbot/connector/exchange/stellar/ tests/ --max-line-length=120 --extend-ignore=E203,W503 --statistics
+
+        # Run mypy check
+        echo "Running mypy..."
+        mypy hummingbot/connector/exchange/stellar/ --ignore-missing-imports --no-error-summary
+
+        echo "✅ Code quality baseline maintained"
+
+    - name: 🔒 Security Baseline Check
+      run: |
+        echo "🔍 Running security baseline check..."
+
+        # Run bandit security scanner
+        bandit -r hummingbot/connector/exchange/stellar/ -f json -o bandit-report.json
+
+        # Check for critical security issues
+        critical_issues=$(jq '.results | map(select(.issue_severity == "HIGH" or .issue_severity == "CRITICAL")) | length' bandit-report.json)
+
+        if [ "$critical_issues" -gt 0 ]; then
+          echo "❌ CRITICAL SECURITY ISSUES FOUND: $critical_issues"
+          jq '.results | map(select(.issue_severity == "HIGH" or .issue_severity == "CRITICAL"))' bandit-report.json
+          exit 1
+        fi
+
+        echo "✅ Security baseline maintained"
+
+    - name: 🧪 Test Infrastructure Validation
+      run: |
+        echo "🔍 Validating test infrastructure..."
+
+        # Check for proper test structure
+        test_files=$(find tests/ -name "test_*.py" | wc -l)
+        echo "Found $test_files test files"
+
+        if [ "$test_files" -lt 10 ]; then
+          echo "⚠️  Warning: Low test file count ($test_files)"
+        fi
+
+        # Validate that critical components have tests
+        critical_components=(
+          "stellar_exchange.py"
+          "stellar_security_manager.py"
+          "stellar_order_manager.py"
+          "stellar_chain_interface.py"
+        )
+
+        for component in "${critical_components[@]}"; do
+          test_name="test_${component%.py}.py"
+          if ! find tests/ -name "*${test_name}*" -o -name "*${component%.py}*test*.py" | grep -q .; then
+            echo "⚠️  Missing tests for critical component: $component"
+          fi
+        done
+
+        echo "✅ Test infrastructure validation complete"
+
+    - name: 📊 Generate Compliance Report
+      run: |
+        echo "📋 COMPLIANCE AUDIT REPORT" > compliance-report.txt
+        echo "=========================" >> compliance-report.txt
+        echo "Date: $(date -u)" >> compliance-report.txt
+        echo "Branch: ${GITHUB_REF##*/}" >> compliance-report.txt
+        echo "Commit: $GITHUB_SHA" >> compliance-report.txt
+        echo "" >> compliance-report.txt
+
+        echo "✅ COMPLIANCE STATUS: PASSED" >> compliance-report.txt
+        echo "✅ Zero pytest.skip violations" >> compliance-report.txt
+        echo "✅ Zero CI/CD bypasses" >> compliance-report.txt
+        echo "✅ Code quality baseline maintained" >> compliance-report.txt
+        echo "✅ Security baseline maintained" >> compliance-report.txt
+        echo "✅ Test infrastructure validated" >> compliance-report.txt
+
+        echo "📊 METRICS:" >> compliance-report.txt
+        echo "   - Test files: $(find tests/ -name "test_*.py" | wc -l)" >> compliance-report.txt
+        echo "   - Python files: $(find hummingbot/connector/exchange/stellar/ -name "*.py" | wc -l)" >> compliance-report.txt
+        echo "   - Lines of code: $(find hummingbot/connector/exchange/stellar/ -name "*.py" -exec wc -l {} \; | awk '{sum+=$1} END {print sum}')" >> compliance-report.txt
+
+        cat compliance-report.txt
+
+    - name: 💬 Comment PR with Compliance Status
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('compliance-report.txt', 'utf8');
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 🛡️ Compliance Audit Report
+
+            \`\`\`
+            ${report}
+            \`\`\`
+
+            🎯 **All compliance checks passed!** This PR maintains the systematic violation remediation achievements.
+
+            📖 For details, see [DEVELOPMENT_RULES.md](./DEVELOPMENT_RULES.md) and [COMPLIANCE_VIOLATIONS_REPORT.md](./COMPLIANCE_VIOLATIONS_REPORT.md)`
+          });
+
+  compliance-metrics:
+    name: 📊 Compliance Metrics Collection
+    runs-on: ubuntu-latest
+    needs: compliance-audit
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+
+    - name: 📊 Collect Compliance Metrics
+      run: |
+        mkdir -p compliance-metrics
+
+        # Count various code quality metrics
+        echo "Collecting compliance metrics..."
+
+        {
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "commit=$GITHUB_SHA"
+          echo "branch=${GITHUB_REF##*/}"
+          echo "pytest_skip_violations=$(find . -name "*.py" -path "./tests/*" -exec grep -c "pytest\.skip\|pytest\.mark\.skip" {} \; 2>/dev/null | awk '{sum+=$1} END {print sum+0}')"
+          echo "cicd_bypasses=$(find . \( -name "*.yml" -o -name "*.yaml" -o -name "*.sh" \) -exec grep -c "|| true\|--no-verify" {} \; 2>/dev/null | awk '{sum+=$1} END {print sum+0}')"
+          echo "test_files=$(find tests/ -name "test_*.py" | wc -l)"
+          echo "python_files=$(find hummingbot/connector/exchange/stellar/ -name "*.py" | wc -l)"
+          echo "total_loc=$(find hummingbot/connector/exchange/stellar/ -name "*.py" -exec wc -l {} \; | awk '{sum+=$1} END {print sum+0}')"
+        } > compliance-metrics/current.properties
+
+        echo "✅ Compliance metrics collected"
+        cat compliance-metrics/current.properties
+
+    - name: 📤 Upload Compliance Metrics
+      uses: actions/upload-artifact@v4
+      with:
+        name: compliance-metrics
+        path: compliance-metrics/
+        retention-days: 90

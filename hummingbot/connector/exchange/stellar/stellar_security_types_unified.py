@@ -171,6 +171,8 @@ SecurityLevel = SecurityEnvironment
 
 # DEPRECATED: Use specific config types instead
 # This ensures existing code continues to work during migration
+
+
 class SecurityConfigCompat:
     """Backward compatibility wrapper for SecurityConfig usage."""
 
@@ -196,6 +198,7 @@ class SecurityConfigCompat:
         self.enable_audit_logging = kwargs.get('enable_audit_logging', True)
         self.encryption_algorithm = kwargs.get('encryption_algorithm', "AES-256-GCM")
         self.backup_enabled = kwargs.get('backup_enabled', True)
+
 
 # Use compatibility wrapper as default SecurityConfig
 SecurityConfig = SecurityConfigCompat

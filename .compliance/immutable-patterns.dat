@@ -1,0 +1,17 @@
+# IMMUTABLE COMPLIANCE PATTERNS - DO NOT MODIFY
+# These patterns are used by external enforcement systems
+# Modification of this file will trigger tamper alerts
+
+PYTEST_SKIP_REGEX=pytest\.skip\(|@pytest\.mark\.skip\(|pytestmark.*pytest\.mark\.skip
+CICD_BYPASS_REGEX=\|\|\s*true|--no-verify|SKIP_COMPLIANCE_CHECK
+QUALITY_BYPASS_REGEX=#\s*noqa\s*$|#\s*type:\s*ignore\s*$
+UNAUTHORIZED_CONFIG_REGEX=SKIP_.*=.*true|DISABLE_.*=.*true|bypass.*=.*true
+
+# File integrity checksums
+DEVELOPMENT_RULES_EXPECTED_CONTENT=NEVER.*pytest.mark.skip.*bypass.*failing.*tests
+COMPLIANCE_GUARD_EXPECTED_CONTENT=COMMIT BLOCKED.*compliance violations found
+
+# Enforcement metadata
+PATTERN_VERSION=1.0
+CREATED_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+TAMPER_DETECTION_ENABLED=true

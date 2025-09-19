@@ -9,8 +9,10 @@ from stellar_sdk import Server, Keypair, Network
 from hummingbot.connector.exchange.stellar.stellar_exchange import StellarExchange
 from tests.fixtures.stellar_component_fixtures import create_testnet_config
 
-# Skip all testnet tests as they require live network connectivity
-pytestmark = pytest.mark.skip(reason="Testnet tests require live network connectivity - skipped in CI")
+# Conditional testnet testing based on environment
+import os
+TESTNET_ENABLED = os.getenv("STELLAR_TESTNET_ENABLED", "false").lower() == "true"
+testnet_conditional_reason = "Testnet tests require STELLAR_TESTNET_ENABLED=true environment variable"
 
 
 class TestStellarTestnetValidation:
@@ -31,7 +33,7 @@ class TestStellarTestnetValidation:
         await exchange.stop_network()
 
     @pytest.mark.testnet
-    @pytest.mark.skip(reason="Testnet tests require live network connectivity - skipped in CI")
+    @pytest.mark.skipif(not TESTNET_ENABLED, reason=testnet_conditional_reason)
     @pytest.mark.asyncio
     async def test_testnet_connectivity(self, testnet_exchange):
         """Test basic testnet connectivity."""
@@ -39,7 +41,7 @@ class TestStellarTestnetValidation:
         assert status.is_connected is True
 
     @pytest.mark.testnet
-    @pytest.mark.skip(reason="Testnet tests require live network connectivity - skipped in CI")
+    @pytest.mark.skipif(not TESTNET_ENABLED, reason=testnet_conditional_reason)
     @pytest.mark.asyncio
     async def test_account_balance_retrieval(self, testnet_exchange):
         """Test account balance retrieval on testnet."""

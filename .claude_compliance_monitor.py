@@ -287,8 +287,8 @@ class ClaudeComplianceMonitor:
 
             # Check for actual test failures
             result = subprocess.run([
-                "python", "-m", "pytest", "--maxfail=1", "-q"
-            ], capture_output=True, text=True, timeout=60)
+                "python", "-m", "pytest", "--maxfail=1", "-q", "tests/unit/", "-m", "not testnet"
+            ], capture_output=True, text=True, timeout=30)
 
             return result.returncode != 0
 

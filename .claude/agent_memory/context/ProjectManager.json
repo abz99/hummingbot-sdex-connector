@@ -1,7 +1,7 @@
 {
   "agentName": "ProjectManager",
   "createdAt": "2025-09-14T20:53:42.236Z",
-  "lastAccessed": "2025-09-14T21:21:20.862Z",
+  "lastAccessed": "2025-09-18T08:36:36.700Z",
   "personalContext": {},
   "workflowState": {
     "workflow-1757883375307": {
@@ -248,11 +248,56 @@
         "completion",
         "strategic"
       ]
+    },
+    {
+      "id": "0f7c820b-8a68-4138-a155-35db55aadbba",
+      "timestamp": "2025-09-18T16:56:09.018Z",
+      "type": "user_instruction",
+      "content": "compliance_violation_remediation_coordination",
+      "context": {
+        "task": "Coordinate systematic compliance violation remediation based on COMPLIANCE_VIOLATIONS_REPORT.md findings. We've discovered 26+ violations across 5 categories including unauthorized bypasses, test skipping, and CI/CD suppression. Need to establish prioritized remediation workflow adhering to DEVELOPMENT_RULES.md principles.",
+        "sessionId": "ProjectManager-e3be7c37"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
+    },
+    {
+      "id": "4188236b-5f88-467d-bc33-2eecae224624",
+      "timestamp": "2025-09-18T17:42:13.417Z",
+      "type": "user_instruction",
+      "content": "compliance_remediation_continuation",
+      "context": {
+        "task": "Continue systematic compliance violation remediation coordination. We've successfully fixed all 7 CI/CD security bypasses in previous session. Current remaining violations: 3 C901 complexity violations (StellarObservabilityFramework.handle_qa_event, ModernStellarOrderManager._validate_order_parameters, StellarUserStreamTracker._stream_account_events) and 15+ pytest.skip test bypasses. Need coordinated approach to complete remediation.",
+        "sessionId": "ProjectManager-7971756e"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
+    },
+    {
+      "id": "41f0babe-f401-4beb-a463-ee038b50b8af",
+      "timestamp": "2025-09-18T17:56:51.280Z",
+      "type": "user_instruction",
+      "content": "test_violation_remediation_phase",
+      "context": {
+        "task": "Continue systematic compliance violation remediation. Previous session achieved major success: ALL CI/CD security bypasses fixed, ALL flake8 violations resolved, ALL C901 complexity fixed. Current priority: Address remaining 15+ pytest.skip violations in test files per DEVELOPMENT_RULES.md rule \"NEVER skip failing tests\". Need coordinated approach to fix underlying test infrastructure issues instead of bypassing them.",
+        "sessionId": "ProjectManager-742c96a8"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
     }
   ],
   "preferences": {},
   "metrics": {
-    "totalInteractions": 19,
+    "totalInteractions": 22,
     "successfulTasks": 0,
     "averageResponseTime": 0,
     "specializations": []
@@ -298,5 +343,5 @@
   "reminders": [],
   "activeProjects": [],
   "completedTasks": [],
-  "lastUpdated": "2025-09-14T21:21:20.915Z"
+  "lastUpdated": "2025-09-18T17:56:51.280Z"
 }
