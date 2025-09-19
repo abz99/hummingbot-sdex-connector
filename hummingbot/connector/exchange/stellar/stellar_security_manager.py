@@ -18,7 +18,7 @@ from .stellar_security_types import (
 )
 from .stellar_security_types_unified import (
     SecurityConfig,
-    SecurityLevel,
+    SecurityEnvironment as SecurityLevel,
 )
 from .stellar_security_validation import (
     create_default_rate_limits,
@@ -70,7 +70,7 @@ class StellarSecurityManager:
             SecurityLevel.PRODUCTION,
         ]:
             base_path = key_store_path or os.path.join(os.path.expanduser("~"), ".stellar-keys")
-            self._stores[KeyStoreType.FILE_SYSTEM] = FileSystemKeyStore(base_path)
+            self._stores[KeyStoreType.FILE] = FileSystemKeyStore(base_path)
 
         # HSM for production (placeholder)
         if (
@@ -159,7 +159,7 @@ class StellarSecurityManager:
                 if self.config.security_level == SecurityLevel.DEVELOPMENT:
                     store_type = KeyStoreType.MEMORY
                 else:
-                    store_type = KeyStoreType.FILE_SYSTEM
+                    store_type = KeyStoreType.FILE
 
             # Create key metadata with sanitized data
             key_id = f"stellar_{account_id[:8]}_{int(time.time())}"
@@ -243,7 +243,7 @@ class StellarSecurityManager:
                 if self.config.security_level == SecurityLevel.DEVELOPMENT:
                     store_type = KeyStoreType.MEMORY
                 else:
-                    store_type = KeyStoreType.FILE_SYSTEM
+                    store_type = KeyStoreType.FILE
 
             # Create key metadata
             key_id = f"stellar_{account_id[:8]}_{int(time.time())}"

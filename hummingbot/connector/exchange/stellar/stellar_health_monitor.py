@@ -61,7 +61,7 @@ class HealthCheckProvider:
                     error_message = f"HTTP {response.status}"
 
                 return HealthCheckResult(
-                    endpoint=endpoint,
+                    component=endpoint,
                     check_type=HealthCheckType.CUSTOM,
                     status=status,
                     response_time=response_time,
@@ -72,7 +72,7 @@ class HealthCheckProvider:
         except asyncio.TimeoutError:
             response_time = time.time() - start_time
             return HealthCheckResult(
-                endpoint=endpoint,
+                component=endpoint,
                 check_type=HealthCheckType.CUSTOM,
                 status=HealthStatus.UNHEALTHY,
                 response_time=response_time,
@@ -82,7 +82,7 @@ class HealthCheckProvider:
         except Exception as e:
             response_time = time.time() - start_time
             return HealthCheckResult(
-                endpoint=endpoint,
+                component=endpoint,
                 check_type=HealthCheckType.CUSTOM,
                 status=HealthStatus.CRITICAL,
                 response_time=response_time,
@@ -110,7 +110,7 @@ class HorizonHealthChecker(HealthCheckProvider):
                     # Check for expected Horizon response structure
                     if "horizon_version" in data and "core_version" in data:
                         return HealthCheckResult(
-                            endpoint=endpoint,
+                            component=endpoint,
                             check_type=HealthCheckType.HORIZON_API,
                             status=HealthStatus.HEALTHY,
                             response_time=response_time,
@@ -122,7 +122,7 @@ class HorizonHealthChecker(HealthCheckProvider):
                         )
                     else:
                         return HealthCheckResult(
-                            endpoint=endpoint,
+                            component=endpoint,
                             check_type=HealthCheckType.HORIZON_API,
                             status=HealthStatus.DEGRADED,
                             response_time=response_time,
@@ -130,7 +130,7 @@ class HorizonHealthChecker(HealthCheckProvider):
                         )
                 else:
                     return HealthCheckResult(
-                        endpoint=endpoint,
+                        component=endpoint,
                         check_type=HealthCheckType.HORIZON_API,
                         status=HealthStatus.UNHEALTHY,
                         response_time=response_time,
@@ -140,7 +140,7 @@ class HorizonHealthChecker(HealthCheckProvider):
         except Exception as e:
             response_time = time.time() - start_time
             return HealthCheckResult(
-                endpoint=endpoint,
+                component=endpoint,
                 check_type=HealthCheckType.HORIZON_API,
                 status=HealthStatus.UNHEALTHY,
                 response_time=response_time,
@@ -171,7 +171,7 @@ class SorobanHealthChecker(HealthCheckProvider):
 
                     if "result" in data and data["result"].get("status") == "healthy":
                         return HealthCheckResult(
-                            endpoint=endpoint,
+                            component=endpoint,
                             check_type=HealthCheckType.SOROBAN_RPC,
                             status=HealthStatus.HEALTHY,
                             response_time=response_time,
@@ -179,7 +179,7 @@ class SorobanHealthChecker(HealthCheckProvider):
                         )
                     else:
                         return HealthCheckResult(
-                            endpoint=endpoint,
+                            component=endpoint,
                             check_type=HealthCheckType.SOROBAN_RPC,
                             status=HealthStatus.DEGRADED,
                             response_time=response_time,
@@ -187,7 +187,7 @@ class SorobanHealthChecker(HealthCheckProvider):
                         )
                 else:
                     return HealthCheckResult(
-                        endpoint=endpoint,
+                        component=endpoint,
                         check_type=HealthCheckType.SOROBAN_RPC,
                         status=HealthStatus.UNHEALTHY,
                         response_time=response_time,
@@ -197,7 +197,7 @@ class SorobanHealthChecker(HealthCheckProvider):
         except Exception as e:
             response_time = time.time() - start_time
             return HealthCheckResult(
-                endpoint=endpoint,
+                component=endpoint,
                 check_type=HealthCheckType.SOROBAN_RPC,
                 status=HealthStatus.UNHEALTHY,
                 response_time=response_time,
@@ -223,14 +223,14 @@ class FriendbotHealthChecker(HealthCheckProvider):
                 # which is actually a healthy response
                 if response.status in [200, 400]:
                     return HealthCheckResult(
-                        endpoint=endpoint,
+                        component=endpoint,
                         check_type=HealthCheckType.FRIENDBOT,
                         status=HealthStatus.HEALTHY,
                         response_time=response_time,
                     )
                 else:
                     return HealthCheckResult(
-                        endpoint=endpoint,
+                        component=endpoint,
                         check_type=HealthCheckType.FRIENDBOT,
                         status=HealthStatus.UNHEALTHY,
                         response_time=response_time,
@@ -240,7 +240,7 @@ class FriendbotHealthChecker(HealthCheckProvider):
         except Exception as e:
             response_time = time.time() - start_time
             return HealthCheckResult(
-                endpoint=endpoint,
+                component=endpoint,
                 check_type=HealthCheckType.FRIENDBOT,
                 status=HealthStatus.UNHEALTHY,
                 response_time=response_time,
@@ -371,6 +371,20 @@ class StellarHealthMonitor:
     ) -> None:
         """Add a callback for endpoint recoveries."""
         self.recovery_callbacks.append(callback)
+
+    async def check_health(self, endpoint: str, session: aiohttp.ClientSession) -> HealthCheckResult:
+        """Check health of an endpoint using appropriate health checker.
+
+        This method provides compatibility with tests that expect a direct check_health method.
+        It uses the default Horizon health checker for generic endpoint checking.
+        """
+        # Use the Horizon health checker as default for generic endpoint checking
+        checker = self.health_checkers.get(HealthCheckType.HORIZON_API)
+        if not checker:
+            # Fallback to basic health check
+            checker = HealthCheckProvider()
+
+        return await checker.check_health(endpoint, session)
 
     async def check_endpoint_health(self, url: str) -> Optional[HealthCheckResult]:
         """Manually check health of a specific endpoint."""

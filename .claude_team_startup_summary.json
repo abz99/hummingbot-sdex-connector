@@ -1,0 +1,120 @@
+{
+  "startup_time": "2025-09-19T09:25:58.188471",
+  "agent_count": 8,
+  "agents": {
+    "ProjectManager": {
+      "role": "Coordinator",
+      "category": "coordinator",
+      "specializations": [
+        "task_orchestration",
+        "workflow_management",
+        "progress_tracking"
+      ],
+      "priority": 1,
+      "auto_engage": true
+    },
+    "Architect": {
+      "role": "System Designer",
+      "category": "reviewer",
+      "specializations": [
+        "system_design",
+        "architecture_review",
+        "technical_leadership"
+      ],
+      "priority": 2,
+      "auto_engage": true
+    },
+    "SecurityEngineer": {
+      "role": "Security Specialist",
+      "category": "reviewer",
+      "specializations": [
+        "threat_modeling",
+        "security_architecture",
+        "vulnerability_assessment"
+      ],
+      "priority": 2,
+      "auto_engage": true
+    },
+    "QAEngineer": {
+      "role": "Quality Assurance",
+      "category": "reviewer",
+      "specializations": [
+        "test_strategy",
+        "quality_framework",
+        "acceptance_criteria"
+      ],
+      "priority": 2,
+      "auto_engage": true
+    },
+    "Implementer": {
+      "role": "Code Developer",
+      "category": "implementer",
+      "specializations": [
+        "code_implementation",
+        "refactoring",
+        "debugging"
+      ],
+      "priority": 3,
+      "auto_engage": true
+    },
+    "DevOpsEngineer": {
+      "role": "Infrastructure Specialist",
+      "category": "implementer",
+      "specializations": [
+        "ci_cd_pipeline",
+        "infrastructure_automation",
+        "deployment"
+      ],
+      "priority": 3,
+      "auto_engage": true
+    },
+    "PerformanceEngineer": {
+      "role": "Performance Specialist",
+      "category": "specialist",
+      "specializations": [
+        "performance_analysis",
+        "optimization",
+        "benchmarking"
+      ],
+      "priority": 4,
+      "auto_engage": true
+    },
+    "DocumentationEngineer": {
+      "role": "Documentation Specialist",
+      "category": "specialist",
+      "specializations": [
+        "technical_writing",
+        "api_documentation",
+        "developer_experience"
+      ],
+      "priority": 4,
+      "auto_engage": true
+    }
+  },
+  "workflow_phases": [
+    "Requirements \u2192 ProjectManager",
+    "Architecture \u2192 Architect",
+    "Security \u2192 SecurityEngineer",
+    "Quality \u2192 QAEngineer",
+    "Implementation \u2192 Implementer + Specialists",
+    "Validation \u2192 All Reviewers"
+  ],
+  "capabilities": {
+    "coordinators": [
+      "ProjectManager"
+    ],
+    "reviewers": [
+      "Architect",
+      "SecurityEngineer",
+      "QAEngineer"
+    ],
+    "implementers": [
+      "Implementer",
+      "DevOpsEngineer"
+    ],
+    "specialists": [
+      "PerformanceEngineer",
+      "DocumentationEngineer"
+    ]
+  }
+}
