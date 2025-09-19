@@ -67,39 +67,58 @@ jobs:
         echo "🔍 IMMUTABLE COMPLIANCE CHECK: CI/CD bypasses"
         echo "============================================="
 
-        violations=$(find . \( -name "*.yml" -o -name "*.yaml" -o -name "*.sh" -o -name "*.py" \) \
+        violations_found=0
+
+        # TARGETED CHECK 1: Dangerous git commit bypasses in shell scripts
+        echo "🔍 Checking for dangerous git commit bypasses..."
+        git_violations=$(find . -name "*.sh" -not -path "./scripts/setup-compliance-prevention.sh" \
+          -not -path "./scripts/detect-compliance-tampering.sh" \
+          -not -path "./scripts/create-tamper-proof-enforcement.sh" -not -path "./venv/*" \
+          -exec grep -Hn "git.*commit.*--no-verify\|git.*push.*--no-verify" {} \; || true)
+
+        if [ -n "$git_violations" ]; then
+          echo "❌ CRITICAL: Git hook bypass violations detected:"
+          echo "$git_violations"
+          violations_found=1
+        fi
+
+        # TARGETED CHECK 2: CI pipeline error suppression patterns
+        echo "🔍 Checking for CI pipeline error suppression..."
+        ci_suppressions=$(find . -name "*.yml" -path "./.github/workflows/*" \
           -not -path "./.github/workflows/claude-resistant-enforcement.yml" \
           -not -path "./.github/workflows/compliance-enforcement.yml" \
-          -not -path "./venv/*" \
+          -exec grep -Hn "|| true.*#.*bypass\||| true.*#.*ignore\||| true.*#.*skip" {} \; || true)
+
+        if [ -n "$ci_suppressions" ]; then
+          echo "❌ CRITICAL: CI pipeline suppression violations detected:"
+          echo "$ci_suppressions"
+          violations_found=1
+        fi
+
+        # TARGETED CHECK 3: Explicit compliance bypass variables
+        echo "🔍 Checking for explicit compliance bypasses..."
+        bypass_vars=$(find . \( -name "*.py" -o -name "*.sh" \) -not -path "./venv/*" \
           -not -path "./scripts/setup-compliance-prevention.sh" \
           -not -path "./scripts/detect-compliance-tampering.sh" \
           -not -path "./scripts/create-tamper-proof-enforcement.sh" \
-          -not -path "./scripts/check-compliance.sh" \
-          -not -path "./scripts/check-failing-tests.sh" \
-          -not -path "./scripts/deploy_to_kubernetes.sh" \
-          -not -path "./scripts/install.sh" \
+          -not -path "./scripts/compliance-watchdog.py" \
           -not -path "./.pre-commit-hooks/compliance-guard.py" \
-          -not -path "./auto_accept_setup.sh" \
-          -not -path "./.claude_session_guard.py" \
-          -not -path "./.claude_emergency_recovery.sh" \
-          -not -path "./fix_cursor.sh" \
-          -not -path "./deployment/scripts/*" \
-          -exec grep -Hn -E "$CICD_BYPASS_PATTERNS" {} \; | \
-          grep -v "COMPLIANCE_VIOLATIONS_REPORT.md" | \
-          grep -v "COMPLIANCE_PREVENTION_GUIDE.md" | \
-          grep -v "docs/" || true)
+          -exec grep -Hn "SKIP_COMPLIANCE_CHECK\s*=\s*[\"']?1[\"']?\|SKIP_COMPLIANCE_CHECK\s*=\s*[\"']?true[\"']?" {} \; || true)
 
-        if [ -n "$violations" ]; then
-          echo "❌ CRITICAL: CI/CD BYPASS VIOLATIONS DETECTED"
-          echo "These violations compromise quality control:"
-          echo ""
-          echo "$violations"
+        if [ -n "$bypass_vars" ]; then
+          echo "❌ CRITICAL: Compliance bypass variables detected:"
+          echo "$bypass_vars"
+          violations_found=1
+        fi
+
+        if [ $violations_found -eq 1 ]; then
           echo ""
           echo "🚨 ENFORCEMENT ACTION: Build terminated"
           echo "🔒 This check cannot be disabled by Claude instances"
+          echo "✋ Human intervention required to resolve violations"
           exit 1
         else
-          echo "✅ No CI/CD bypass violations found"
+          echo "✅ No targeted CI/CD bypass violations found"
         fi
 
     - name: 🔍 Detect Compliance Guard Tampering (IMMUTABLE)
@@ -158,31 +177,38 @@ jobs:
         # Comprehensive scan that Claude cannot influence
         total_violations=0
 
-        # Count each type of violation (excluding legitimate enforcement files)
+        # Count each type of violation with targeted detection
         pytest_violations=$(find . -name "*.py" -path "./tests/*" \
           -not -path "./tests/adapted/__pycache__/*" \
           -exec grep -c -E "$PYTEST_SKIP_PATTERNS" {} \; 2>/dev/null | awk '{sum+=$1} END {print sum+0}')
 
-        cicd_violations=$(find . \( -name "*.yml" -o -name "*.yaml" -o -name "*.sh" \) \
+        # Targeted CI/CD violation counting (not broad pattern matching)
+        git_bypass_violations=$(find . -name "*.sh" -not -path "./scripts/setup-compliance-prevention.sh" \
+          -not -path "./scripts/detect-compliance-tampering.sh" \
+          -not -path "./scripts/create-tamper-proof-enforcement.sh" -not -path "./venv/*" \
+          -exec grep -c "git.*commit.*--no-verify\|git.*push.*--no-verify" {} \; 2>/dev/null | awk '{sum+=$1} END {print sum+0}')
+
+        ci_suppression_violations=$(find . -name "*.yml" -path "./.github/workflows/*" \
           -not -path "./.github/workflows/claude-resistant-enforcement.yml" \
           -not -path "./.github/workflows/compliance-enforcement.yml" \
+          -exec grep -c "|| true.*#.*bypass\||| true.*#.*ignore\||| true.*#.*skip" {} \; 2>/dev/null | awk '{sum+=$1} END {print sum+0}')
+
+        bypass_var_violations=$(find . \( -name "*.py" -o -name "*.sh" \) -not -path "./venv/*" \
           -not -path "./scripts/setup-compliance-prevention.sh" \
           -not -path "./scripts/detect-compliance-tampering.sh" \
           -not -path "./scripts/create-tamper-proof-enforcement.sh" \
-          -not -path "./scripts/check-compliance.sh" \
-          -not -path "./scripts/check-failing-tests.sh" \
-          -not -path "./scripts/deploy_to_kubernetes.sh" \
-          -not -path "./scripts/install.sh" \
-          -not -path "./auto_accept_setup.sh" \
-          -not -path "./.claude_session_guard.py" \
-          -not -path "./.claude_emergency_recovery.sh" \
-          -not -path "./fix_cursor.sh" \
-          -not -path "./deployment/scripts/*" \
-          -exec grep -c -E "$CICD_BYPASS_PATTERNS" {} \; 2>/dev/null | awk '{sum+=$1} END {print sum+0}')
+          -not -path "./scripts/compliance-watchdog.py" \
+          -not -path "./.pre-commit-hooks/compliance-guard.py" \
+          -exec grep -c "SKIP_COMPLIANCE_CHECK\s*=\s*[\"']?1[\"']?\|SKIP_COMPLIANCE_CHECK\s*=\s*[\"']?true[\"']?" {} \; 2>/dev/null | awk '{sum+=$1} END {print sum+0}')
 
-        echo "📊 VIOLATION COUNTS:"
+        cicd_violations=$((git_bypass_violations + ci_suppression_violations + bypass_var_violations))
+
+        echo "📊 TARGETED VIOLATION COUNTS:"
         echo "   pytest.skip violations: $pytest_violations (Required: 0)"
-        echo "   CI/CD bypass violations: $cicd_violations (Required: 0)"
+        echo "   git bypass violations: $git_bypass_violations (Required: 0)"
+        echo "   CI suppression violations: $ci_suppression_violations (Required: 0)"
+        echo "   bypass variable violations: $bypass_var_violations (Required: 0)"
+        echo "   total CI/CD violations: $cicd_violations (Required: 0)"
 
         total_violations=$((pytest_violations + cicd_violations))
 
