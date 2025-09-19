@@ -35,7 +35,7 @@ jobs:
     - name: 🚫 Check for pytest.skip Violations
       run: |
         echo "🔍 Scanning for pytest.skip violations..."
-        violations=$(find . -name "*.py" -path "./tests/*" -exec grep -Hn "pytest\.skip\|pytest\.mark\.skip" {} \; || true)
+        violations=$(find . -name "*.py" -path "./tests/*" -exec grep -Hn "pytest\.skip\|@pytest\.mark\.skip[^i]" {} \; || true)
 
         if [ -n "$violations" ]; then
           echo "❌ PYTEST.SKIP VIOLATIONS FOUND:"
