@@ -82,7 +82,7 @@ class OptimizedQAMetricsCache:
             return ""
 
         stat = file_path.stat()
-        return hashlib.md5(f"{stat.st_mtime}:{stat.st_size}".encode()).hexdigest()
+        return hashlib.md5(f"{stat.st_mtime}:{stat.st_size}".encode(), usedforsecurity=False).hexdigest()
 
     def get(self, key: str, file_path: Optional[Path] = None) -> Optional[Any]:
         """Get cached data if valid."""

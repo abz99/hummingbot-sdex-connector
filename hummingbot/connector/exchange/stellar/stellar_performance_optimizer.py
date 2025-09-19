@@ -84,7 +84,7 @@ class RequestCache:
     def _generate_key(self, endpoint: str, params: Dict[str, Any]) -> str:
         """Generate cache key from endpoint and parameters."""
         key_data = f"{endpoint}:{json.dumps(params, sort_keys=True)}"
-        return hashlib.md5(key_data.encode()).hexdigest()
+        return hashlib.md5(key_data.encode(), usedforsecurity=False).hexdigest()
 
     def get(self, endpoint: str, params: Dict[str, Any]) -> Optional[Any]:
         """Get cached response if valid."""
