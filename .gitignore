@@ -2,3 +2,24 @@ test/defi_performance_benchmarks.py
 test/run_defi_tests.py
 test/qa/
 test/stellar_defi_integration_tests.py
+
+# Session Management & Agent State (should not be committed)
+.claude_session_state.json
+.claude_auto_startup_state.json
+.claude_current_session.json
+.claude/agent_memory/conversations/
+.claude/settings.json
+
+# Agent State Files (runtime state, not source code)
+agent_state/*.json
+
+# Log Files
+logs/*.log
+
+# Claude Code Session Files
+.claude_auto_startup.py
+.claude_session_auto_init.py
+.claude_startup_trigger.py
+.claude_hooks.json
+CLAUDE_CODE_HOOK_SETUP.md
+logs/session_auto_init.log

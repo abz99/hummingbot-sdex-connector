@@ -28,21 +28,30 @@
 
 ## 🎯 SESSION STARTUP CHECKLIST (AUTOMATED)
 
-**AUTOMATIC STARTUP SEQUENCE** - Runs automatically when Claude Code starts:
+**CRITICAL: AUTOMATIC SESSION INITIALIZATION** - MUST run at start of every session:
 
-The system now includes **automated startup** via `.claude_code_startup.py` which:
+⚠️  **MANDATORY FIRST ACTION** - Run this immediately when session starts:
+```python
+# ALWAYS run this first in any new Claude Code session:
+exec(open('.claude_session_auto_init.py').read())
+```
 
-1. ✅ **Validates Prerequisites** - Checks Python version, dependencies, required files
-2. ✅ **Validates Configuration** - Ensures `team_startup.yaml` is valid  
-3. ✅ **Updates Knowledge Base** - Automatically indexes all documentation and code
-4. ✅ **Initializes Persistent Agents** - Starts all 8 specialized agents with state persistence
-5. ✅ **Starts Background Services** - Monitors file changes and agent health
-6. ✅ **Displays System Status** - Shows agents, tasks, and knowledge base status
+**AUTOMATIC STARTUP SEQUENCE** includes:
+
+1. ✅ **Session Detection** - Detects new Claude Code sessions automatically
+2. ✅ **Context Restoration** - Reads PROJECT_STATUS.md, CLAUDE.md, and key documentation
+3. ✅ **Agent Initialization** - Starts all 8 specialized agents with state persistence
+4. ✅ **System Verification** - Confirms multi-agent system is active and responsive
+5. ✅ **Session State** - Creates session markers to prevent duplicate initialization
+
+**VERIFICATION COMMANDS**:
+- Agent Status: `python scripts/agent_manager.py --status`
+- Force Restart: `python .claude_code_startup.py`
+- Session Check: `python .claude_session_auto_init.py`
 
 **MANUAL OVERRIDE** (if needed):
-- Set `SKIP_CLAUDE_STARTUP=1` to skip automated startup
-- Run `python .claude_code_startup.py` to manually trigger startup
-- Use `python scripts/agent_manager.py --status` for current system status
+- Set `SKIP_CLAUDE_AUTO_INIT=1` to skip session auto-initialization
+- Set `SKIP_CLAUDE_STARTUP=1` to skip automated startup entirely
 
 **CORE INSTRUCTION FILES** ⭐ (Auto-indexed for all agents):
    - `stellar_sdex_checklist_v3.md` - **Master implementation roadmap**
