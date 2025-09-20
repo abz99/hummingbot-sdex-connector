@@ -58,6 +58,12 @@ jobs:
         echo "Safety report generated successfully"
         python -m pytest tests/security/test_stellar_security_compliance.py::TestSecurityCompliance::test_dependency_security_scan -v
 
+    - name: Compliance Prevention Check
+      run: |
+        echo "🔍 Running compliance prevention check..."
+        python scripts/compliance_prevention.py --check
+        echo "✅ Compliance check passed"
+
     - name: Run static security analysis
       run: |
         echo "Starting static security analysis..."
@@ -119,7 +125,7 @@ jobs:
     
     - name: Run linting
       run: |
-        flake8 hummingbot/connector/exchange/stellar/ --max-line-length=100 --extend-ignore=E203,W503 --max-complexity=12
+        flake8 hummingbot/connector/exchange/stellar/ --config=.flake8
     
     - name: Run type checking
       run: |

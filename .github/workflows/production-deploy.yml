@@ -72,7 +72,13 @@ jobs:
         fi
         # Install additional security tools with specific versions
         pip install bandit==1.7.5 safety==3.1.0 tenacity==8.2.3
-        
+
+    - name: Compliance Prevention Check
+      run: |
+        echo "🔍 Running compliance prevention check..."
+        python scripts/compliance_prevention.py --check
+        echo "✅ Compliance check passed"
+
     - name: Security Scan - Bandit
       run: |
         # Run bandit and only fail on HIGH or MEDIUM severity issues
@@ -104,7 +110,7 @@ jobs:
         
     - name: Code Quality - Flake8
       run: |
-        flake8 hummingbot/connector/exchange/stellar/ --output-file=flake8-report.txt --format=default || echo "Flake8 completed with style warnings"
+        flake8 hummingbot/connector/exchange/stellar/ --config=.flake8 --output-file=flake8-report.txt --format=default || echo "Flake8 completed with style warnings"
         
     - name: Code Quality - MyPy
       run: |

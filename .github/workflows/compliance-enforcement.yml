@@ -32,6 +32,12 @@ jobs:
         pip install pytest flake8 mypy bandit safety
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+    - name: Compliance Prevention Check
+      run: |
+        echo "🔍 Running compliance prevention check..."
+        python scripts/compliance_prevention.py --check
+        echo "✅ Compliance check passed"
+
     - name: 🚫 Check for pytest.skip Violations
       run: |
         echo "🔍 Scanning for pytest.skip violations..."
@@ -97,7 +103,7 @@ jobs:
 
         # Run flake8 and ensure it passes (align with main CI standards)
         echo "Running flake8..."
-        flake8 hummingbot/connector/exchange/stellar/ tests/ --max-line-length=120 --extend-ignore=E203,W503,C901 --statistics
+        flake8 hummingbot/connector/exchange/stellar/ tests/ --config=.flake8 --statistics
 
         # Run mypy check (allow errors for now to prevent pipeline blocking)
         echo "Running mypy..."

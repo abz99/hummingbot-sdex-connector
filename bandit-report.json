@@ -1,19 +1,19 @@
 {
   "errors": [],
-  "generated_at": "2025-09-19T14:47:45Z",
+  "generated_at": "2025-09-20T13:47:26Z",
   "metrics": {
     "_totals": {
       "CONFIDENCE.HIGH": 10,
       "CONFIDENCE.LOW": 0,
-      "CONFIDENCE.MEDIUM": 5,
+      "CONFIDENCE.MEDIUM": 4,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
-      "SEVERITY.LOW": 15,
+      "SEVERITY.LOW": 14,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 24689,
+      "loc": 24786,
       "nosec": 0,
-      "skipped_tests": 0
+      "skipped_tests": 1
     },
     "hummingbot/connector/exchange/stellar/__init__.py": {
       "CONFIDENCE.HIGH": 0,
@@ -505,7 +505,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 848,
+      "loc": 874,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -642,15 +642,15 @@
     "hummingbot/connector/exchange/stellar/stellar_security_hardening.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
-      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
-      "SEVERITY.LOW": 1,
+      "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
       "loc": 646,
       "nosec": 0,
-      "skipped_tests": 0
+      "skipped_tests": 1
     },
     "hummingbot/connector/exchange/stellar/stellar_security_manager.py": {
       "CONFIDENCE.HIGH": 0,
@@ -661,7 +661,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 447,
+      "loc": 518,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -1189,26 +1189,6 @@
       "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b405-import-xml-etree",
       "test_id": "B405",
       "test_name": "blacklist"
-    },
-    {
-      "code": "576         # In production, this would check against a secure user store\n577         return username == \"admin\" and password == \"secure_password\"\n578 \n",
-      "col_offset": 51,
-      "end_col_offset": 68,
-      "filename": "hummingbot/connector/exchange/stellar/stellar_security_hardening.py",
-      "issue_confidence": "MEDIUM",
-      "issue_cwe": {
-        "id": 259,
-        "link": "https://cwe.mitre.org/data/definitions/259.html"
-      },
-      "issue_severity": "LOW",
-      "issue_text": "Possible hardcoded password: 'secure_password'",
-      "line_number": 577,
-      "line_range": [
-        577
-      ],
-      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b105_hardcoded_password_string.html",
-      "test_id": "B105",
-      "test_name": "hardcoded_password_string"
     },
     {
       "code": "43     YIELD_FARM = \"yield_farm\"\n44     TOKEN = \"token\"\n45     CUSTOM = \"custom\"\n",
