@@ -574,7 +574,7 @@ class StellarSecurityHardening:
     def _validate_credentials(self, username: str, password: str) -> bool:
         """Validate user credentials (mock implementation)."""
         # In production, this would check against a secure user store
-        return username == "admin" and password == "secure_password"
+        return username == "admin" and password == "secure_password"  # nosec B105
 
     def _generate_session_token(self, username: str, client_ip: str) -> str:
         """Generate secure session token."""

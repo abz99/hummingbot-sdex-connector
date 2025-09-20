@@ -892,7 +892,9 @@ class StellarObservabilityFramework:
         module = context.get("module", "unknown")
 
         alert = Alert(
-            id="low_test_coverage", category=AlertCategory.BUSINESS, title="low_test_coverage",
+            id="low_test_coverage",
+            category=AlertCategory.BUSINESS,
+            title="low_test_coverage",
             severity=AlertLevel.WARNING,
             message=f"Test coverage for {module} is {coverage_percentage}% (below 80%)",
             context=context,
@@ -907,7 +909,9 @@ class StellarObservabilityFramework:
         test_suite = context.get("test_suite", "unknown")
 
         alert = Alert(
-            id="test_failures", category=AlertCategory.BUSINESS, title="test_failures",
+            id="test_failures",
+            category=AlertCategory.BUSINESS,
+            title="test_failures",
             severity=AlertLevel.CRITICAL if success_rate < 0.90 else AlertLevel.WARNING,
             message=f"Test suite {test_suite} has {success_rate*100:.1f}% success rate",
             context=context,
@@ -921,7 +925,9 @@ class StellarObservabilityFramework:
         quality_score = context.get("quality_score", 0)
 
         alert = Alert(
-            id="low_code_quality", category=AlertCategory.BUSINESS, title="low_code_quality",
+            id="low_code_quality",
+            category=AlertCategory.BUSINESS,
+            title="low_code_quality",
             severity=AlertLevel.CRITICAL if quality_score < 5.0 else AlertLevel.WARNING,
             message=f"Code quality score is {quality_score}/10",
             context=context,
@@ -936,7 +942,9 @@ class StellarObservabilityFramework:
         category = context.get("category", "unknown")
 
         alert = Alert(
-            id="compliance_failure", category=AlertCategory.COMPLIANCE, title="compliance_failure",
+            id="compliance_failure",
+            category=AlertCategory.COMPLIANCE,
+            title="compliance_failure",
             severity=AlertLevel.CRITICAL if category == "security" else AlertLevel.WARNING,
             message=f"Requirement {requirement_id} in category {category} is non-compliant",
             context=context,
@@ -951,7 +959,9 @@ class StellarObservabilityFramework:
         severity = context.get("severity", "unknown")
 
         alert = Alert(
-            id="high_defect_rate", category=AlertCategory.BUSINESS, title="high_defect_rate",
+            id="high_defect_rate",
+            category=AlertCategory.BUSINESS,
+            title="high_defect_rate",
             severity=AlertLevel.CRITICAL if severity == "critical" else AlertLevel.WARNING,
             message=f"High {severity} defect rate: {defect_rate} defects/hour",
             context=context,
@@ -965,7 +975,9 @@ class StellarObservabilityFramework:
         last_update = context.get("last_update", "unknown")
 
         alert = Alert(
-            id="stale_qa_metrics", category=AlertCategory.BUSINESS, title="stale_qa_metrics",
+            id="stale_qa_metrics",
+            category=AlertCategory.BUSINESS,
+            title="stale_qa_metrics",
             severity=AlertLevel.WARNING,
             message=f"QA metrics haven't been updated since {last_update}",
             context=context,

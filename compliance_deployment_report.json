@@ -1,0 +1,30 @@
+{
+  "deployment_timestamp": "2025-09-20T10:05:59.692216",
+  "deployment_log": [
+    "\u2705 \ud83d\udd27 Ensuring agent system operational: SUCCESS (11.68s)",
+    "\u2705 \ud83d\udccb Deploying compliance gateway: SUCCESS (1.89s)",
+    "\u2705 \ud83c\udfe5 Deploying agent health manager: SUCCESS (1.00s)",
+    "\u2705 \ud83e\uddea Deploying test suite: SUCCESS (5.46s)",
+    "\u2705 \ud83d\udcca Deploying real-time monitoring: SUCCESS (10.92s)",
+    "\u2705 \u2705 Running system validation: SUCCESS (11.74s)",
+    "\u2705 \ud83d\udd04 Testing violation detection: SUCCESS (0.00s)"
+  ],
+  "validation_results": {
+    "compliance_gateway": false,
+    "agent_health_manager": true,
+    "monitoring_system": true,
+    "overall_valid": false
+  },
+  "system_components": {
+    "compliance_gateway": "scripts/compliance_gateway.py",
+    "agent_health_manager": "scripts/agent_health_manager.py",
+    "compliance_monitor": "scripts/compliance_monitor.py",
+    "test_suite": "tests/compliance/test_compliance_enforcement.py"
+  },
+  "next_steps": [
+    "Start real-time monitoring: python scripts/compliance_monitor.py --start",
+    "Run comprehensive tests: python -m pytest tests/compliance/ -v",
+    "Monitor agent health: python scripts/agent_health_manager.py --monitor",
+    "Check compliance status: python scripts/compliance_gateway.py --test"
+  ]
+}
