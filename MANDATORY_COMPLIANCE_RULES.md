@@ -28,8 +28,9 @@ pytest --collect-only -q | grep -v "warnings summary" | tail -1 | grep -E "faile
 2. **NEVER COMMIT WITH FAILING TESTS** - All commits must pass complete test suite
 3. **NEVER ALLOW OUTDATED DOCUMENTATION** - PROJECT_STATUS.md must be current within 24 hours
 4. **NEVER BYPASS SECURITY REVIEWS** - All security-related changes require SecurityEngineer approval
-5. **NEVER VIOLATE GIT WORKFLOW** - Every commit must sync to remote (`git push origin main`)
-6. **NEVER WORK WITHOUT TEAM ENGAGEMENT** - ALL tasks must engage appropriate specialized agents FIRST
+5. **NEVER VIOLATE GIT WORKFLOW** - Every commit must sync to remote (`git push origin main`) IMMEDIATELY after completion
+6. **NEVER LEAVE UNCOMMITTED CHANGES** - All completed work must be committed and pushed within 5 minutes of completion
+7. **NEVER WORK WITHOUT TEAM ENGAGEMENT** - ALL tasks must engage appropriate specialized agents FIRST
 
 ### **MANDATORY ACTIONS (MUST PERFORM)**
 1. **ALWAYS ENGAGE THE TEAM** - Every task MUST start with appropriate agent engagement using Task tool
@@ -38,6 +39,24 @@ pytest --collect-only -q | grep -v "warnings summary" | tail -1 | grep -E "faile
 4. **ALWAYS RUN QUALITY CHECKS** - Before major commits, run `flake8`, `mypy`, `black`
 5. **ALWAYS MAINTAIN TEST COVERAGE** - Minimum 90% coverage for new code, 85% overall
 6. **ALWAYS DOCUMENT DECISIONS** - Architectural decisions must be recorded in tracking files
+7. **ALWAYS COMMIT IMMEDIATELY** - Upon task completion, immediately run `git add .`, `git commit`, `git push origin main`
+8. **ALWAYS VERIFY GIT SYNC** - After each commit, verify changes are pushed to remote with `git status`
+
+### **GIT WORKFLOW ENFORCEMENT (CRITICAL)**
+1. **REAL-TIME MONITORING**: Check for uncommitted changes every 5 minutes during active sessions
+2. **POST-COMPLETION CHECKS**: After completing any task, automatically verify git status shows no uncommitted changes
+3. **VIOLATION ALERTS**: If uncommitted changes detected >5 minutes, trigger immediate alert and halt new work
+4. **ESCALATION TRIGGERS**:
+   - 1st violation: Warning and immediate commit requirement
+   - 2nd violation: Session pause until compliance restored
+   - 3rd violation: Session termination and compliance review
+5. **PREVENTION COMMANDS**: Always run these after task completion:
+   ```bash
+   git add .
+   git commit -m "[descriptive message]"
+   git push origin main
+   git status  # Verify clean state
+   ```
 
 ### **SESSION CONTINUITY REQUIREMENTS**
 1. **SESSION START**: Execute `.claude_session_init.sh` within first 60 seconds
