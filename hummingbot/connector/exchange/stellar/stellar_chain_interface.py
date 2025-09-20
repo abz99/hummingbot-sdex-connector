@@ -160,8 +160,11 @@ class ModernStellarChainInterface:
                     account_call_builder = self.current_horizon.accounts().account_id(account_id)
                     account = await account_call_builder.call()
 
-                    # Update sequence number cache
-                    sequence = int(account.sequence)
+                    # Update sequence number cache with compatibility wrapper
+                    try:
+                        sequence = int(account.sequence)  # Object access
+                    except AttributeError:
+                        sequence = int(account.get('sequence', 0))  # Dict access fallback
                     self._account_sequences[account_id] = sequence
 
                     return account
