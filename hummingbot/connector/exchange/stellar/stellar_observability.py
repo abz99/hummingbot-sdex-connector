@@ -37,11 +37,11 @@ from .stellar_metrics import get_stellar_metrics, StellarMetrics
 # Import from there for new code:
 from .stellar_observability_types_unified import (
     Alert,
+    AlertCategory,
     AlertRule,
 )
 from .stellar_observability_types_unified import (
     AlertSeverity as AlertLevel,  # Alias for backward compatibility
-    AlertCategory,
 )
 from .stellar_observability_types_unified import (
     HealthCheckResult,

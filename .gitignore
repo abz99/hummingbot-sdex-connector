@@ -23,3 +23,5 @@ logs/*.log
 .claude_hooks.json
 CLAUDE_CODE_HOOK_SETUP.md
 logs/session_auto_init.log
+# Exclude bandit report artifacts from security scanning
+bandit-report*.json
