@@ -59,7 +59,13 @@ class StellarSecurityManager:
 
     def _initialize_key_stores(self, key_store_path: Optional[str] = None) -> None:
         """Initialize key storage backends based on configuration."""
-        # Always include memory store as fallback
+        self._initialize_memory_store()
+        self._initialize_file_store(key_store_path)
+        self._initialize_hsm_store()
+        self._ensure_fallback_store()
+
+    def _initialize_memory_store(self) -> None:
+        """Initialize memory key store as fallback."""
         try:
             self._stores[KeyStoreType.MEMORY] = MemoryKeyStore()
             self.logger.info(
@@ -74,57 +80,67 @@ class StellarSecurityManager:
                 exception=e,
             )
 
-        # File system store for testing and above
-        if self.config.security_level in [
+    def _initialize_file_store(self, key_store_path: Optional[str] = None) -> None:
+        """Initialize file system key store for testing and above."""
+        if self.config.security_level not in [
             SecurityLevel.TESTING,
             SecurityLevel.STAGING,
             SecurityLevel.PRODUCTION,
         ]:
-            try:
-                base_path = key_store_path or os.path.join(os.path.expanduser("~"), ".stellar-keys")
-                self._stores[KeyStoreType.FILE] = FileSystemKeyStore(base_path)
-                self.logger.info(
-                    f"File system key store initialized at: {base_path}",
-                    category=LogCategory.SECURITY,
-                    store_type=KeyStoreType.FILE.name,
-                    base_path=base_path,
-                )
-            except Exception as e:
-                self.logger.error(
-                    f"Failed to initialize file system key store: {e}",
-                    category=LogCategory.SECURITY,
-                    exception=e,
-                )
-                # Fall back to memory store if file store fails
-                if KeyStoreType.MEMORY not in self._stores:
-                    self._stores[KeyStoreType.MEMORY] = MemoryKeyStore()
-                    self.logger.warning(
-                        "Falling back to memory key store after file store failure",
-                        category=LogCategory.SECURITY,
-                    )
+            return
 
-        # HSM for production (placeholder)
-        if (
+        try:
+            base_path = key_store_path or os.path.join(os.path.expanduser("~"), ".stellar-keys")
+            self._stores[KeyStoreType.FILE] = FileSystemKeyStore(base_path)
+            self.logger.info(
+                f"File system key store initialized at: {base_path}",
+                category=LogCategory.SECURITY,
+                store_type=KeyStoreType.FILE.name,
+                base_path=base_path,
+            )
+        except Exception as e:
+            self.logger.error(
+                f"Failed to initialize file system key store: {e}",
+                category=LogCategory.SECURITY,
+                exception=e,
+            )
+            self._fallback_to_memory_store()
+
+    def _initialize_hsm_store(self) -> None:
+        """Initialize HSM key store for production."""
+        if not (
             self.config.security_level == SecurityLevel.PRODUCTION
             and self.config.require_hardware_security
         ):
-            try:
-                # This would be configured with actual HSM details in production
-                hsm_config: Dict[str, Any] = {}
-                self._stores[KeyStoreType.HSM] = HSMKeyStore(hsm_config)
-                self.logger.info(
-                    "HSM key store initialized successfully",
-                    category=LogCategory.SECURITY,
-                    store_type=KeyStoreType.HSM.name,
-                )
-            except Exception as e:
-                self.logger.error(
-                    f"Failed to initialize HSM key store: {e}",
-                    category=LogCategory.SECURITY,
-                    exception=e,
-                )
+            return
 
-        # Ensure we have at least one store available
+        try:
+            # This would be configured with actual HSM details in production
+            hsm_config: Dict[str, Any] = {}
+            self._stores[KeyStoreType.HSM] = HSMKeyStore(hsm_config)
+            self.logger.info(
+                "HSM key store initialized successfully",
+                category=LogCategory.SECURITY,
+                store_type=KeyStoreType.HSM.name,
+            )
+        except Exception as e:
+            self.logger.error(
+                f"Failed to initialize HSM key store: {e}",
+                category=LogCategory.SECURITY,
+                exception=e,
+            )
+
+    def _fallback_to_memory_store(self) -> None:
+        """Fall back to memory store if file store fails."""
+        if KeyStoreType.MEMORY not in self._stores:
+            self._stores[KeyStoreType.MEMORY] = MemoryKeyStore()
+            self.logger.warning(
+                "Falling back to memory key store after file store failure",
+                category=LogCategory.SECURITY,
+            )
+
+    def _ensure_fallback_store(self) -> None:
+        """Ensure we have at least one store available."""
         if not self._stores:
             self.logger.error(
                 "No key stores could be initialized",
