@@ -172,8 +172,8 @@ class TestNetworkSecurity:
         print("\n🔐 Testing TLS certificate validation")
 
         endpoints_to_test = [
-            security_test_config.horizon_url,
-            security_test_config.soroban_url,
+            str(security_test_config.horizon.primary),
+            str(security_test_config.soroban.primary),
             "https://friendbot.stellar.org",
         ]
 
@@ -184,7 +184,8 @@ class TestNetworkSecurity:
             try:
                 async with aiohttp.ClientSession() as session:
                     async with session.get(endpoint, timeout=10) as response:
-                        assert response.status in [200, 404], f"Unexpected status from {endpoint}"
+                        # Accept 200 (Horizon), 400 (Friendbot Bad Request), 404 (not found), 405 (Soroban Method Not Allowed)
+                        assert response.status in [200, 400, 404, 405], f"Unexpected status from {endpoint}: {response.status}"
 
             except aiohttp.ClientError as e:
                 pytest.fail(f"TLS validation failed for {endpoint}: {e}")
@@ -198,7 +199,7 @@ class TestNetworkSecurity:
         try:
             async with aiohttp.ClientSession(connector=connector) as session:
                 # This should work for valid Stellar endpoints
-                async with session.get(security_test_config.horizon_url, timeout=10) as response:
+                async with session.get(str(security_test_config.horizon.primary), timeout=10) as response:
                     assert response.status == 200, "Valid certificate rejected"
         except Exception as e:
             pytest.fail(f"Valid certificate test failed: {e}")
@@ -484,16 +485,22 @@ class TestResilienceAndRecoverySecurity:
         print("\n🔄 Testing failover security")
 
         # Create config with multiple endpoints for failover testing
+        from hummingbot.connector.exchange.stellar.stellar_config_models import NetworkEndpointConfig
+
         failover_config = StellarNetworkConfig(
             name="security_failover_test",
-            network="testnet",
-            horizon_url="https://horizon-testnet.stellar.org",
-            soroban_url="https://soroban-testnet.stellar.org",
-            passphrase="Test SDF Network ; September 2015",
-            fallback_horizons=[
-                "https://horizon-testnet-1.stellar.org",
-                "https://invalid-endpoint-for-testing.example.com",  # Should fail
-            ],
+            network_passphrase="Test SDF Network ; September 2015",
+            horizon=NetworkEndpointConfig(
+                primary="https://horizon-testnet.stellar.org",
+                fallbacks=[
+                    "https://horizon-testnet-1.stellar.org",
+                    "https://invalid-endpoint-for-testing.example.com",  # Should fail
+                ]
+            ),
+            soroban=NetworkEndpointConfig(
+                primary="https://soroban-testnet.stellar.org"
+            ),
+            rate_limits={"horizon": 1000, "soroban": 500}
         )
 
         chain_interface = ModernStellarChainInterface(

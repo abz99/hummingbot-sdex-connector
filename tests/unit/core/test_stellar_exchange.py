@@ -21,7 +21,12 @@ class TestStellarExchangeInitialization:
     def mock_stellar_config(self):
         """Mock Stellar network configuration."""
         config = MagicMock(spec=StellarNetworkConfig)
-        config.horizon_url = "https://horizon-testnet.stellar.org"
+        # Create mock for horizon endpoint
+        config.horizon = MagicMock()
+        config.horizon.primary = "https://horizon-testnet.stellar.org"
+        # Create mock for soroban endpoint
+        config.soroban = MagicMock()
+        config.soroban.primary = "https://soroban-testnet.stellar.org"
         config.network_passphrase = "Test SDF Network ; September 2015"
         config.is_testnet = True
         return config
@@ -89,7 +94,12 @@ class TestStellarExchangeNetworkLifecycle:
     @pytest.fixture
     def mock_stellar_config(self):
         config = MagicMock(spec=StellarNetworkConfig)
-        config.horizon_url = "https://horizon-testnet.stellar.org"
+        # Create mock for horizon endpoint
+        config.horizon = MagicMock()
+        config.horizon.primary = "https://horizon-testnet.stellar.org"
+        # Create mock for soroban endpoint
+        config.soroban = MagicMock()
+        config.soroban.primary = "https://soroban-testnet.stellar.org"
         config.network_passphrase = "Test SDF Network ; September 2015"
         config.is_testnet = True
         config.name = "testnet"
@@ -216,7 +226,13 @@ class TestStellarExchangeTradingPairs:
     @pytest.fixture
     def mock_stellar_config(self):
         config = MagicMock(spec=StellarNetworkConfig)
-        config.horizon_url = "https://horizon-testnet.stellar.org"
+        # Create mock for horizon endpoint
+        config.horizon = MagicMock()
+        config.horizon.primary = "https://horizon-testnet.stellar.org"
+        # Create mock for soroban endpoint
+        config.soroban = MagicMock()
+        config.soroban.primary = "https://soroban-testnet.stellar.org"
+        config.network_passphrase = "Test SDF Network ; September 2015"
         return config
 
     def test_trading_pairs_storage(self, mock_stellar_config):
