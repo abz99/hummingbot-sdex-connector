@@ -39,8 +39,11 @@ jobs:
         # Install security tools with compatible versions
         pip install safety==3.1.0 bandit==1.7.5 tenacity==8.2.3
         pip install semgrep --no-warn-conflicts
-        # Install project dependencies needed for tests
-        pip install -r requirements.txt
+        # Install project dependencies with timeout and better error handling
+        timeout 300 pip install -r requirements.txt || {
+          echo "⚠️ Full requirements install failed, installing core dependencies"
+          pip install stellar-sdk==8.2.1 aiohttp==3.12.15 cryptography==45.0.7 pytest==8.4.1 pytest-asyncio==1.1.0
+        }
         echo "Security tools installed successfully"
     
     - name: Run secret scanning
