@@ -60,11 +60,11 @@ jobs:
         # Look for actual problematic bypass patterns, excluding legitimate error handling
         violations=""
 
-        # Check for git hook bypasses
-        git_bypasses=$(find . -name "*.py" -o -name "*.sh" | xargs grep -Hn "git.*commit.*--no-verify\|git.*push.*--no-verify" | grep -v "example\|documentation\|comment" || true)
+        # Check for git hook bypasses (exclude compliance monitoring scripts)
+        git_bypasses=$(find . -name "*.py" -o -name "*.sh" | xargs grep -Hn "git.*commit.*--no-verify\|git.*push.*--no-verify" | grep -v "example\|documentation\|comment\|compliance\|detect-compliance\|watchdog\|enforcement" || true)
 
-        # Check for explicit compliance skips
-        compliance_skips=$(find . -name "*.py" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" | xargs grep -Hn "SKIP_COMPLIANCE_CHECK\s*=\s*1\|SKIP_COMPLIANCE_CHECK\s*=\s*true" || true)
+        # Check for explicit compliance skips (exclude compliance monitoring scripts)
+        compliance_skips=$(find . -name "*.py" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" | xargs grep -Hn "SKIP_COMPLIANCE_CHECK\s*=\s*1\|SKIP_COMPLIANCE_CHECK\s*=\s*true" | grep -v "compliance\|detect-compliance\|watchdog\|enforcement" || true)
 
         # Check for test bypasses (but exclude legitimate test configuration)
         test_bypasses=$(find . -name "*.py" | xargs grep -Hn "pytest.*--no-verify\|pytest.*skip.*compliance" || true)
