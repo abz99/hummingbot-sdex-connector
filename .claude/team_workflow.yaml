@@ -20,6 +20,8 @@ phase_gates:
     owner: "ProjectManager"
     description: "Task intake, scoping, and prioritization"
     deliverable: "Task specification with success criteria"
+    mandatory_team_engagement: true
+    enforcement: "ABSOLUTE - No task proceeds without appropriate agent engagement"
     
   architecture_review:
     owner: "Architect"
@@ -100,11 +102,11 @@ escalations:
     level_1: "Engage appropriate specialist"
     level_2: "ProjectManager coordination"
     level_3: "Multi-agent review session"
-  
+
   scope_creep:
     action: "Return to requirements_intake phase"
     owner: "ProjectManager"
-  
+
   quality_issues:
     action: "Loop back to implementer with specific feedback"
     reviewers: ["Architect", "SecurityEngineer", "QAEngineer", "ComplianceOfficer"]
@@ -113,7 +115,14 @@ escalations:
     action: "Immediate review and remediation"
     owner: "ComplianceOfficer"
     escalation: "ProjectManager"
-  
+
+  team_engagement_violations:
+    action: "CRITICAL - Immediate halt and compliance remediation"
+    owner: "ComplianceOfficer"
+    escalation: "ProjectManager"
+    severity: "ABSOLUTE_OVERRIDE"
+    description: "Any task started without proper team engagement"
+
   timeline_concerns:
     action: "Re-prioritize and communicate to stakeholders"
     owner: "ProjectManager"
@@ -138,13 +147,20 @@ automation:
     frequency: "After each phase completion"
     target_file: "PROJECT_STATUS.md"
     responsible: "ProjectManager"
-  
+
   quality_tracking:
     source: "qa/quality_catalogue.yml"
     validation: "Continuous"
     responsible: "QAEngineer"
-  
+
   progress_reporting:
     format: "Task Status Report"
     frequency: "On demand and milestones"
     responsible: "ProjectManager"
+
+  team_engagement_enforcement:
+    pre_task_validation: "MANDATORY - Verify agent engagement before task start"
+    monitoring: "Real-time compliance checking"
+    enforcement_level: "ABSOLUTE_OVERRIDE"
+    responsible: "ComplianceOfficer"
+    escalation: "Immediate halt for violations"

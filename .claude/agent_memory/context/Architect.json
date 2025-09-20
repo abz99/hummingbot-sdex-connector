@@ -1,7 +1,7 @@
 {
   "agentName": "Architect",
   "createdAt": "2025-09-14T20:56:15.318Z",
-  "lastAccessed": "2025-09-14T21:21:20.865Z",
+  "lastAccessed": "2025-09-19T21:45:22.561Z",
   "personalContext": {},
   "workflowState": {
     "workflow-1757883375307": {
@@ -120,10 +120,26 @@
       }
     }
   },
-  "learnings": [],
+  "learnings": [
+    {
+      "id": "98cbdd9c-1774-4695-81e3-3b07967dec7c",
+      "timestamp": "2025-09-19T21:56:19.494Z",
+      "type": "user_instruction",
+      "content": "architectural_files_assignment",
+      "context": {
+        "task": "Update your agent memory system to include architectural files: stellar_sdex_tdd_v3.md (96KB technical design document), docs/COMPONENT_API_REFERENCE.md, and docs/decisions/ directory. These contain system architecture, design patterns, and technical decisions that align with your role.",
+        "sessionId": "Architect-7be02d3f"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
+    }
+  ],
   "preferences": {},
   "metrics": {
-    "totalInteractions": 15,
+    "totalInteractions": 16,
     "successfulTasks": 0,
     "averageResponseTime": 0,
     "specializations": []
@@ -192,5 +208,5 @@
   "reminders": [],
   "activeProjects": [],
   "completedTasks": [],
-  "lastUpdated": "2025-09-14T21:21:20.894Z"
+  "lastUpdated": "2025-09-19T21:56:19.494Z"
 }

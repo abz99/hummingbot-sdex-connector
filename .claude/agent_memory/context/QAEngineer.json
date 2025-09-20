@@ -1,7 +1,7 @@
 {
   "agentName": "QAEngineer",
   "createdAt": "2025-09-14T20:55:18.329Z",
-  "lastAccessed": "2025-09-18T10:46:49.758Z",
+  "lastAccessed": "2025-09-19T21:45:25.640Z",
   "personalContext": {},
   "workflowState": {
     "workflow-1757883375307": {
@@ -166,11 +166,26 @@
         "user_memory",
         "instruction"
       ]
+    },
+    {
+      "id": "acae8e91-413e-4f12-81c5-5d307ffdce1a",
+      "timestamp": "2025-09-19T21:56:20.593Z",
+      "type": "user_instruction",
+      "content": "qa_files_assignment",
+      "context": {
+        "task": "Update your agent memory system to include QA-specific files: qa/quality_catalogue.yml, docs/QUALITY_GUIDELINES.md, COMPREHENSIVE_CODE_REVIEW_REPORT.md, and UAT_REPORT files. These contain quality standards, testing guidelines, and review results.",
+        "sessionId": "QAEngineer-2d08f847"
+      },
+      "confidence": 0.8,
+      "tags": [
+        "user_memory",
+        "instruction"
+      ]
     }
   ],
   "preferences": {},
   "metrics": {
-    "totalInteractions": 33,
+    "totalInteractions": 34,
     "successfulTasks": 0,
     "averageResponseTime": 0,
     "specializations": []
@@ -298,5 +313,5 @@
   "reminders": [],
   "activeProjects": [],
   "completedTasks": [],
-  "lastUpdated": "2025-09-18T17:57:09.671Z"
+  "lastUpdated": "2025-09-19T21:56:20.593Z"
 }

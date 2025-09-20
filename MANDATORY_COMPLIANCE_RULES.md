@@ -29,13 +29,15 @@ pytest --collect-only -q | grep -v "warnings summary" | tail -1 | grep -E "faile
 3. **NEVER ALLOW OUTDATED DOCUMENTATION** - PROJECT_STATUS.md must be current within 24 hours
 4. **NEVER BYPASS SECURITY REVIEWS** - All security-related changes require SecurityEngineer approval
 5. **NEVER VIOLATE GIT WORKFLOW** - Every commit must sync to remote (`git push origin main`)
+6. **NEVER WORK WITHOUT TEAM ENGAGEMENT** - ALL tasks must engage appropriate specialized agents FIRST
 
 ### **MANDATORY ACTIONS (MUST PERFORM)**
-1. **ALWAYS USE TODOWRITE** - All task tracking must use TodoWrite tool
-2. **ALWAYS UPDATE TRACKING FILES** - After every significant change, update PROJECT_STATUS.md
-3. **ALWAYS RUN QUALITY CHECKS** - Before major commits, run `flake8`, `mypy`, `black`
-4. **ALWAYS MAINTAIN TEST COVERAGE** - Minimum 90% coverage for new code, 85% overall
-5. **ALWAYS DOCUMENT DECISIONS** - Architectural decisions must be recorded in tracking files
+1. **ALWAYS ENGAGE THE TEAM** - Every task MUST start with appropriate agent engagement using Task tool
+2. **ALWAYS USE TODOWRITE** - All task tracking must use TodoWrite tool
+3. **ALWAYS UPDATE TRACKING FILES** - After every significant change, update PROJECT_STATUS.md
+4. **ALWAYS RUN QUALITY CHECKS** - Before major commits, run `flake8`, `mypy`, `black`
+5. **ALWAYS MAINTAIN TEST COVERAGE** - Minimum 90% coverage for new code, 85% overall
+6. **ALWAYS DOCUMENT DECISIONS** - Architectural decisions must be recorded in tracking files
 
 ### **SESSION CONTINUITY REQUIREMENTS**
 1. **SESSION START**: Execute `.claude_session_init.sh` within first 60 seconds
