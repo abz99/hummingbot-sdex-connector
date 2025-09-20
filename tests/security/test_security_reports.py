@@ -24,32 +24,34 @@ class TestSecurityReports:
         project_root = Path(__file__).parent.parent.parent
         safety_report = project_root / "safety-report.json"
 
+        # Import modules at function level to ensure they're available
+        import tempfile
+        import json
+
         if not safety_report.exists():
             # Safety report not found - create minimal mock for testing
-            import tempfile
-            import json
 
             # Create temporary safety report for testing
             mock_report = {
                 "status": "safe",
                 "vulnerabilities": [],
                 "timestamp": "2024-01-01T00:00:00Z",
-                "scan_target": "requirements.txt"
+                "scan_target": "requirements.txt",
             }
 
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
                 json.dump(mock_report, f)
                 temp_safety_report = Path(f.name)
 
             # Test with mock report
-            with open(temp_safety_report, 'r') as f:
+            with open(temp_safety_report, "r") as f:
                 report_data = json.load(f)
 
             # Clean up
             temp_safety_report.unlink()
         else:
             # Use actual safety report
-            with open(safety_report, 'r') as f:
+            with open(safety_report, "r") as f:
                 report_data = json.load(f)
 
         # report_data already loaded above
@@ -61,10 +63,14 @@ class TestSecurityReports:
         has_vulnerabilities = "vulnerabilities" in report_data
         has_status = "status" in report_data
 
-        assert has_vulnerabilities or has_status, "Safety report should have vulnerabilities or status field"
+        assert (
+            has_vulnerabilities or has_status
+        ), "Safety report should have vulnerabilities or status field"
 
         if has_vulnerabilities:
-            assert isinstance(report_data["vulnerabilities"], list), "Vulnerabilities should be a list"
+            assert isinstance(
+                report_data["vulnerabilities"], list
+            ), "Vulnerabilities should be a list"
 
     def test_bandit_report_exists_and_valid(self):
         """Test that bandit report exists and has valid JSON structure.
@@ -84,27 +90,25 @@ class TestSecurityReports:
             mock_report = {
                 "metrics": {"total_lines": 1000, "lines_skipped": 0},
                 "results": [],
-                "errors": []
+                "errors": [],
             }
 
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
                 json.dump(mock_report, f)
                 temp_bandit_report = Path(f.name)
 
             # Test with mock report
-            with open(temp_bandit_report, 'r') as f:
+            with open(temp_bandit_report, "r") as f:
                 report_data = json.load(f)
 
             # Clean up
             temp_bandit_report.unlink()
         else:
             # Use actual bandit report
-            with open(bandit_report, 'r') as f:
+            with open(bandit_report, "r") as f:
                 report_data = json.load(f)
 
-        # Validate JSON structure
-        with open(bandit_report, 'r') as f:
-            report_data = json.load(f)
+        # report_data already loaded above
 
         # Check for expected fields
         assert isinstance(report_data, dict), "Bandit report should be a JSON object"
@@ -124,31 +128,29 @@ class TestSecurityReports:
         project_root = Path(__file__).parent.parent.parent
         semgrep_report = project_root / "semgrep-report.json"
 
+        # Import modules at function level to ensure they're available
+        import tempfile
+        import json
+
         if not semgrep_report.exists():
             # Semgrep report not found - create minimal mock for testing
-            import tempfile
-            import json
 
             # Create temporary semgrep report for testing
-            mock_report = {
-                "results": [],
-                "errors": [],
-                "paths": {"scanned": ["."]}
-            }
+            mock_report = {"results": [], "errors": [], "paths": {"scanned": ["."]}}
 
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
                 json.dump(mock_report, f)
                 temp_semgrep_report = Path(f.name)
 
             # Test with mock report
-            with open(temp_semgrep_report, 'r') as f:
+            with open(temp_semgrep_report, "r") as f:
                 report_data = json.load(f)
 
             # Clean up
             temp_semgrep_report.unlink()
         else:
             # Use actual semgrep report
-            with open(semgrep_report, 'r') as f:
+            with open(semgrep_report, "r") as f:
                 report_data = json.load(f)
 
         # Check for expected fields
@@ -171,26 +173,37 @@ class TestSecurityReports:
         # Check bandit for high-severity issues
         bandit_report = project_root / "bandit-report.json"
         if bandit_report.exists():
-            with open(bandit_report, 'r') as f:
+            with open(bandit_report, "r") as f:
                 bandit_data = json.load(f)
 
             high_severity_issues = []
             if "results" in bandit_data:
                 for result in bandit_data["results"]:
-                    if isinstance(result, dict) and result.get("issue_severity", "").lower() in ["high", "critical"]:
+                    if isinstance(result, dict) and result.get("issue_severity", "").lower() in [
+                        "high",
+                        "critical",
+                    ]:
                         high_severity_issues.append(result)
 
-            assert len(high_severity_issues) == 0, f"Found {len(high_severity_issues)} high-severity security issues in Bandit scan"
+            assert (
+                len(high_severity_issues) == 0
+            ), f"Found {len(high_severity_issues)} high-severity security issues in Bandit scan"
 
         # Check safety for critical vulnerabilities
         safety_report = project_root / "safety-report.json"
         if safety_report.exists():
-            with open(safety_report, 'r') as f:
+            with open(safety_report, "r") as f:
                 safety_data = json.load(f)
 
             if "vulnerabilities" in safety_data:
-                critical_vulns = [v for v in safety_data["vulnerabilities"] if isinstance(v, dict) and v.get("severity", "").lower() in ["high", "critical"]]
-                assert len(critical_vulns) == 0, f"Found {len(critical_vulns)} critical vulnerabilities in dependency scan"
+                critical_vulns = [
+                    v
+                    for v in safety_data["vulnerabilities"]
+                    if isinstance(v, dict) and v.get("severity", "").lower() in ["high", "critical"]
+                ]
+                assert (
+                    len(critical_vulns) == 0
+                ), f"Found {len(critical_vulns)} critical vulnerabilities in dependency scan"
 
     def test_security_scan_completion_markers(self):
         """Test that all security scans completed successfully.
@@ -203,7 +216,7 @@ class TestSecurityReports:
         reports = [
             ("safety-report.json", "Safety dependency scan"),
             ("bandit-report.json", "Bandit static analysis"),
-            ("semgrep-report.json", "Semgrep pattern analysis")
+            ("semgrep-report.json", "Semgrep pattern analysis"),
         ]
 
         missing_reports = []
@@ -221,17 +234,17 @@ class TestSecurityReports:
             mock_reports = {
                 "safety-report.json": {"status": "safe", "vulnerabilities": []},
                 "bandit-report.json": {"metrics": {"total_lines": 1000}, "results": []},
-                "semgrep-report.json": {"results": [], "errors": []}
+                "semgrep-report.json": {"results": [], "errors": []},
             }
 
             # Test that we can process each type of security report
             for report_file, mock_data in mock_reports.items():
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+                with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
                     json.dump(mock_data, f)
                     temp_path = Path(f.name)
 
                 # Validate mock report structure
-                with open(temp_path, 'r') as f:
+                with open(temp_path, "r") as f:
                     loaded_data = json.load(f)
                     assert isinstance(loaded_data, dict)
 

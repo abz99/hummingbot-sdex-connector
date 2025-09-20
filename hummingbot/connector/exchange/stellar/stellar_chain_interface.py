@@ -164,7 +164,7 @@ class ModernStellarChainInterface:
                     try:
                         sequence = int(account.sequence)  # Object access
                     except AttributeError:
-                        sequence = int(account.get('sequence', 0))  # Dict access fallback
+                        sequence = int(account.get("sequence", 0))  # Dict access fallback
                     self._account_sequences[account_id] = sequence
 
                     return account
@@ -581,7 +581,9 @@ class ModernStellarChainInterface:
 
             # Use aiohttp to check Soroban health endpoint
             async with aiohttp.ClientSession() as session:
-                health_url = f"{self.config.soroban.primary}/health"
+                # Remove trailing slash from soroban URL to avoid double slashes
+                base_url = str(self.config.soroban.primary).rstrip("/")
+                health_url = f"{base_url}/health"
                 async with session.get(health_url, timeout=10) as response:
                     if response.status == 200:
                         if self.observability:
