@@ -58,6 +58,7 @@ exec(open('.claude_session_auto_init.py').read())
 @PROJECT_STATUS.md
 @DEVELOPMENT_RULES.md
 @PRODUCTION_READINESS_REPORT.md
+@MANDATORY_COMPLIANCE_RULES.md
 
 **🚀 STARTUP EXECUTION** - Run this immediately upon session start:
 
