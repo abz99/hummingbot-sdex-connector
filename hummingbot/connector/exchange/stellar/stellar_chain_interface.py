@@ -574,28 +574,64 @@ class ModernStellarChainInterface:
             raise
 
     async def check_soroban_health(self) -> bool:
-        """Check Soroban RPC endpoint health."""
+        """Check Soroban RPC endpoint health using JSON-RPC getHealth method."""
         try:
             if not self.config.soroban or not self.config.soroban.primary:
                 return False
 
-            # Use aiohttp to check Soroban health endpoint
+            # Use aiohttp to check Soroban health via JSON-RPC
             async with aiohttp.ClientSession() as session:
-                # Remove trailing slash from soroban URL to avoid double slashes
+                # Soroban RPC uses JSON-RPC, not REST endpoints
                 base_url = str(self.config.soroban.primary).rstrip("/")
-                health_url = f"{base_url}/health"
-                async with session.get(health_url, timeout=10) as response:
+
+                # Prepare JSON-RPC getHealth request
+                rpc_request = {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "getHealth"
+                }
+
+                headers = {"Content-Type": "application/json"}
+
+                async with session.post(
+                    base_url,
+                    json=rpc_request,
+                    headers=headers,
+                    timeout=10
+                ) as response:
                     if response.status == 200:
-                        if self.observability:
-                            await self.observability.log_event(
-                                "soroban_health_check_success", {"url": health_url}
-                            )
-                        return True
+                        try:
+                            data = await response.json()
+                            # Check if response contains valid health status
+                            if (data.get("jsonrpc") == "2.0" and
+                                "result" in data and
+                                data["result"].get("status") == "healthy"):
+
+                                if self.observability:
+                                    await self.observability.log_event(
+                                        "soroban_health_check_success",
+                                        {"url": base_url, "status": data["result"]["status"]}
+                                    )
+                                return True
+                            else:
+                                if self.observability:
+                                    await self.observability.log_event(
+                                        "soroban_health_check_failed",
+                                        {"url": base_url, "response": data},
+                                    )
+                                return False
+                        except Exception as json_error:
+                            if self.observability:
+                                await self.observability.log_event(
+                                    "soroban_health_check_failed",
+                                    {"url": base_url, "status": response.status, "json_error": str(json_error)},
+                                )
+                            return False
                     else:
                         if self.observability:
                             await self.observability.log_event(
                                 "soroban_health_check_failed",
-                                {"url": health_url, "status": response.status},
+                                {"url": base_url, "status": response.status},
                             )
                         return False
         except Exception as e:
@@ -624,8 +660,12 @@ class ModernStellarChainInterface:
         ledgers_call = self.current_horizon.ledgers().order(desc=True).limit(1)
         response = await ledgers_call.call()
 
-        if response and "records" in response and len(response["records"]) > 0:
-            latest_ledger = response["records"][0]
+        # Stellar Horizon API returns records in _embedded.records
+        if (response and
+            "_embedded" in response and
+            "records" in response["_embedded"] and
+            len(response["_embedded"]["records"]) > 0):
+            latest_ledger = response["_embedded"]["records"][0]
             await self._log_ledger_success(latest_ledger)
             return latest_ledger
         else:
