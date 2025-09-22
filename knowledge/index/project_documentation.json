@@ -5,7 +5,7 @@
   "files": [
     {
       "path": "/home/abz/projects/stellar-hummingbot-connector-v3/PROJECT_STATUS.md",
-      "hash": "43984a4963e85020833a60b94b41f0fd01ee57a991e8d01203acb4621d7cf1fc",
+      "hash": "1ab9f145ded0b8ce07137f5350e0f2affbb6d8e192714b4ebdbe898be65fbdf4",
       "exists": true
     },
     {
@@ -20,7 +20,7 @@
     },
     {
       "path": "/home/abz/projects/stellar-hummingbot-connector-v3/README.md",
-      "hash": "cdfbb8c0ee56a0027204d11ad5462cddae55708104de9e17f10b8dbc7362219c",
+      "hash": "b617bf7c26087c4f7db09c508b774668096e5a54d2394732baf0f10dc4b1b138",
       "exists": true
     },
     {
@@ -39,6 +39,6 @@
       "exists": false
     }
   ],
-  "last_indexed": "2025-09-16T19:36:35.907430+00:00",
-  "hash": "291035cf8c0fb2b915d9dad461b3727c8be8219a395cb6de584d450ded251c68"
+  "last_indexed": "2025-09-20T23:19:49.635322+00:00",
+  "hash": "ab53d804fc536988bd36ff1542abe361c17adf4c56b9285578f4a3b446dad22f"
 }

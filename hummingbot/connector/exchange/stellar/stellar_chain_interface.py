@@ -585,32 +585,27 @@ class ModernStellarChainInterface:
                 base_url = str(self.config.soroban.primary).rstrip("/")
 
                 # Prepare JSON-RPC getHealth request
-                rpc_request = {
-                    "jsonrpc": "2.0",
-                    "id": 1,
-                    "method": "getHealth"
-                }
+                rpc_request = {"jsonrpc": "2.0", "id": 1, "method": "getHealth"}
 
                 headers = {"Content-Type": "application/json"}
 
                 async with session.post(
-                    base_url,
-                    json=rpc_request,
-                    headers=headers,
-                    timeout=10
+                    base_url, json=rpc_request, headers=headers, timeout=10
                 ) as response:
                     if response.status == 200:
                         try:
                             data = await response.json()
                             # Check if response contains valid health status
-                            if (data.get("jsonrpc") == "2.0" and
-                                "result" in data and
-                                data["result"].get("status") == "healthy"):
+                            if (
+                                data.get("jsonrpc") == "2.0"
+                                and "result" in data
+                                and data["result"].get("status") == "healthy"
+                            ):
 
                                 if self.observability:
                                     await self.observability.log_event(
                                         "soroban_health_check_success",
-                                        {"url": base_url, "status": data["result"]["status"]}
+                                        {"url": base_url, "status": data["result"]["status"]},
                                     )
                                 return True
                             else:
@@ -624,7 +619,11 @@ class ModernStellarChainInterface:
                             if self.observability:
                                 await self.observability.log_event(
                                     "soroban_health_check_failed",
-                                    {"url": base_url, "status": response.status, "json_error": str(json_error)},
+                                    {
+                                        "url": base_url,
+                                        "status": response.status,
+                                        "json_error": str(json_error),
+                                    },
                                 )
                             return False
                     else:
@@ -661,10 +660,12 @@ class ModernStellarChainInterface:
         response = await ledgers_call.call()
 
         # Stellar Horizon API returns records in _embedded.records
-        if (response and
-            "_embedded" in response and
-            "records" in response["_embedded"] and
-            len(response["_embedded"]["records"]) > 0):
+        if (
+            response
+            and "_embedded" in response
+            and "records" in response["_embedded"]
+            and len(response["_embedded"]["records"]) > 0
+        ):
             latest_ledger = response["_embedded"]["records"][0]
             await self._log_ledger_success(latest_ledger)
             return latest_ledger

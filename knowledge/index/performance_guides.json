@@ -3,7 +3,7 @@
   "type": "file",
   "path": "/home/abz/projects/stellar-hummingbot-connector-v3/knowledge/performance_baselines.md",
   "description": "Performance benchmarks, SLO definitions, and optimization strategies",
-  "last_indexed": "2025-09-10T15:54:53.582278+00:00",
+  "last_indexed": "2025-09-20T23:19:49.628868+00:00",
   "hash": "7eeaccebea12d469e47c5584695c9ac38132ec4e7d885d2933ebf9c80914aaa0",
   "related_files": [
     "tests/integration/test_performance_benchmarks.py",
